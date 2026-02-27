@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 from dataclasses import asdict
+import math
 from typing import Any
 
 from .params import ScenarioConfig
@@ -8,7 +9,13 @@ from .params import ScenarioConfig
 
 def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
     n = cfg.sampling.pilot_n if cfg.mode == "pilot" else cfg.sampling.scaleup_n
-    invites_per_complete = 1.0 / max(cfg.cost.response_rate, 1e-6)
+    attempts = max(cfg.cost.contact_attempts, 1.0)
+    extra_attempts = max(0.0, attempts - 1.0)
+    response_multiplier = (1.0 + cfg.cost.response_lift_per_extra_attempt * extra_attempts) * math.exp(
+        -cfg.cost.response_decay_per_extra_attempt * extra_attempts
+    )
+    effective_response_rate = max(0.01, min(0.99, cfg.cost.response_rate * response_multiplier))
+    invites_per_complete = 1.0 / effective_response_rate
     recruited = n * invites_per_complete
 
     recruitment = recruited * cfg.cost.cost_per_invite + n * (
@@ -21,6 +28,12 @@ def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
         cfg.cost.base_incentive_phase1
         + cfg.retest_rate * cfg.cost.base_incentive_phase2
         + cfg.cost.bonus_expected_value
+    )
+    rescheduling_cost = (
+        n
+        * cfg.retest_rate
+        * cfg.cost.retest_reschedule_fraction
+        * cfg.cost.rescheduling_cost_per_event
     )
 
     turns = cfg.cost.avg_scripted_questions + cfg.cost.avg_followups_per_block
@@ -44,7 +57,7 @@ def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
     )
 
     weighting = cfg.cost.weighting_raking_cost if cfg.mode == "scaleup" else 0.0
-    direct = recruitment + incentives + voice_ops + llm_ops + postproc + labor + weighting
+    direct = recruitment + incentives + rescheduling_cost + voice_ops + llm_ops + postproc + labor + weighting
     overhead = direct * cfg.cost.overhead_rate
     total = direct + overhead
 
@@ -54,6 +67,7 @@ def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
         "n_target": n,
         "recruitment_cost": recruitment,
         "incentives_cost": incentives,
+        "rescheduling_cost": rescheduling_cost,
         "voice_ops_cost": voice_ops,
         "llm_ops_cost": llm_ops,
         "postproc_cost": postproc,
@@ -63,6 +77,8 @@ def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
         "total_cost": total,
         "cost_per_completed_interview": total / max(n, 1),
         "cost_per_retained_agent": total / max(retained, 1),
+        "effective_response_rate": effective_response_rate,
+        "invites_per_complete": invites_per_complete,
         "tokens_input": tokens_in,
         "tokens_output": tokens_out,
     }

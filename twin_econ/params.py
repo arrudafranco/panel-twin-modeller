@@ -10,6 +10,9 @@ import yaml
 class CostParams:
     cost_per_invite: float = 1.0
     response_rate: float = 0.25
+    contact_attempts: float = 1.0
+    response_lift_per_extra_attempt: float = 0.0
+    response_decay_per_extra_attempt: float = 0.0
     screening_time_cost: float = 2.0
     scheduling_admin_time_per_participant: float = 4.0
     panel_overhead_per_active_member: float = 1.0
@@ -37,6 +40,8 @@ class CostParams:
     irb_compliance_hours: float = 18.0
     fully_loaded_hourly_rate: float = 120.0
     overhead_rate: float = 0.12
+    retest_reschedule_fraction: float = 0.0
+    rescheduling_cost_per_event: float = 0.0
 
 
 @dataclass
@@ -64,6 +69,8 @@ class SamplingParams:
     scaleup_n: int = 2000
     target_strata: list[str] = field(default_factory=lambda: ["age", "gender", "race", "region", "education"])
     response_rate_by_stratum: dict[str, float] = field(default_factory=lambda: {"default": 0.22})
+    representativeness_penalty_max: float = 0.10
+    target_margins_csv: str = ""
 
 
 @dataclass
@@ -95,6 +102,22 @@ class CompetitionParams:
     cannibalization_rate: float = 0.30
     market_tailwind: float = 0.10
     turnaround_days: float = 10.0
+    utility_quality_weight: float = 3.2
+    utility_brand_weight: float = 1.1
+    utility_tailwind_weight: float = 0.8
+    utility_price_weight: float = 0.000012
+    utility_turnaround_weight: float = 0.03
+    federal_risk_penalty: float = 0.08
+    cross_price_elasticity: float = 0.20
+    amerispeak_price: float = 260000.0
+    amerispeak_quality: float = 0.90
+    amerispeak_turnaround_days: float = 18.0
+    truenorth_price: float = 160000.0
+    truenorth_quality: float = 0.80
+    truenorth_turnaround_days: float = 12.0
+    external_synthetic_price: float = 130000.0
+    external_synthetic_quality: float = 0.72
+    external_synthetic_turnaround_days: float = 7.0
 
 
 @dataclass

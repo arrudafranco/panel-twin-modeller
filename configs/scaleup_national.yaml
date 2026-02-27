@@ -11,6 +11,8 @@
     "pilot_n": 100,
     "scaleup_n": 5000,
     "target_strata": ["age", "gender", "race", "region", "education"],
+    "representativeness_penalty_max": 0.08,
+    "target_margins_csv": "",
     "response_rate_by_stratum": {
       "18_29": 0.16,
       "30_44": 0.23,

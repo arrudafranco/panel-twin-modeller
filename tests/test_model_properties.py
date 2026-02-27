@@ -41,3 +41,26 @@ def test_finance_sensitive_to_effective_quality():
     fin_high = compute_finance(cfg, cogs, quality=0.85)
     assert fin_high["win_probability"] > fin_low["win_probability"]
     assert fin_high["npv"] > fin_low["npv"]
+
+
+def test_market_shares_sum_to_one():
+    cfg = ScenarioConfig()
+    cogs = compute_costs(cfg)["cost_per_completed_interview"]
+    fin = compute_finance(cfg, cogs, quality=0.8)
+    total_share = (
+        float(fin["market_share_panel_twin"])
+        + float(fin["market_share_amerispeak_like"])
+        + float(fin["market_share_truenorth_like"])
+        + float(fin["market_share_external_synthetic"])
+    )
+    assert abs(total_share - 1.0) < 1e-6
+
+
+def test_longer_horizon_changes_npv_projection():
+    cfg = ScenarioConfig()
+    cogs = compute_costs(cfg)["cost_per_completed_interview"]
+    cfg.revenue.horizon_months = 12
+    fin_12 = compute_finance(cfg, cogs, quality=0.8)
+    cfg.revenue.horizon_months = 60
+    fin_60 = compute_finance(cfg, cogs, quality=0.8)
+    assert fin_60["npv"] != fin_12["npv"]

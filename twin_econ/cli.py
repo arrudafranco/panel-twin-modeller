@@ -9,14 +9,13 @@ import pandas as pd
 import yaml
 
 from .benchmark_model import quality_market_adjustment, recommended_quality_threshold
-from .competition_model import win_probability
 from .cost_model import compute_costs
 from .deliverables_model import generate_client_deliverables
 from .mc_model import run_monte_carlo
 from .params import ScenarioConfig, dump_config, load_config
 from .pilot_calibration import calibrate_from_csv, write_calibrated_config
 from .quality_model import quality_score, quality_tiers
-from .reporting import heatmap_2way, save_csv, tornado_plot, write_exec_brief
+from .reporting import heatmap_2way, save_csv, top_driver_analysis, tornado_plot, write_exec_brief
 from .revenue_model import compute_finance
 from .sampling_model import run_sampling
 
@@ -63,7 +62,13 @@ def cmd_run(args: argparse.Namespace) -> int:
         "cost_per_completed_interview": round(cost["cost_per_completed_interview"], 2),
         "cost_per_retained_agent": round(cost["cost_per_retained_agent"], 2),
         "win_probability": round(finance["win_probability"], 4),
+        "market_share_panel_twin": round(float(finance["market_share_panel_twin"]), 4),
+        "market_share_amerispeak_like": round(float(finance["market_share_amerispeak_like"]), 4),
+        "market_share_truenorth_like": round(float(finance["market_share_truenorth_like"]), 4),
+        "market_share_external_synthetic": round(float(finance["market_share_external_synthetic"]), 4),
         "npv": round(finance["npv"], 2),
+        "time_horizon_months": int(float(finance["time_horizon_months"])),
+        "time_to_break_even_months": finance["time_to_break_even_months"],
         "effective_sample_size": round(float(sampling["effective_sample_size"]), 2),
         "deliverables": deliverables,
     }
@@ -98,7 +103,10 @@ def cmd_run(args: argparse.Namespace) -> int:
         f"- Threshold used: {summary['quality_threshold_used']}",
         f"- Quality pass: {summary['quality_pass']}",
         f"- Win probability: {summary['win_probability']}",
+        f"- Panel-twin market share: {summary['market_share_panel_twin']}",
         f"- NPV: ${summary['npv']}",
+        f"- Time horizon (months): {summary['time_horizon_months']}",
+        f"- Time to break even (months): {summary['time_to_break_even_months']}",
     ]
     (out / "baseline_summary.md").write_text("\n".join(md), encoding="utf-8")
     print("\n".join(md))
@@ -169,7 +177,32 @@ def cmd_mc(args: argparse.Namespace) -> int:
     pass_rate = float(df["quality_pass"].mean())
     summary = df[["cost_per_completed_interview", "cost_per_usable_synthetic_case", "npv"]].describe(percentiles=[0.1, 0.5, 0.9])
     summary.loc["quality_pass_rate", "cost_per_completed_interview"] = pass_rate
+    summary.loc["feasible_rate", "cost_per_completed_interview"] = float(df["feasible"].mean())
     summary.to_csv(out / "mc_summary.csv")
+
+    candidate_features = [
+        "interview_minutes",
+        "attrition_rate",
+        "response_rate",
+        "quality",
+        "sellable_quality",
+        "representativeness_penalty",
+    ]
+    npv_drivers = top_driver_analysis(df, "npv", candidate_features, top_n=5)
+    cost_drivers = top_driver_analysis(df, "cost_per_retained_agent", candidate_features, top_n=5)
+    npv_drivers.to_csv(out / "drivers_npv.csv", index=False)
+    cost_drivers.to_csv(out / "drivers_cost_per_agent.csv", index=False)
+
+    feasible = df[df["feasible"] == 1.0]
+    feasible_summary = {
+        "feasible_rate": float(df["feasible"].mean()),
+        "quality_pass_rate": pass_rate,
+        "median_npv_feasible": float(feasible["npv"].median()) if not feasible.empty else None,
+        "median_cost_per_retained_agent_feasible": (
+            float(feasible["cost_per_retained_agent"].median()) if not feasible.empty else None
+        ),
+    }
+    (out / "feasible_region_summary.json").write_text(json.dumps(feasible_summary, indent=2), encoding="utf-8")
     print(summary.to_string())
     return 0
 

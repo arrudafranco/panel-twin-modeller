@@ -53,6 +53,19 @@
   margin-bottom: 12px;
 }
 
+.advanced {
+  margin-top: 10px;
+  border-top: 1px dashed #c6d8e8;
+  padding-top: 8px;
+}
+
+.advanced summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #21425f;
+  margin-bottom: 8px;
+}
+
 .field span {
   display: flex;
   justify-content: space-between;

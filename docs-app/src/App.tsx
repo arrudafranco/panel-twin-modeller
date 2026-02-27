@@ -12,6 +12,21 @@ type Scenario = {
   projectsPerYear: number
   horizonMonths: number
   otherInitialInvestment: number
+  contactAttempts: number
+  responseLiftPerExtraAttempt: number
+  responseDecayPerExtraAttempt: number
+  retestRescheduleFraction: number
+  reschedulingCostPerEvent: number
+  crossPriceElasticity: number
+  probabilityPrice: number
+  probabilityQuality: number
+  probabilityTurnaroundDays: number
+  hybridPrice: number
+  hybridQuality: number
+  hybridTurnaroundDays: number
+  externalPrice: number
+  externalQuality: number
+  externalTurnaroundDays: number
   risk: 'commercial' | 'federal'
 }
 
@@ -24,6 +39,21 @@ const INITIAL: Scenario = {
   projectsPerYear: 8,
   horizonMonths: 36,
   otherInitialInvestment: 0,
+  contactAttempts: 1,
+  responseLiftPerExtraAttempt: 0,
+  responseDecayPerExtraAttempt: 0,
+  retestRescheduleFraction: 0,
+  reschedulingCostPerEvent: 0,
+  crossPriceElasticity: 0.2,
+  probabilityPrice: 260_000,
+  probabilityQuality: 0.9,
+  probabilityTurnaroundDays: 18,
+  hybridPrice: 160_000,
+  hybridQuality: 0.8,
+  hybridTurnaroundDays: 12,
+  externalPrice: 130_000,
+  externalQuality: 0.72,
+  externalTurnaroundDays: 7,
   risk: 'commercial',
 }
 
@@ -35,22 +65,112 @@ function money(x: number): string {
   return `$${Math.round(x).toLocaleString()}`
 }
 
+function utility(
+  quality: number,
+  price: number,
+  turnaroundDays: number,
+  risk: Scenario['risk'],
+  tailwind: number,
+  ownPrice: number,
+  crossPriceElasticity: number,
+  includeBrand: boolean
+): number {
+  const riskPenalty = risk === 'federal' ? 0.08 : 0
+  const brand = includeBrand ? 0.7 : 0
+  const relPrice = Math.max(ownPrice, 1) / Math.max(price, 1)
+  return (
+    3.2 * quality +
+    1.1 * brand +
+    0.8 * tailwind -
+    0.000012 * price -
+    0.03 * turnaroundDays +
+    crossPriceElasticity * Math.log(relPrice) -
+    riskPenalty
+  )
+}
+
 function App() {
   const [tab, setTab] = useState<TabKey>('overview')
   const [cfg, setCfg] = useState<Scenario>(INITIAL)
 
   const threshold = cfg.risk === 'federal' ? 0.77 : 0.72
+  const tailwind = 0.1
+  const extraAttempts = Math.max(0, cfg.contactAttempts - 1)
+  const effectiveResponse = clamp(
+    cfg.responseRate *
+      (1 + cfg.responseLiftPerExtraAttempt * extraAttempts) *
+      Math.exp(-cfg.responseDecayPerExtraAttempt * extraAttempts),
+    0.01,
+    0.99
+  )
   const quality = clamp(
     0.83 -
       (cfg.minutes - 90) * 0.0012 -
       cfg.attrition * 0.17 +
-      cfg.responseRate * 0.07 +
+      effectiveResponse * 0.07 +
       (Math.log10(cfg.pilotN) - 2.1) * 0.03,
     0,
     1
   )
-  const cost = 72 + cfg.minutes * 0.58 + (1 / Math.max(cfg.responseRate, 0.05)) * 16 + cfg.attrition * 40
-  const winProb = clamp(0.12 + (quality - threshold) * 1.9, 0.02, 0.96)
+  const reschedulingCost =
+    cfg.pilotN * 0.8 * cfg.retestRescheduleFraction * cfg.reschedulingCostPerEvent
+  const cost =
+    72 +
+    cfg.minutes * 0.58 +
+    (1 / Math.max(effectiveResponse, 0.05)) * 16 +
+    cfg.attrition * 40 +
+    reschedulingCost / Math.max(cfg.pilotN, 1)
+
+  const ownU = utility(
+    quality,
+    cfg.price,
+    10,
+    cfg.risk,
+    tailwind,
+    cfg.price,
+    cfg.crossPriceElasticity,
+    true
+  )
+  const probU = utility(
+    cfg.probabilityQuality,
+    cfg.probabilityPrice,
+    cfg.probabilityTurnaroundDays,
+    cfg.risk,
+    tailwind,
+    cfg.price,
+    cfg.crossPriceElasticity,
+    false
+  )
+  const hybridU = utility(
+    cfg.hybridQuality,
+    cfg.hybridPrice,
+    cfg.hybridTurnaroundDays,
+    cfg.risk,
+    tailwind,
+    cfg.price,
+    cfg.crossPriceElasticity,
+    false
+  )
+  const externalU = utility(
+    cfg.externalQuality,
+    cfg.externalPrice,
+    cfg.externalTurnaroundDays,
+    cfg.risk,
+    tailwind,
+    cfg.price,
+    cfg.crossPriceElasticity,
+    false
+  )
+  const maxU = Math.max(ownU, probU, hybridU, externalU)
+  const ownE = Math.exp(ownU - maxU)
+  const probE = Math.exp(probU - maxU)
+  const hybridE = Math.exp(hybridU - maxU)
+  const externalE = Math.exp(externalU - maxU)
+  const sumE = ownE + probE + hybridE + externalE
+  const winProb = ownE / Math.max(sumE, 1e-9)
+  const shareProbability = probE / Math.max(sumE, 1e-9)
+  const shareHybrid = hybridE / Math.max(sumE, 1e-9)
+  const shareExternal = externalE / Math.max(sumE, 1e-9)
   const annual = (cfg.price - cost * 1000) * cfg.projectsPerYear * winProb
   const monthlyContribution = annual / 12
   const cac = 210_000
@@ -79,7 +199,7 @@ function App() {
     ['base', threshold],
     ['optimistic', threshold - 0.03],
   ].map(([name, t]) => {
-    const wp = clamp(0.12 + (quality - (t as number)) * 1.9, 0.02, 0.96)
+    const wp = clamp(winProb + (quality - (t as number)) * 0.3, 0.01, 0.99)
     const n = ((cfg.price - cost * 1000) * cfg.projectsPerYear * wp) * 2.8 - totalUpfrontInvestment
     const low = n - Math.abs(n) * 0.15
     const high = n + Math.abs(n) * 0.15
@@ -167,6 +287,66 @@ function App() {
               <option value="federal">federal_high_risk</option>
             </select>
           </label>
+          <details className="advanced">
+            <summary>Advanced modular controls (optional)</summary>
+            <Range
+              label="Contact attempts"
+              value={cfg.contactAttempts}
+              min={1}
+              max={6}
+              step={0.5}
+              onChange={(v) => update('contactAttempts', v)}
+            />
+            <Range
+              label="Response lift per extra attempt"
+              value={cfg.responseLiftPerExtraAttempt}
+              min={0}
+              max={0.3}
+              step={0.01}
+              onChange={(v) => update('responseLiftPerExtraAttempt', Number(v.toFixed(2)))}
+            />
+            <Range
+              label="Response decay per extra attempt"
+              value={cfg.responseDecayPerExtraAttempt}
+              min={0}
+              max={0.8}
+              step={0.01}
+              onChange={(v) => update('responseDecayPerExtraAttempt', Number(v.toFixed(2)))}
+            />
+            <Range
+              label="Retest reschedule fraction"
+              value={cfg.retestRescheduleFraction}
+              min={0}
+              max={1}
+              step={0.01}
+              onChange={(v) => update('retestRescheduleFraction', Number(v.toFixed(2)))}
+            />
+            <Range
+              label="Rescheduling cost per event"
+              value={cfg.reschedulingCostPerEvent}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => update('reschedulingCostPerEvent', v)}
+            />
+            <Range
+              label="Cross-price elasticity"
+              value={cfg.crossPriceElasticity}
+              min={0}
+              max={1}
+              step={0.01}
+              onChange={(v) => update('crossPriceElasticity', Number(v.toFixed(2)))}
+            />
+            <Range label="Probability benchmark price" value={cfg.probabilityPrice} min={20_000} max={600_000} step={5000} onChange={(v) => update('probabilityPrice', v)} />
+            <Range label="Probability benchmark quality" value={cfg.probabilityQuality} min={0.4} max={1.0} step={0.01} onChange={(v) => update('probabilityQuality', Number(v.toFixed(2)))} />
+            <Range label="Probability benchmark turnaround" value={cfg.probabilityTurnaroundDays} min={3} max={45} step={1} onChange={(v) => update('probabilityTurnaroundDays', v)} />
+            <Range label="Hybrid benchmark price" value={cfg.hybridPrice} min={20_000} max={600_000} step={5000} onChange={(v) => update('hybridPrice', v)} />
+            <Range label="Hybrid benchmark quality" value={cfg.hybridQuality} min={0.4} max={1.0} step={0.01} onChange={(v) => update('hybridQuality', Number(v.toFixed(2)))} />
+            <Range label="Hybrid benchmark turnaround" value={cfg.hybridTurnaroundDays} min={3} max={45} step={1} onChange={(v) => update('hybridTurnaroundDays', v)} />
+            <Range label="External synthetic price" value={cfg.externalPrice} min={20_000} max={600_000} step={5000} onChange={(v) => update('externalPrice', v)} />
+            <Range label="External synthetic quality" value={cfg.externalQuality} min={0.4} max={1.0} step={0.01} onChange={(v) => update('externalQuality', Number(v.toFixed(2)))} />
+            <Range label="External synthetic turnaround" value={cfg.externalTurnaroundDays} min={3} max={45} step={1} onChange={(v) => update('externalTurnaroundDays', v)} />
+          </details>
         </aside>
 
         <main className="card content">
@@ -223,7 +403,9 @@ function App() {
                   <tr><th>Pilot N</th><td>{cfg.pilotN}</td></tr>
                   <tr><th>Token burden proxy</th><td>{(cfg.minutes * cfg.pilotN).toLocaleString()}</td></tr>
                   <tr><th>Response rate</th><td>{cfg.responseRate.toFixed(2)}</td></tr>
+                  <tr><th>Effective response rate</th><td>{effectiveResponse.toFixed(2)}</td></tr>
                   <tr><th>Retest attrition</th><td>{cfg.attrition.toFixed(2)}</td></tr>
+                  <tr><th>Rescheduling cost (total)</th><td>{money(reschedulingCost)}</td></tr>
                   <tr><th>Cost per completed interview</th><td>{money(cost)}</td></tr>
                 </tbody>
               </table>
@@ -236,6 +418,9 @@ function App() {
               <table>
                 <tbody>
                   <tr><th>Win probability</th><td>{winProb.toFixed(3)}</td></tr>
+                  <tr><th>Market share: probability benchmark</th><td>{shareProbability.toFixed(3)}</td></tr>
+                  <tr><th>Market share: calibrated hybrid</th><td>{shareHybrid.toFixed(3)}</td></tr>
+                  <tr><th>Market share: external synthetic</th><td>{shareExternal.toFixed(3)}</td></tr>
                   <tr><th>Annual expected contribution</th><td>{money(annual)}</td></tr>
                   <tr><th>Total upfront investment</th><td>{money(totalUpfrontInvestment)}</td></tr>
                   <tr><th>Time horizon</th><td>{cfg.horizonMonths} months</td></tr>

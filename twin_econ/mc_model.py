@@ -10,6 +10,7 @@ from .cost_model import compute_costs
 from .params import ScenarioConfig
 from .quality_model import quality_score
 from .revenue_model import compute_finance
+from .sampling_model import run_sampling
 
 
 def run_monte_carlo(cfg: ScenarioConfig, n: int, seed: int) -> pd.DataFrame:
@@ -29,11 +30,16 @@ def run_monte_carlo(cfg: ScenarioConfig, n: int, seed: int) -> pd.DataFrame:
 
         cost = compute_costs(cfg_draw)
         qual = quality_score(cfg_draw, cfg.quality_profile)
+        sampling = run_sampling(cfg_draw)
+        represent_penalty = float(sampling["representativeness_penalty"])
+        effective_quality = max(0.0, qual - represent_penalty)
         threshold = recommended_quality_threshold(cfg_draw, cfg.quality_profile)
-        quality_eval = quality_market_adjustment(qual, threshold)
+        quality_eval = quality_market_adjustment(effective_quality, threshold)
         usable = 1.0 if bool(quality_eval["quality_pass"]) else 0.0
         cpu = cost["cost_per_retained_agent"] if usable > 0 else np.nan
         fin = compute_finance(cfg_draw, cost["cost_per_completed_interview"], float(quality_eval["effective_quality_for_market"]))
+        represent_ok = represent_penalty <= float(cfg_draw.sampling.representativeness_penalty_max)
+        feasible = bool(quality_eval["quality_pass"]) and float(fin["npv"]) > 0 and represent_ok
 
         rows.append(
             {
@@ -41,9 +47,14 @@ def run_monte_carlo(cfg: ScenarioConfig, n: int, seed: int) -> pd.DataFrame:
                 "attrition_rate": attrition,
                 "response_rate": response,
                 "quality": qual,
+                "sellable_quality": effective_quality,
                 "quality_threshold_used": threshold,
                 "quality_pass": usable,
+                "representativeness_penalty": represent_penalty,
+                "representativeness_ok": 1.0 if represent_ok else 0.0,
+                "feasible": 1.0 if feasible else 0.0,
                 "cost_per_completed_interview": cost["cost_per_completed_interview"],
+                "cost_per_retained_agent": cost["cost_per_retained_agent"],
                 "cost_per_usable_synthetic_case": cpu,
                 "npv": fin["npv"],
             }

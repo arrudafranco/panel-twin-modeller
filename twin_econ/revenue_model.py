@@ -1,6 +1,6 @@
 ﻿from __future__ import annotations
 
-from .competition_model import net_new_fraction, win_probability
+from .competition_model import market_shares, net_new_fraction, win_probability
 from .params import ScenarioConfig
 
 
@@ -11,6 +11,7 @@ def _monthly_discount(discount_rate: float) -> float:
 def compute_finance(cfg: ScenarioConfig, cogs_per_project: float, quality: float) -> dict[str, float | bool | None]:
     base = cfg.revenue
     pwin = win_probability(cfg, base.price_per_project, quality, cfg.competition.turnaround_days)
+    shares = market_shares(cfg, base.price_per_project, quality, cfg.competition.turnaround_days)
     monthly_d = _monthly_discount(base.discount_rate)
     total_upfront_investment = max(0.0, base.cac + base.other_initial_investment)
 
@@ -36,6 +37,10 @@ def compute_finance(cfg: ScenarioConfig, cogs_per_project: float, quality: float
     break_even_within_horizon = break_even_month is not None
     return {
         "win_probability": pwin,
+        "market_share_panel_twin": shares["panel_twin"],
+        "market_share_amerispeak_like": shares["amerispeak_like"],
+        "market_share_truenorth_like": shares["truenorth_like"],
+        "market_share_external_synthetic": shares["external_synthetic"],
         "gross_margin": gross_margin,
         "contribution_margin_total": monthly_margin,
         "npv": npv,

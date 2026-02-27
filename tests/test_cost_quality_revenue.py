@@ -12,6 +12,32 @@ def test_cost_outputs_positive():
     assert out["cost_per_retained_agent"] >= out["cost_per_completed_interview"]
 
 
+def test_contact_attempts_can_improve_effective_response():
+    cfg = ScenarioConfig()
+    base = compute_costs(cfg)
+
+    cfg.cost.contact_attempts = 3.0
+    cfg.cost.response_lift_per_extra_attempt = 0.10
+    cfg.cost.response_decay_per_extra_attempt = 0.0
+    tuned = compute_costs(cfg)
+
+    assert tuned["effective_response_rate"] > base["effective_response_rate"]
+    assert tuned["invites_per_complete"] < base["invites_per_complete"]
+
+
+def test_rescheduling_cost_is_optional_and_explicit():
+    cfg = ScenarioConfig()
+    cfg.cost.retest_reschedule_fraction = 0.0
+    cfg.cost.rescheduling_cost_per_event = 20.0
+    no_reschedule = compute_costs(cfg)
+    assert no_reschedule["rescheduling_cost"] == 0.0
+
+    cfg.cost.retest_reschedule_fraction = 0.5
+    with_reschedule = compute_costs(cfg)
+    assert with_reschedule["rescheduling_cost"] > 0.0
+    assert with_reschedule["total_cost"] > no_reschedule["total_cost"]
+
+
 def test_quality_bounds_and_ordering():
     cfg = ScenarioConfig()
     q_full = quality_score(cfg, "attitude_belief")

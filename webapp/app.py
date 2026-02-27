@@ -294,6 +294,7 @@ def _decision_brief(cfg: ScenarioConfig, out: dict[str, object]) -> str:
             f"- NPV: ${out['finance']['npv']:.2f}",
             f"- Total upfront investment: ${float(out['finance']['total_upfront_investment']):.2f}",
             f"- Time to break even: {_break_even_label(out['finance'])}",
+            f"- NPV horizon (months): {int(float(out['finance']['time_horizon_months']))}",
             "",
             "## Interpretation",
             str(out["interpretation"]),
@@ -368,6 +369,97 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
             cfg.quality.benchmark_mapping_uncertainty = float(
                 st.slider("Mapping uncertainty (band width)", 0.0, 0.2, float(cfg.quality.benchmark_mapping_uncertainty), 0.005)
             )
+        with st.expander("Operational Cost Controls (optional)"):
+            cfg.cost.contact_attempts = float(
+                st.slider("Contact attempts", 1.0, 6.0, float(cfg.cost.contact_attempts), 0.5)
+            )
+            cfg.cost.response_lift_per_extra_attempt = float(
+                st.slider(
+                    "Response lift per extra attempt",
+                    0.0,
+                    0.30,
+                    float(cfg.cost.response_lift_per_extra_attempt),
+                    0.01,
+                )
+            )
+            cfg.cost.response_decay_per_extra_attempt = float(
+                st.slider(
+                    "Response decay per extra attempt",
+                    0.0,
+                    0.80,
+                    float(cfg.cost.response_decay_per_extra_attempt),
+                    0.01,
+                )
+            )
+            cfg.cost.retest_reschedule_fraction = float(
+                st.slider(
+                    "Retest reschedule fraction",
+                    0.0,
+                    1.0,
+                    float(cfg.cost.retest_reschedule_fraction),
+                    0.01,
+                )
+            )
+            cfg.cost.rescheduling_cost_per_event = float(
+                st.slider(
+                    "Rescheduling cost per event ($)",
+                    0,
+                    100,
+                    int(cfg.cost.rescheduling_cost_per_event),
+                    1,
+                )
+            )
+        with st.expander("Competition and Substitution Controls"):
+            cfg.competition.cross_price_elasticity = float(
+                st.slider("Cross-price elasticity", 0.0, 1.0, float(cfg.competition.cross_price_elasticity), 0.01)
+            )
+            cfg.competition.cannibalization_rate = float(
+                st.slider("Cannibalization rate", 0.0, 0.9, float(cfg.competition.cannibalization_rate), 0.01)
+            )
+            cfg.competition.market_tailwind = float(
+                st.slider("Market tailwind", -0.3, 0.5, float(cfg.competition.market_tailwind), 0.01)
+            )
+
+            s1, s2, s3 = st.columns(3)
+            with s1:
+                st.markdown("**AmeriSpeak-like**")
+                cfg.competition.amerispeak_price = float(
+                    st.slider("AmeriSpeak-like price", 20000, 600000, int(cfg.competition.amerispeak_price), 5000)
+                )
+                cfg.competition.amerispeak_quality = float(
+                    st.slider("AmeriSpeak-like quality", 0.4, 1.0, float(cfg.competition.amerispeak_quality), 0.01)
+                )
+                cfg.competition.amerispeak_turnaround_days = float(
+                    st.slider("AmeriSpeak-like turnaround", 3.0, 45.0, float(cfg.competition.amerispeak_turnaround_days), 1.0)
+                )
+            with s2:
+                st.markdown("**TrueNorth-like**")
+                cfg.competition.truenorth_price = float(
+                    st.slider("TrueNorth-like price", 20000, 600000, int(cfg.competition.truenorth_price), 5000)
+                )
+                cfg.competition.truenorth_quality = float(
+                    st.slider("TrueNorth-like quality", 0.4, 1.0, float(cfg.competition.truenorth_quality), 0.01)
+                )
+                cfg.competition.truenorth_turnaround_days = float(
+                    st.slider("TrueNorth-like turnaround", 3.0, 45.0, float(cfg.competition.truenorth_turnaround_days), 1.0)
+                )
+            with s3:
+                st.markdown("**External synthetic**")
+                cfg.competition.external_synthetic_price = float(
+                    st.slider("External synthetic price", 20000, 600000, int(cfg.competition.external_synthetic_price), 5000)
+                )
+                cfg.competition.external_synthetic_quality = float(
+                    st.slider("External synthetic quality", 0.4, 1.0, float(cfg.competition.external_synthetic_quality), 0.01)
+                )
+                cfg.competition.external_synthetic_turnaround_days = float(
+                    st.slider(
+                        "External synthetic turnaround",
+                        3.0,
+                        45.0,
+                        float(cfg.competition.external_synthetic_turnaround_days),
+                        1.0,
+                    )
+                )
 
     return cfg, modules_count, mc_n
 
@@ -432,6 +524,7 @@ def main() -> None:
                     {
                         "interview_minutes": cfg.interview_minutes,
                         "response_rate": cfg.cost.response_rate,
+                        "contact_attempts": cfg.cost.contact_attempts,
                         "attrition_rate": cfg.cost.attrition_rate,
                         "price_per_project": cfg.revenue.price_per_project,
                         "projects_per_year": cfg.revenue.projects_per_year,
@@ -485,6 +578,10 @@ def main() -> None:
                     "tokens_input_total": round(float(out["cost"]["tokens_input"]), 0),
                     "tokens_output_total": round(float(out["cost"]["tokens_output"]), 0),
                     "memory_strategy": cfg.memory_strategy_prediction,
+                    "effective_response_rate": round(float(out["cost"]["effective_response_rate"]), 4),
+                    "invites_per_complete": round(float(out["cost"]["invites_per_complete"]), 2),
+                    "rescheduling_cost_total": round(float(out["cost"]["rescheduling_cost"]), 2),
+                    "module_marginal_cost_per_module": round(float(out["module"]["marginal_cost_per_module"]), 2),
                     "module_marginal_quality_gain": round(float(out["module"]["marginal_quality_gain_per_module"]), 4),
                 }
             ),
@@ -507,6 +604,10 @@ def main() -> None:
                     "total_upfront_investment": round(float(out["finance"]["total_upfront_investment"]), 2),
                     "time_to_break_even": _break_even_label(out["finance"]),
                     "break_even_within_horizon": bool(out["finance"]["break_even_within_horizon"]),
+                    "market_share_panel_twin": round(float(out["finance"]["market_share_panel_twin"]), 4),
+                    "market_share_amerispeak_like": round(float(out["finance"]["market_share_amerispeak_like"]), 4),
+                    "market_share_truenorth_like": round(float(out["finance"]["market_share_truenorth_like"]), 4),
+                    "market_share_external_synthetic": round(float(out["finance"]["market_share_external_synthetic"]), 4),
                     "break_even_month": out["finance"]["break_even_month"],
                 }
             ),
