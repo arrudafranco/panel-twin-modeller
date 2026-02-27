@@ -177,6 +177,14 @@ def _kv_table(payload: dict[str, object]) -> pd.DataFrame:
     return pd.DataFrame({"metric": list(payload.keys()), "value": list(payload.values())})
 
 
+def _break_even_label(finance: dict[str, object]) -> str:
+    months = finance.get("time_to_break_even_months")
+    if months is None:
+        return f"Not reached in {int(float(finance['time_horizon_months']))} months"
+    years = float(months) / 12.0
+    return f"{int(float(months))} months ({years:.1f} years)"
+
+
 def _sensitivity_table(cfg: ScenarioConfig, q_sellable: float, cost_per_complete: float) -> pd.DataFrame:
     rows: list[dict[str, float | str | bool]] = []
     original_mode = cfg.quality.benchmark_mapping_sensitivity
@@ -284,6 +292,8 @@ def _decision_brief(cfg: ScenarioConfig, out: dict[str, object]) -> str:
             f"- Quality pass: {bool(out['quality_eval']['quality_pass'])}",
             f"- Cost per completed interview: ${out['cost']['cost_per_completed_interview']:.2f}",
             f"- NPV: ${out['finance']['npv']:.2f}",
+            f"- Total upfront investment: ${float(out['finance']['total_upfront_investment']):.2f}",
+            f"- Time to break even: {_break_even_label(out['finance'])}",
             "",
             "## Interpretation",
             str(out["interpretation"]),
@@ -327,6 +337,10 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
                 st.slider("Price per project", 10000, 500000, int(cfg.revenue.price_per_project), 5000)
             )
             cfg.revenue.projects_per_year = int(st.slider("Projects/year", 1, 30, int(cfg.revenue.projects_per_year), 1))
+            cfg.revenue.horizon_months = int(st.slider("Time horizon (months)", 6, 120, int(cfg.revenue.horizon_months), 3))
+            cfg.revenue.other_initial_investment = float(
+                st.slider("Other upfront investment ($)", 0, 1000000, int(cfg.revenue.other_initial_investment), 5000)
+            )
             modules_count = int(st.slider("Topic modules", 0, cfg.product.max_modules_per_participant, 1))
             mc_n = int(st.selectbox("Monte Carlo draws", [500, 1000, 5000, 10000], index=1))
 
@@ -409,6 +423,7 @@ def main() -> None:
             "quality_pass": bool(out["quality_eval"]["quality_pass"]),
             "win_probability": round(float(out["finance"]["win_probability"]), 4),
             "npv": round(float(out["finance"]["npv"]), 2),
+            "time_to_break_even": _break_even_label(out["finance"]),
         }
         st.dataframe(_kv_table(overview_payload), use_container_width=True, hide_index=True)
         with st.expander("What drives this result?", expanded=False):
@@ -420,6 +435,8 @@ def main() -> None:
                         "attrition_rate": cfg.cost.attrition_rate,
                         "price_per_project": cfg.revenue.price_per_project,
                         "projects_per_year": cfg.revenue.projects_per_year,
+                        "other_initial_investment": cfg.revenue.other_initial_investment,
+                        "time_horizon_months": cfg.revenue.horizon_months,
                     }
                 ),
                 use_container_width=True,
@@ -487,6 +504,9 @@ def main() -> None:
                     "win_probability": round(float(out["finance"]["win_probability"]), 4),
                     "gross_margin": round(float(out["finance"]["gross_margin"]), 4),
                     "contribution_margin_total": round(float(out["finance"]["contribution_margin_total"]), 2),
+                    "total_upfront_investment": round(float(out["finance"]["total_upfront_investment"]), 2),
+                    "time_to_break_even": _break_even_label(out["finance"]),
+                    "break_even_within_horizon": bool(out["finance"]["break_even_within_horizon"]),
                     "break_even_month": out["finance"]["break_even_month"],
                 }
             ),

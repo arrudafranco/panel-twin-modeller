@@ -83,6 +83,7 @@ class RevenueParams:
     growth_rate: float = 0.08
     churn_rate: float = 0.05
     cac: float = 20000.0
+    other_initial_investment: float = 0.0
     discount_rate: float = 0.12
     horizon_months: int = 36
 
