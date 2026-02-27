@@ -10,6 +10,8 @@ type Scenario = {
   attrition: number
   price: number
   projectsPerYear: number
+  horizonMonths: number
+  otherInitialInvestment: number
   risk: 'commercial' | 'federal'
 }
 
@@ -20,6 +22,8 @@ const INITIAL: Scenario = {
   attrition: 0.2,
   price: 120_000,
   projectsPerYear: 8,
+  horizonMonths: 36,
+  otherInitialInvestment: 0,
   risk: 'commercial',
 }
 
@@ -48,7 +52,18 @@ function App() {
   const cost = 72 + cfg.minutes * 0.58 + (1 / Math.max(cfg.responseRate, 0.05)) * 16 + cfg.attrition * 40
   const winProb = clamp(0.12 + (quality - threshold) * 1.9, 0.02, 0.96)
   const annual = (cfg.price - cost * 1000) * cfg.projectsPerYear * winProb
-  const npv = annual * 2.8 - 210_000
+  const monthlyContribution = annual / 12
+  const cac = 210_000
+  const totalUpfrontInvestment = cac + cfg.otherInitialInvestment
+  const npv = annual * 2.8 - totalUpfrontInvestment
+  const breakEvenMonths =
+    monthlyContribution > 0 ? Math.ceil(totalUpfrontInvestment / monthlyContribution) : null
+  const breakEvenWithinHorizon =
+    breakEvenMonths !== null && breakEvenMonths <= cfg.horizonMonths
+  const breakEvenLabel =
+    breakEvenMonths === null
+      ? `Not reached in ${cfg.horizonMonths} months`
+      : `${breakEvenMonths} months (${(breakEvenMonths / 12).toFixed(1)} years)`
   const favorable = quality >= threshold && npv > 0
 
   const plainLanguage = favorable
@@ -65,7 +80,7 @@ function App() {
     ['optimistic', threshold - 0.03],
   ].map(([name, t]) => {
     const wp = clamp(0.12 + (quality - (t as number)) * 1.9, 0.02, 0.96)
-    const n = ((cfg.price - cost * 1000) * cfg.projectsPerYear * wp) * 2.8 - 210_000
+    const n = ((cfg.price - cost * 1000) * cfg.projectsPerYear * wp) * 2.8 - totalUpfrontInvestment
     const low = n - Math.abs(n) * 0.15
     const high = n + Math.abs(n) * 0.15
     return `${(name as string).padEnd(12)} threshold=${(t as number).toFixed(3)} win=${wp.toFixed(3)} npv=${money(n)} band=[${money(low)}, ${money(high)}]`
@@ -126,6 +141,22 @@ function App() {
             step={1}
             onChange={(v) => update('projectsPerYear', v)}
           />
+          <Range
+            label="Time horizon (months)"
+            value={cfg.horizonMonths}
+            min={6}
+            max={120}
+            step={3}
+            onChange={(v) => update('horizonMonths', v)}
+          />
+          <Range
+            label="Other upfront investment ($)"
+            value={cfg.otherInitialInvestment}
+            min={0}
+            max={1_000_000}
+            step={5000}
+            onChange={(v) => update('otherInitialInvestment', v)}
+          />
           <label className="field">
             <span>Risk profile</span>
             <select value={cfg.risk} onChange={(e) => update('risk', e.target.value as Scenario['risk'])}>
@@ -159,6 +190,7 @@ function App() {
                 <Kpi label="Quality threshold" value={threshold.toFixed(3)} />
                 <Kpi label="Cost per complete" value={money(cost)} />
                 <Kpi label="Projected NPV" value={money(npv)} />
+                <Kpi label="Time to break-even" value={breakEvenMonths === null ? 'Not reached' : `${breakEvenMonths} mo`} />
               </div>
               <p className={favorable ? 'pill ok' : 'pill warn'}>{favorable ? 'favorable' : 'needs work'}</p>
               <p className="note">{plainLanguage}</p>
@@ -202,8 +234,11 @@ function App() {
                 <tbody>
                   <tr><th>Win probability</th><td>{winProb.toFixed(3)}</td></tr>
                   <tr><th>Annual expected contribution</th><td>{money(annual)}</td></tr>
+                  <tr><th>Total upfront investment</th><td>{money(totalUpfrontInvestment)}</td></tr>
+                  <tr><th>Time horizon</th><td>{cfg.horizonMonths} months</td></tr>
+                  <tr><th>Time to break-even</th><td>{breakEvenLabel}</td></tr>
                   <tr><th>Projected NPV</th><td>{money(npv)}</td></tr>
-                  <tr><th>Break-even signal</th><td>{npv > 0 ? 'Positive expected value' : 'Negative expected value'}</td></tr>
+                  <tr><th>Break-even within horizon</th><td>{breakEvenWithinHorizon ? 'Yes' : 'No'}</td></tr>
                 </tbody>
               </table>
               <h3>Assumption sensitivity</h3>
