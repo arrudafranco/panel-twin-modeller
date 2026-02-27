@@ -95,6 +95,9 @@ function App() {
       <header className="hero">
         <h1>Panel Twin Modeller</h1>
         <p>Feasibility explorer for quality, operations, economics, and benchmark-driven decision support.</p>
+        <p className="hero-subnote" title="The full Python model (Streamlit + CLI) remains the source of truth for production analysis.">
+          Pages app runs on React + TypeScript (built with Node/Vite) and mirrors core controls for interactive exploration.
+        </p>
       </header>
 
       <div className="layout">

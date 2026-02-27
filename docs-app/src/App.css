@@ -22,6 +22,12 @@
   opacity: 0.92;
 }
 
+.hero-subnote {
+  margin-top: 8px !important;
+  font-size: 13px;
+  opacity: 0.86 !important;
+}
+
 .layout {
   display: grid;
   grid-template-columns: 330px 1fr;
