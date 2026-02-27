@@ -32,6 +32,8 @@ def test_run_output_contract(tmp_path: Path):
         "mode",
         "client_risk_profile",
         "quality_profile",
+        "response_mode_assumption_source",
+        "calibration_completeness_status",
         "quality_threshold_used",
         "quality_pass",
         "npv",

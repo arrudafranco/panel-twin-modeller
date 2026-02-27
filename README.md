@@ -51,6 +51,7 @@ twin-econ run --config configs/base.yaml --out outputs/run_001/
 twin-econ sweep --config configs/base.yaml --param interview_minutes=30,60,90,120 --param attrition_rate=0.1,0.2,0.3 --out outputs/sweep_001/
 twin-econ mc --n 20000 --seed 123 --config configs/base.yaml --out outputs/mc_001/
 twin-econ calibrate --pilot_csv pilot_logs/runA.csv --config configs/base.yaml --out outputs/calibrated_run/
+twin-econ calibrate --pilot_csv pilot_logs/template_response_modes.csv --config configs/attitude_profile.yaml --out outputs/calibrated_modes/
 twin-econ compare --config configs/base.yaml --config configs/scaleup_national.yaml --out outputs/compare_001/
 twin-econ benchmark --out outputs/benchmarks/
 ```
@@ -91,10 +92,12 @@ python scripts/run_pytests_stable.py -q tests
 
 - Config files are real YAML and loaded with `PyYAML`.
 - Construct-focused presets are available in `configs/attitude_profile.yaml`, `configs/self_report_profile.yaml`, and `configs/incentivized_profile.yaml`.
+- A sample pilot CSV with optional response-mode calibration columns is available at `pilot_logs/template_response_modes.csv`.
 - All RNG-driven paths are seeded.
 - Pilot mode emphasizes unknown-parameter estimation; scale-up mode emphasizes representativeness diagnostics.
 - Plain-English architecture and rationale are documented in [docs/design_decisions.md](C:\Users\gusta\panel-twin-public\docs\design_decisions.md).
 - Optional external anchor references are documented in [docs/external_reference_defaults.md](C:\Users\gusta\panel-twin-public\docs\external_reference_defaults.md).
+
 
 
 

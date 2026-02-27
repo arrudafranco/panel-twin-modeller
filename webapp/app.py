@@ -355,6 +355,7 @@ def _decision_brief(cfg: ScenarioConfig, out: dict[str, object]) -> str:
 
 
 def _render_controls() -> tuple[ScenarioConfig, int, int]:
+    previous_source = st.session_state.get("response_mode_source_prev")
     with st.expander("Scenario Controls", expanded=True):
         preset = st.selectbox("Config preset", _list_presets(), index=0)
         cfg = load_config(CONFIG_DIR / preset)
@@ -611,6 +612,10 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
                         1.0,
                     )
                 )
+
+    st.session_state["response_mode_source_prev"] = cfg.quality.response_mode_assumption_source
+    if previous_source == "preset_driven" and cfg.quality.response_mode_assumption_source == "manual":
+        st.info("Response-mode assumptions moved from preset-driven to manual in this session.")
 
     return cfg, modules_count, mc_n
 

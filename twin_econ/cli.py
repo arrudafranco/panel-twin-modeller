@@ -79,6 +79,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         "mode": cfg.mode,
         "client_risk_profile": cfg.competition.client_risk_profile,
         "quality_profile": cfg.quality_profile,
+        "response_mode_assumption_source": cfg.quality.response_mode_assumption_source,
+        "response_mode_construct_defaults_enabled": bool(cfg.quality.use_construct_response_mode_defaults),
+        "calibration_completeness_status": (
+            "pilot_calibrated" if cfg.quality.response_mode_assumption_source == "pilot_calibrated" else "available_via_calibrate"
+        ),
         "sellable_quality": round(q_sellable, 4),
         "quality_threshold_used": round(float(quality_eval["quality_threshold_used"]), 4),
         "quality_pass": bool(quality_eval["quality_pass"]),
@@ -139,6 +144,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         f"- Cost per completed interview: ${summary['cost_per_completed_interview']}",
         f"- Cost per retained agent: ${summary['cost_per_retained_agent']}",
         f"- Sellable quality ({cfg.quality_profile}): {summary['sellable_quality']}",
+        f"- Response-mode assumption source: {summary['response_mode_assumption_source']}",
+        f"- Calibration completeness: {summary['calibration_completeness_status']}",
         f"- Threshold used: {summary['quality_threshold_used']}",
         f"- Quality pass: {summary['quality_pass']}",
         f"- Win probability: {summary['win_probability']}",
