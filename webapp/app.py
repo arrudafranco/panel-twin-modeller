@@ -532,6 +532,12 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
                     help="When enabled, each quality profile starts from a different default mix of categorical, numeric, and open-ended items.",
                 )
             )
+            if cfg.quality.response_mode_assumption_source != "pilot_calibrated":
+                cfg.quality.response_mode_assumption_source = (
+                    "preset_driven" if cfg.quality.use_construct_response_mode_defaults else "manual"
+                )
+            elif not cfg.quality.use_construct_response_mode_defaults:
+                cfg.quality.response_mode_assumption_source = "manual"
             r1, r2, r3 = st.columns(3)
             with r1:
                 cfg.quality.categorical_question_share = float(
@@ -636,6 +642,7 @@ def main() -> None:
         st.warning(w)
     out = _run_scenario(cfg, modules_count, mc_n=mc_n, mc_seed=cfg.seed)
     memory_summary = memory_architecture_summary(cfg)
+    response_mode_badge = str(memory_summary["response_mode_assumption_source"]).replace("_", " ")
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Sellable quality", f"{out['sellable_quality']:.3f}")
@@ -686,6 +693,7 @@ def main() -> None:
             )
         with st.expander("Plain-language interpretation", expanded=True):
             st.write(out["interpretation"])
+        st.caption(f"Response-mode assumptions: {response_mode_badge}")
 
     with tabs[1]:
         st.header("Model and Methods")
@@ -745,9 +753,12 @@ def main() -> None:
             cost_df = pd.DataFrame([lines]).T.rename(columns={0: "value"}).reset_index().rename(columns={"index": "metric"})
             st.dataframe(cost_df, use_container_width=True, hide_index=True)
         with st.expander("Response mode assumptions", expanded=False):
+            st.markdown(f"**Current source:** `{response_mode_badge}`")
             st.dataframe(
                 _kv_table(
                     {
+                        "response_mode_assumption_source": cfg.quality.response_mode_assumption_source,
+                        "use_construct_response_mode_defaults": cfg.quality.use_construct_response_mode_defaults,
                         "categorical_question_share": cfg.quality.categorical_question_share,
                         "numeric_question_share": cfg.quality.numeric_question_share,
                         "open_ended_question_share": cfg.quality.open_ended_question_share,

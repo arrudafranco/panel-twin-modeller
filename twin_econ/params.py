@@ -64,6 +64,7 @@ class QualityParams:
     reflection_interval_turns: int = 8
     reflection_summary_count: int = 3
     use_construct_response_mode_defaults: bool = True
+    response_mode_assumption_source: str = "preset_driven"
     categorical_question_share: float = 0.45
     numeric_question_share: float = 0.20
     open_ended_question_share: float = 0.35

@@ -98,6 +98,7 @@ def memory_architecture_summary(cfg: ScenarioConfig, construct_type: str | None 
         "reflection_interval_turns": int(cfg.quality.reflection_interval_turns),
         "reflection_summary_count": int(cfg.quality.reflection_summary_count),
         "use_construct_response_mode_defaults": bool(cfg.quality.use_construct_response_mode_defaults),
+        "response_mode_assumption_source": str(cfg.quality.response_mode_assumption_source),
         "full_transcript_injection": bool(cfg.cost.full_transcript_injection),
         "interview_context_chars": int(cfg.cost.interview_context_chars),
         "response_mode_mix": (

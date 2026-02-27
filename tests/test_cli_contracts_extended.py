@@ -52,6 +52,10 @@ def test_calibrate_outputs_contract_and_yaml_config(tmp_path: Path):
     rep = json.loads((out / "calibration_report.json").read_text(encoding="utf-8"))
     assert "precision" in rep
     assert "response_rate_ci_low" in rep["precision"]
+    completeness = json.loads((out / "calibration_completeness.json").read_text(encoding="utf-8"))
+    assert "learned_from_pilot" in completeness
+    assert "left_at_prior_or_default" in completeness
+    assert (out / "calibration_completeness.md").exists()
 
     calibrated = (out / "calibrated_config.yaml").read_text(encoding="utf-8")
     assert "scenario_name:" in calibrated

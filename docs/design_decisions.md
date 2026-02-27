@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.1.3
+Version: 0.1.4
 Last updated: 2026-02-27
 Status: active working design record
 
@@ -101,6 +101,7 @@ So in this project:
 - memory importance is treated as a weighting heuristic, not a ground-truth score
 - response-mode reliability is handled as a transparent multiplier rather than buried inside one headline quality number
 - pilot calibration can optionally update response-mode shares and multipliers when the pilot log includes those columns
+- the active source of response-mode assumptions is tracked explicitly as preset-driven, manual, or pilot-calibrated
 
 ### How We Label Evidence
 
@@ -433,6 +434,15 @@ When a meaningful design or architecture change is made:
 If a change only affects wording, styling, or minor implementation detail without changing design intent, an update may not be necessary.
 
 ## Version Updates
+
+### 0.1.4 - 2026-02-27
+
+Added assumption-source tracking and calibration completeness reporting.
+
+Included:
+- explicit response-mode assumption source state (`preset_driven`, `manual`, `pilot_calibrated`)
+- dedicated calibration-completeness artifacts
+- neutralized publication-sync wording in README documentation
 
 ### 0.1.3 - 2026-02-27
 

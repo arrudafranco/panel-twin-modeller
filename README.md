@@ -38,7 +38,7 @@ pytest -q
 
 ## CI
 
-- GitHub Actions workflow: [.github/workflows/ci.yml](C:\Users\gusta\panel-twin\.github\workflows\ci.yml)
+- GitHub Actions workflow: [.github/workflows/ci.yml](C:\Users\gusta\panel-twin-public\.github\workflows\ci.yml)
 - Runs on every push and pull request.
 - Executes full `pytest` suite and CLI smoke tests (`run`, `sweep`, `mc`, `calibrate`, `benchmark`) on Python 3.10 and 3.12.
 - Runs a dedicated cross-browser (Chromium/Firefox/WebKit) Playwright + axe-core UI audit job and uploads reports/screenshots as CI artifacts.
@@ -61,10 +61,10 @@ twin-econ benchmark --out outputs/benchmarks/
 streamlit run webapp/app.py
 ```
 
-- App docs: [webapp/README.md](C:\Users\gusta\panel-twin\webapp\README.md)
-- Citations: [webapp/CITATIONS.md](C:\Users\gusta\panel-twin\webapp\CITATIONS.md)
+- App docs: [webapp/README.md](C:\Users\gusta\panel-twin-public\webapp\README.md)
+- Citations: [webapp/CITATIONS.md](C:\Users\gusta\panel-twin-public\webapp\CITATIONS.md)
 
-### UI Accessibility Audit (Local)
+### UI Accessibility Audit
 
 ```bash
 python -m pip install playwright axe-playwright-python
@@ -81,29 +81,21 @@ Approve baseline updates intentionally:
 $env:UI_AUDIT_APPROVE_BASELINE='true'; python scripts/playwright_ui_audit.py
 ```
 
-Run local tests with isolated temp directories (Windows cleanup-safe):
+Run tests with isolated temp directories (Windows cleanup-safe):
 
 ```bash
 python scripts/run_pytests_stable.py -q tests
 ```
 
-## Public Export (No Proprietary Naming)
-
-Create a sanitized copy for public hosting/publishing while keeping this local repo unchanged:
-
-```bash
-python scripts/prepare_public_repo.py
-```
-
-This writes a publish-ready copy to `C:\Users\gusta\panel-twin-public` and fails if explicit proprietary tokens remain.
-
 ## Notes
 
 - Config files are real YAML and loaded with `PyYAML`.
+- Construct-focused presets are available in `configs/attitude_profile.yaml`, `configs/self_report_profile.yaml`, and `configs/incentivized_profile.yaml`.
 - All RNG-driven paths are seeded.
 - Pilot mode emphasizes unknown-parameter estimation; scale-up mode emphasizes representativeness diagnostics.
-- Plain-English architecture and rationale are documented in [docs/design_decisions.md](C:\Users\gusta\panel-twin\docs\design_decisions.md).
-- Optional external anchor references are documented in [docs/external_reference_defaults.md](C:\Users\gusta\panel-twin\docs\external_reference_defaults.md).
+- Plain-English architecture and rationale are documented in [docs/design_decisions.md](C:\Users\gusta\panel-twin-public\docs\design_decisions.md).
+- Optional external anchor references are documented in [docs/external_reference_defaults.md](C:\Users\gusta\panel-twin-public\docs\external_reference_defaults.md).
+
 
 
 

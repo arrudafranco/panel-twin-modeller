@@ -332,6 +332,51 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
         "precision": precision,
     }
     (out / "calibration_report.json").write_text(json.dumps(unknowns, indent=2), encoding="utf-8")
+    optional_mode_keys = {
+        "categorical_question_share_posterior_mean": "categorical_question_share",
+        "numeric_question_share_posterior_mean": "numeric_question_share",
+        "open_ended_question_share_posterior_mean": "open_ended_question_share",
+        "categorical_mode_reliability_posterior_mean": "categorical_mode_reliability",
+        "numeric_mode_reliability_posterior_mean": "numeric_mode_reliability",
+        "open_ended_mode_reliability_posterior_mean": "open_ended_mode_reliability",
+    }
+    learned = [
+        "response_rate",
+        "attrition_rate",
+        "interview_minutes",
+        "token_input_cost_scalar",
+        "token_output_cost_scalar",
+    ]
+    learned.extend([label for key, label in optional_mode_keys.items() if key in precision])
+    still_prior = [
+        label
+        for key, label in optional_mode_keys.items()
+        if key not in precision
+    ]
+    completeness = {
+        "scenario": calibrated.scenario_name,
+        "quality_profile": calibrated.quality_profile,
+        "response_mode_assumption_source": calibrated.quality.response_mode_assumption_source,
+        "learned_from_pilot": learned,
+        "left_at_prior_or_default": still_prior,
+    }
+    (out / "calibration_completeness.json").write_text(json.dumps(completeness, indent=2), encoding="utf-8")
+    completeness_md = [
+        "# Calibration Completeness",
+        "",
+        f"- Scenario: {calibrated.scenario_name}",
+        f"- Quality profile: {calibrated.quality_profile}",
+        f"- Response-mode source after calibration: {calibrated.quality.response_mode_assumption_source}",
+        "",
+        "## Learned From Pilot",
+    ]
+    completeness_md.extend([f"- {item}" for item in learned])
+    completeness_md.extend(["", "## Left At Prior Or Default"])
+    if still_prior:
+        completeness_md.extend([f"- {item}" for item in still_prior])
+    else:
+        completeness_md.append("- None")
+    (out / "calibration_completeness.md").write_text("\n".join(completeness_md), encoding="utf-8")
     print(json.dumps(unknowns, indent=2))
     return 0
 

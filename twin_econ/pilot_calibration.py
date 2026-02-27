@@ -117,6 +117,7 @@ def calibrate_from_csv(cfg: ScenarioConfig, csv_path: str) -> tuple[ScenarioConf
             setattr(cfg.quality, target_attr, updated)
             response_mode_updates[f"{obs_col}_sample_mean"] = sample
             response_mode_updates[f"{target_attr}_posterior_mean"] = updated
+        cfg.quality.response_mode_assumption_source = "pilot_calibrated"
 
     precision = {
         "response_rate_sample_mean": completed_rate_sample,

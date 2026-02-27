@@ -183,6 +183,7 @@ function App() {
     0.85,
     1.1
   )
+  const responseModeSource = cfg.useConstructDefaults ? 'preset-driven' : 'manual'
   const quality = clamp(
     0.83 -
       (cfg.minutes - 90) * 0.0012 -
@@ -536,6 +537,7 @@ function App() {
               </div>
               <p className={favorable ? 'pill ok' : 'pill warn'}>{favorable ? 'favorable' : 'needs work'}</p>
               <p className="note">{plainLanguage}</p>
+              <p className="note">Response-mode assumptions: <strong>{responseModeSource}</strong></p>
             </section>
           )}
 
@@ -554,11 +556,15 @@ function App() {
                   <tr><th>Memory weights</th><td>recency {cfg.memoryRecencyWeight.toFixed(1)} / relevance {cfg.memoryRelevanceWeight.toFixed(1)} / importance {cfg.memoryImportanceWeight.toFixed(1)}</td></tr>
                   <tr><th>Response mode mix</th><td>cat {categoricalShare.toFixed(2)} / num {numericShare.toFixed(2)} / open {openEndedShare.toFixed(2)}</td></tr>
                   <tr><th>Construct defaults</th><td>{cfg.useConstructDefaults ? 'enabled' : 'manual'}</td></tr>
+                  <tr><th>Response-mode source</th><td>{responseModeSource}</td></tr>
                   <tr><th>Response-mode reliability</th><td>{responseModeAdjustment.toFixed(3)} multiplier</td></tr>
                 </tbody>
               </table>
               <p className="note">
                 Reflection and importance are prompt-mediated heuristics in the reference architecture. This app treats them as transparent assumptions, not direct measurements.
+              </p>
+              <p className="note">
+                Pilot-calibrated response-mode tracking is available in the full Python app and CLI; this Pages view shows preset-driven or manual states only.
               </p>
             </section>
           )}

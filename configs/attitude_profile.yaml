@@ -1,0 +1,8 @@
+{
+  "scenario_name": "attitude_profile",
+  "quality_profile": "attitude_belief",
+  "quality": {
+    "use_construct_response_mode_defaults": true,
+    "response_mode_assumption_source": "preset_driven"
+  }
+}

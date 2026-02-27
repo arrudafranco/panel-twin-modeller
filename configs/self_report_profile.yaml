@@ -1,0 +1,8 @@
+{
+  "scenario_name": "self_report_profile",
+  "quality_profile": "self_report_behavior",
+  "quality": {
+    "use_construct_response_mode_defaults": true,
+    "response_mode_assumption_source": "preset_driven"
+  }
+}
