@@ -57,6 +57,10 @@ def run_monte_carlo(cfg: ScenarioConfig, n: int, seed: int) -> pd.DataFrame:
                 "cost_per_retained_agent": cost["cost_per_retained_agent"],
                 "cost_per_usable_synthetic_case": cpu,
                 "npv": fin["npv"],
+                "break_even_within_horizon": 1.0 if bool(fin["break_even_within_horizon"]) else 0.0,
+                "time_to_break_even_months": (
+                    float(fin["time_to_break_even_months"]) if fin["time_to_break_even_months"] is not None else np.nan
+                ),
             }
         )
 

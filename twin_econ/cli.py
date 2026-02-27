@@ -69,6 +69,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         "npv": round(finance["npv"], 2),
         "time_horizon_months": int(float(finance["time_horizon_months"])),
         "time_to_break_even_months": finance["time_to_break_even_months"],
+        "break_even_within_horizon": bool(finance["break_even_within_horizon"]),
         "effective_sample_size": round(float(sampling["effective_sample_size"]), 2),
         "deliverables": deliverables,
     }
@@ -175,9 +176,17 @@ def cmd_mc(args: argparse.Namespace) -> int:
     heatmap_2way(df2, "minutes_bin", "attrition_bin", "npv", str(out / "heatmap_npv.png"))
 
     pass_rate = float(df["quality_pass"].mean())
+    p_npv_positive = float((df["npv"] > 0).mean())
+    p_break_even_h = float(df["break_even_within_horizon"].mean()) if "break_even_within_horizon" in df.columns else float("nan")
+    p_break_even_24 = float(
+        ((df["time_to_break_even_months"] <= 24).fillna(False)).mean()
+    ) if "time_to_break_even_months" in df.columns else float("nan")
     summary = df[["cost_per_completed_interview", "cost_per_usable_synthetic_case", "npv"]].describe(percentiles=[0.1, 0.5, 0.9])
     summary.loc["quality_pass_rate", "cost_per_completed_interview"] = pass_rate
     summary.loc["feasible_rate", "cost_per_completed_interview"] = float(df["feasible"].mean())
+    summary.loc["p_npv_positive", "cost_per_completed_interview"] = p_npv_positive
+    summary.loc["p_break_even_within_horizon", "cost_per_completed_interview"] = p_break_even_h
+    summary.loc["p_break_even_le_24m", "cost_per_completed_interview"] = p_break_even_24
     summary.to_csv(out / "mc_summary.csv")
 
     candidate_features = [
@@ -204,6 +213,56 @@ def cmd_mc(args: argparse.Namespace) -> int:
     }
     (out / "feasible_region_summary.json").write_text(json.dumps(feasible_summary, indent=2), encoding="utf-8")
     print(summary.to_string())
+    return 0
+
+
+def cmd_compare(args: argparse.Namespace) -> int:
+    out = _ensure_out(args.out)
+    rows: list[dict[str, object]] = []
+    for cfg_path in args.config:
+        cfg = load_config(cfg_path)
+        cost = compute_costs(cfg)
+        sampling = run_sampling(cfg)
+        q = quality_score(cfg, cfg.quality_profile)
+        represent_penalty = float(sampling["representativeness_penalty"])
+        q_sellable = max(0.0, q - represent_penalty)
+        threshold = recommended_quality_threshold(cfg, cfg.quality_profile)
+        q_eval = quality_market_adjustment(q_sellable, threshold)
+        finance = compute_finance(cfg, cost["cost_per_completed_interview"], float(q_eval["effective_quality_for_market"]))
+        rows.append(
+            {
+                "scenario": cfg.scenario_name,
+                "config_path": cfg_path,
+                "client_risk_profile": cfg.competition.client_risk_profile,
+                "cost_per_completed_interview": round(float(cost["cost_per_completed_interview"]), 2),
+                "cost_per_retained_agent": round(float(cost["cost_per_retained_agent"]), 2),
+                "sellable_quality": round(float(q_sellable), 4),
+                "quality_pass": bool(q_eval["quality_pass"]),
+                "npv": round(float(finance["npv"]), 2),
+                "time_to_break_even_months": finance["time_to_break_even_months"],
+                "break_even_within_horizon": bool(finance["break_even_within_horizon"]),
+                "win_probability": round(float(finance["win_probability"]), 4),
+            }
+        )
+    df = pd.DataFrame(rows)
+    save_csv(str(out / "scenario_compare.csv"), df)
+    if len(df) >= 2:
+        base = df.iloc[0]
+        delta_rows = []
+        for i in range(1, len(df)):
+            r = df.iloc[i]
+            delta_rows.append(
+                {
+                    "scenario_vs_base": f"{r['scenario']} vs {base['scenario']}",
+                    "delta_npv": float(r["npv"]) - float(base["npv"]),
+                    "delta_cost_per_completed_interview": float(r["cost_per_completed_interview"]) - float(base["cost_per_completed_interview"]),
+                    "delta_sellable_quality": float(r["sellable_quality"]) - float(base["sellable_quality"]),
+                    "delta_win_probability": float(r["win_probability"]) - float(base["win_probability"]),
+                }
+            )
+        delta_df = pd.DataFrame(delta_rows)
+        save_csv(str(out / "scenario_compare_deltas.csv"), delta_df)
+    print(df.to_string(index=False))
     return 0
 
 
@@ -321,6 +380,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_bench = sub.add_parser("benchmark", help="Show benchmark library")
     p_bench.add_argument("--out", default="outputs/benchmarks")
     p_bench.set_defaults(func=cmd_benchmark)
+
+    p_compare = sub.add_parser("compare", help="Compare multiple scenarios side-by-side")
+    p_compare.add_argument("--config", action="append", required=True)
+    p_compare.add_argument("--out", default="outputs/compare_001")
+    p_compare.set_defaults(func=cmd_compare)
 
     return parser
 

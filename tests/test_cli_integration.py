@@ -98,3 +98,29 @@ def test_sweep_uses_benchmark_adjusted_quality(tmp_path: Path):
     csv = (out / "sweep_results.csv").read_text(encoding="utf-8")
     assert "quality_threshold_used" in csv
     assert "quality_pass" in csv
+
+
+def test_compare_outputs_table_and_deltas(tmp_path: Path):
+    repo = Path(__file__).resolve().parents[1]
+    out = tmp_path / "compare"
+    mpl = tmp_path / "mpl"
+    mpl.mkdir(parents=True, exist_ok=True)
+
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "twin_econ.cli",
+            "compare",
+            "--config",
+            "configs/base.yaml",
+            "--config",
+            "configs/optimistic.yaml",
+            "--out",
+            str(out),
+        ],
+        cwd=repo,
+        mpl_dir=mpl,
+    )
+    assert (out / "scenario_compare.csv").exists()
+    assert (out / "scenario_compare_deltas.csv").exists()

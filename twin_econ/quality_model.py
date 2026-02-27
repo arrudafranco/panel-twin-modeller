@@ -42,10 +42,15 @@ def quality_score(
         minute_effect = min(1.0, 0.7 + 0.3 * math.log(max(minutes, 10.0)) / math.log(120.0))
 
     memory_effect = _memory_adjustment(cfg.memory_strategy_prediction)
+    if cfg.cost.full_transcript_injection:
+        context_tokens = cfg.cost.interview_context_chars * cfg.cost.chars_to_tokens_ratio
+    else:
+        context_tokens = cfg.cost.interview_context_chars * cfg.cost.chars_to_tokens_ratio * 0.6
+    context_effect = min(1.0, 0.85 + 0.15 * math.log(max(context_tokens, 100.0)) / math.log(5000.0))
     fatigue = max(0.6, 1.0 - (contacts - 1) * cfg.quality.fatigue_decay_per_contact)
     complexity = max(0.75, 1.0 - 0.08 * (domain_complexity_scalar - 1.0))
 
-    score = base * minute_effect * memory_effect * fatigue * complexity
+    score = base * minute_effect * memory_effect * context_effect * fatigue * complexity
     return max(0.0, min(1.0, score))
 
 

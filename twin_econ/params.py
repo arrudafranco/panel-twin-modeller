@@ -29,7 +29,14 @@ class CostParams:
     avg_followups_per_block: int = 82
     avg_tokens_per_question: float = 55.0
     avg_tokens_per_answer: float = 80.0
+    use_word_based_token_estimate: bool = False
+    avg_words_per_participant: float = 6491.0
+    avg_words_interviewer: float = 5373.0
+    words_to_tokens_ratio: float = 1.3
     reflection_update_tokens_per_turn: float = 45.0
+    interview_context_chars: int = 5000
+    chars_to_tokens_ratio: float = 0.25
+    full_transcript_injection: bool = True
     transcript_cleaning_cost_per_participant: float = 5.0
     summarization_cost: float = 2.0
     storage_security_compliance_cost_per_participant: float = 8.0
@@ -42,6 +49,7 @@ class CostParams:
     overhead_rate: float = 0.12
     retest_reschedule_fraction: float = 0.0
     rescheduling_cost_per_event: float = 0.0
+    panel_fatigue_function: str = "exponential"
 
 
 @dataclass

@@ -1,65 +1,82 @@
-# Panel Twin Modeller
+﻿# Panel Twin
 
-Feasibility modelling toolkit for evaluating panel-twin quality, operations, and economics with transparent assumptions.
+Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
 
-## What This Includes
-
-- Python modelling package (`twin_econ/`) for cost, quality, sampling, revenue, and Monte Carlo risk.
-- Streamlit app (`webapp/app.py`) for interactive scenario exploration.
-- Automated UI audit tooling (`scripts/playwright_ui_audit.py`) with cross-browser checks and accessibility scans.
-- Vite + React + TypeScript frontend (`docs-app/`) deployed to GitHub Pages.
-
-## Quick Start
+## Install
 
 ```bash
 python -m pip install -e .
-python -m pytest -q tests
 ```
 
-Run the app:
+## Test
+
+```bash
+pytest -q
+```
+
+## CI
+
+- GitHub Actions workflow: [.github/workflows/ci.yml](C:\Users\gusta\panel-twin\.github\workflows\ci.yml)
+- Runs on every push and pull request.
+- Executes full `pytest` suite and CLI smoke tests (`run`, `sweep`, `mc`, `calibrate`, `benchmark`) on Python 3.10 and 3.12.
+- Runs a dedicated cross-browser (Chromium/Firefox/WebKit) Playwright + axe-core UI audit job and uploads reports/screenshots as CI artifacts.
+
+## CLI
+
+```bash
+twin-econ --help
+twin-econ run --config configs/base.yaml --out outputs/run_001/
+twin-econ sweep --config configs/base.yaml --param interview_minutes=30,60,90,120 --param attrition_rate=0.1,0.2,0.3 --out outputs/sweep_001/
+twin-econ mc --n 20000 --seed 123 --config configs/base.yaml --out outputs/mc_001/
+twin-econ calibrate --pilot_csv pilot_logs/runA.csv --config configs/base.yaml --out outputs/calibrated_run/
+twin-econ compare --config configs/base.yaml --config configs/scaleup_national.yaml --out outputs/compare_001/
+twin-econ benchmark --out outputs/benchmarks/
+```
+
+## Web App
 
 ```bash
 streamlit run webapp/app.py
 ```
 
-## CLI Examples
+- App docs: [webapp/README.md](C:\Users\gusta\panel-twin\webapp\README.md)
+- Citations: [webapp/CITATIONS.md](C:\Users\gusta\panel-twin\webapp\CITATIONS.md)
+
+### UI Accessibility Audit (Local)
 
 ```bash
-python -m twin_econ.cli run --config configs/base.yaml --out outputs/run_001
-python -m twin_econ.cli sweep --config configs/base.yaml --param interview_minutes=60,90,120 --out outputs/sweep_001
-python -m twin_econ.cli mc --n 5000 --seed 123 --config configs/base.yaml --out outputs/mc_001
-python -m twin_econ.cli benchmark --out outputs/benchmarks
-```
-
-## UI Quality Gates
-
-```bash
-python -m pip install playwright axe-playwright-python pillow
+python -m pip install playwright axe-playwright-python
 python -m playwright install chromium firefox webkit
 python scripts/playwright_ui_audit.py
 ```
 
-- Strict CI mode uses:
-  - `UI_AUDIT_FAIL_ON_VISUAL_DIFF=true`
-  - `UI_AUDIT_FAIL_ON_PERF_BUDGET=true`
-- Visual baselines are versioned in `webapp/visual_baseline/`.
+Outputs are written to `outputs/ui_audit_001/` (screenshots + a11y/performance report).
+Approved visual baselines are stored at `webapp/visual_baseline/`.
 
-## Public Interactive Page
-
-The repository includes a Vite + React + TypeScript frontend in `docs-app/` for broad stakeholder exploration.  
-GitHub Pages deployment is automated by `.github/workflows/pages.yml`.
-
-Build locally:
+Approve baseline updates intentionally:
 
 ```bash
-cd docs-app
-npm install
-npm run build
-npm run dev
+$env:UI_AUDIT_APPROVE_BASELINE='true'; python scripts/playwright_ui_audit.py
 ```
+
+Run local tests with isolated temp directories (Windows cleanup-safe):
+
+```bash
+python scripts/run_pytests_stable.py -q tests
+```
+
+## Public Export (No Proprietary Naming)
+
+Create a sanitized copy for public hosting/publishing while keeping this local repo unchanged:
+
+```bash
+python scripts/prepare_public_repo.py
+```
+
+This writes a publish-ready copy to `C:\Users\gusta\panel-twin-public` and fails if explicit proprietary tokens remain.
 
 ## Notes
 
-- Configuration files use YAML (`PyYAML`).
-- Model stochastic paths are seeded.
-- Reliability comparators and threshold logic are explicit and auditable.
+- Config files are real YAML and loaded with `PyYAML`.
+- All RNG-driven paths are seeded.
+- Pilot mode emphasizes unknown-parameter estimation; scale-up mode emphasizes representativeness diagnostics.

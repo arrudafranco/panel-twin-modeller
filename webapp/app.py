@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import asdict
 from pathlib import Path
@@ -185,6 +185,21 @@ def _break_even_label(finance: dict[str, object]) -> str:
     return f"{int(float(months))} months ({years:.1f} years)"
 
 
+def _assumption_warnings(cfg: ScenarioConfig) -> list[str]:
+    warns: list[str] = []
+    if cfg.interview_minutes > 150:
+        warns.append("Interview minutes are high relative to typical calibration windows.")
+    if cfg.cost.contact_attempts > 4:
+        warns.append("Contact attempts are high; projected response uplift may be optimistic.")
+    if cfg.cost.response_rate < 0.10:
+        warns.append("Very low response rate may destabilize cost and representativeness estimates.")
+    if cfg.cost.attrition_rate > 0.40:
+        warns.append("High retest attrition may weaken normalized-accuracy grounding.")
+    if cfg.competition.cross_price_elasticity > 0.60:
+        warns.append("High cross-price elasticity can overstate substitution sensitivity.")
+    return warns
+
+
 def _sensitivity_table(cfg: ScenarioConfig, q_sellable: float, cost_per_complete: float) -> pd.DataFrame:
     rows: list[dict[str, float | str | bool]] = []
     original_mode = cfg.quality.benchmark_mapping_sensitivity
@@ -311,6 +326,21 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
     with st.expander("Scenario Controls", expanded=True):
         preset = st.selectbox("Config preset", _list_presets(), index=0)
         cfg = load_config(CONFIG_DIR / preset)
+        subject_preset = st.selectbox(
+            "Focus preset (optional)",
+            ["none", "economics", "sampling_quality", "operations"],
+            index=0,
+            help="Applies lightweight defaults for a specific analysis focus; all controls remain editable.",
+        )
+        if subject_preset == "economics":
+            cfg.revenue.horizon_months = max(cfg.revenue.horizon_months, 60)
+            cfg.competition.cross_price_elasticity = max(cfg.competition.cross_price_elasticity, 0.25)
+        elif subject_preset == "sampling_quality":
+            cfg.sampling.representativeness_penalty_max = min(cfg.sampling.representativeness_penalty_max, 0.08)
+            cfg.quality.benchmark_mapping_sensitivity = "conservative"
+        elif subject_preset == "operations":
+            cfg.cost.contact_attempts = max(cfg.cost.contact_attempts, 2.0)
+            cfg.cost.retest_reschedule_fraction = max(cfg.cost.retest_reschedule_fraction, 0.1)
 
         c1, c2 = st.columns(2)
         with c1:
@@ -409,6 +439,25 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
                     1,
                 )
             )
+            cfg.cost.use_word_based_token_estimate = bool(
+                st.checkbox("Use word-based token estimate", value=bool(cfg.cost.use_word_based_token_estimate))
+            )
+            if cfg.cost.use_word_based_token_estimate:
+                cfg.cost.avg_words_per_participant = float(
+                    st.slider("Avg participant words", 1000, 12000, int(cfg.cost.avg_words_per_participant), 100)
+                )
+                cfg.cost.avg_words_interviewer = float(
+                    st.slider("Avg interviewer words", 1000, 10000, int(cfg.cost.avg_words_interviewer), 100)
+                )
+                cfg.cost.words_to_tokens_ratio = float(
+                    st.slider("Words-to-tokens ratio", 0.8, 2.0, float(cfg.cost.words_to_tokens_ratio), 0.05)
+                )
+            cfg.cost.interview_context_chars = int(
+                st.slider("Interview context chars", 500, 12000, int(cfg.cost.interview_context_chars), 100)
+            )
+            cfg.cost.full_transcript_injection = bool(
+                st.checkbox("Full transcript injection at prediction time", value=bool(cfg.cost.full_transcript_injection))
+            )
         with st.expander("Competition and Substitution Controls"):
             cfg.competition.cross_price_elasticity = float(
                 st.slider("Cross-price elasticity", 0.0, 1.0, float(cfg.competition.cross_price_elasticity), 0.01)
@@ -422,26 +471,26 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
 
             s1, s2, s3 = st.columns(3)
             with s1:
-                st.markdown("**AmeriSpeak-like**")
+                st.markdown("**Probability benchmark**")
                 cfg.competition.amerispeak_price = float(
-                    st.slider("AmeriSpeak-like price", 20000, 600000, int(cfg.competition.amerispeak_price), 5000)
+                    st.slider("Probability benchmark price", 20000, 600000, int(cfg.competition.amerispeak_price), 5000)
                 )
                 cfg.competition.amerispeak_quality = float(
-                    st.slider("AmeriSpeak-like quality", 0.4, 1.0, float(cfg.competition.amerispeak_quality), 0.01)
+                    st.slider("Probability benchmark quality", 0.4, 1.0, float(cfg.competition.amerispeak_quality), 0.01)
                 )
                 cfg.competition.amerispeak_turnaround_days = float(
-                    st.slider("AmeriSpeak-like turnaround", 3.0, 45.0, float(cfg.competition.amerispeak_turnaround_days), 1.0)
+                    st.slider("Probability benchmark turnaround", 3.0, 45.0, float(cfg.competition.amerispeak_turnaround_days), 1.0)
                 )
             with s2:
-                st.markdown("**TrueNorth-like**")
+                st.markdown("**Calibrated hybrid**")
                 cfg.competition.truenorth_price = float(
-                    st.slider("TrueNorth-like price", 20000, 600000, int(cfg.competition.truenorth_price), 5000)
+                    st.slider("Calibrated hybrid price", 20000, 600000, int(cfg.competition.truenorth_price), 5000)
                 )
                 cfg.competition.truenorth_quality = float(
-                    st.slider("TrueNorth-like quality", 0.4, 1.0, float(cfg.competition.truenorth_quality), 0.01)
+                    st.slider("Calibrated hybrid quality", 0.4, 1.0, float(cfg.competition.truenorth_quality), 0.01)
                 )
                 cfg.competition.truenorth_turnaround_days = float(
-                    st.slider("TrueNorth-like turnaround", 3.0, 45.0, float(cfg.competition.truenorth_turnaround_days), 1.0)
+                    st.slider("Calibrated hybrid turnaround", 3.0, 45.0, float(cfg.competition.truenorth_turnaround_days), 1.0)
                 )
             with s3:
                 st.markdown("**External synthetic**")
@@ -486,6 +535,8 @@ def main() -> None:
             st.write(rec["content"])
 
     cfg, modules_count, mc_n = _render_controls()
+    for w in _assumption_warnings(cfg):
+        st.warning(w)
     out = _run_scenario(cfg, modules_count, mc_n=mc_n, mc_seed=cfg.seed)
 
     col1, col2, col3, col4 = st.columns(4)
@@ -619,6 +670,13 @@ def main() -> None:
         with st.expander("Monte Carlo summary", expanded=False):
             mc_desc = mc.describe().reset_index().rename(columns={"index": "statistic"})
             st.dataframe(mc_desc, use_container_width=True, hide_index=True)
+            prob_payload = {
+                "p_npv_positive": round(float((mc["npv"] > 0).mean()), 4),
+                "p_break_even_within_horizon": round(float(mc["break_even_within_horizon"].mean()), 4),
+                "p_break_even_le_24m": round(float((mc["time_to_break_even_months"] <= 24).fillna(False).mean()), 4),
+                "p_feasible": round(float(mc["feasible"].mean()), 4),
+            }
+            st.dataframe(_kv_table(prob_payload), use_container_width=True, hide_index=True)
         with st.expander("Assumption sensitivity (threshold and NPV bands)", expanded=False):
             sens = _sensitivity_table(cfg, out["sellable_quality"], out["cost"]["cost_per_completed_interview"])
             st.dataframe(sens, use_container_width=True, hide_index=True)

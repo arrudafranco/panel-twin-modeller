@@ -28,7 +28,7 @@ Date: 2026-02-27
   - Progressive disclosure via expanders/tabs remains intact.
   - New advanced knobs placed in optional expanders to avoid first-view overload.
 - Risks:
-  - Advanced panels can still be dense; consider role-based presets ("Executive", "Method", "Ops").
+  - Advanced panels can still be dense; consider subject-matter presets ("Economics", "Sampling & Quality", "Operations").
   - Add brief inline help text for high-impact knobs (cross-price elasticity, representativeness cap).
 
 ### 3) Statistician
@@ -56,7 +56,7 @@ Date: 2026-02-27
 
 ### 6) Business Executive / Analyst
 - Strengths:
-  - Explicit outside-option shares (AmeriSpeak-like, TrueNorth-like, external synthetic) improve market narrative.
+  - Explicit outside-option shares (probability benchmark, calibrated hybrid, external synthetic) improve market narrative.
   - Optional "other initial investment" + horizon improve strategic planning usability.
 - Risks:
   - Financial outputs still single-scenario deterministic per run; could add scenario comparison dashboard cards.
@@ -69,6 +69,6 @@ Date: 2026-02-27
 - Public/private naming separation readiness: Pass (labels can be swapped without logic changes).
 
 ## Recommended Next Steps
-1. Add role-based preset bundles in app ("Executive", "Methodology", "Product/Ops").
+1. Add subject-matter preset bundles in app ("Economics", "Sampling & Quality", "Operations").
 2. Implement multi-margin IPF raking with optional target CSVs per margin.
 3. Add warning badges when users move high-sensitivity knobs outside calibrated ranges.
