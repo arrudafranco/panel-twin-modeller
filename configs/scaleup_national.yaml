@@ -1,0 +1,21 @@
+﻿{
+  "scenario_name": "scaleup_national",
+  "seed": 321,
+  "mode": "scaleup",
+  "interview_minutes": 90,
+  "retest_rate": 0.75,
+  "quality_profile": "attitude_belief",
+  "memory_strategy_prediction": "summary_memory",
+  "sampling": {
+    "recruitment_mode": "stratified",
+    "pilot_n": 100,
+    "scaleup_n": 5000,
+    "target_strata": ["age", "gender", "race", "region", "education"],
+    "response_rate_by_stratum": {
+      "18_29": 0.16,
+      "30_44": 0.23,
+      "45_64": 0.31,
+      "65_plus": 0.30
+    }
+  }
+}

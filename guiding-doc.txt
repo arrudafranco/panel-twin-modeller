@@ -1,0 +1,335 @@
+﻿# Digital Panel Twin Simulator
+
+You are an expert applied economist + survey methodologist + ML engineer. Build a small, well-documented Python project that models the **COST, CAPACITY, QUALITY, and COMMERCIAL FEASIBILITY** of creating "digital panel twins" inspired by the paper *"Generative Agent Simulations of 1,000 People"* and related agent simulation work.
+
+---
+
+## Framing: Two-Stage Logic (Pilot → Scale-Up)
+
+This project serves a **two-stage decision process**. The architecture, configs, and outputs must reflect both stages explicitly:
+
+### Stage 1 — Pilot (parameter estimation)
+The immediate goal is to design and cost a **small pilot** (e.g., 50–150 participants) whose primary purpose is to **estimate the unknowns** that drive feasibility: tokens per minute of interview, completion and attrition rates, per-interview cost actuals, quality by construct type, and fatigue effects. The pilot need NOT be nationally representative; convenience or quota sampling is acceptable.
+
+The simulator should help decide pilot specs by showing how different pilot designs (sample size, interview length, number of modules) trade off against the **precision of the estimates** we care about and the **budget required**.
+
+After the pilot runs, empirical data (logged costs, timings, attrition, retest consistency) are fed back into the model via a calibration step, narrowing the distributions used in Monte Carlo and producing better-grounded feasibility estimates for Stage 2.
+
+### Stage 2 — Scale-Up Feasibility (planning, not execution)
+Using pilot-calibrated parameters, the model projects unit economics, quality, and commercial viability for a hypothetical scale-up — potentially to a nationally representative panel. Stage 2 outputs inform go/no-go decisions, pricing, and product design, but the scale-up itself is NOT the immediate deliverable.
+
+**Both stages share the same underlying cost, quality, and revenue models; they differ only in config values and which outputs are emphasized.**
+
+---
+
+## Methodological Facts from the Paper (implement as configurable defaults, not hard-coded)
+
+- **Mode:** voice-to-voice semi-structured interviews in English (default 120 minutes).
+- **AI interviewer design:** reflection notes + most recent ~5,000 characters of transcript for follow-up generation (to avoid long-context degradation).
+- **Interviewer verbosity:** participants responded with ~6,491 words on average; interviewer spoke ~5,373 words; ~82 follow-ups on top of scripted questions.
+- **Agent prediction-time strategy:** by default, append reflections + full interview transcript when prompting the LLM to predict survey answers (high input token costs).
+- **Normalized accuracy definition:** normalized = agent prediction accuracy / participant internal consistency; 1.0 means as accurate as the person repeating their own answers ~2 weeks later.
+- **Performance anchors:**
+  - GSS normalized accuracy ≈ 0.85 for interview-based agents (attitude/belief tier)
+  - Summary agents ≈ 0.83 on GSS
+  - Removing 80% of interview utterances ≈ 0.79 on GSS
+  - Incentivized economic games normalized correlation ≈ 0.66 (harder "behavior" tier)
+- **Retest design + incentive defaults:**
+  - Second phase occurs ~2 weeks later (no interview), used for internal consistency measurement
+  - Anticipate ~20% attrition to retest; paid $60 (phase 1) + $30 (phase 2) + bonus $0–$10
+- **Consent/IRB and privacy risk** are non-trivial for qualitative transcripts; include compliance as a cost line item.
+
+---
+
+## Deliverables (generate real files)
+
+### 1) Python Package `twin_econ/`
+
+| Module | Purpose |
+|--------|---------|
+| `params.py` | Dataclasses/Pydantic models for all configurable knobs |
+| `cost_model.py` | Deterministic unit economics with full voice pipeline (ASR/TTS) + LLM token costs |
+| `quality_model.py` | Transparent proxy models calibrated to paper anchors; MUST separate construct types (attitude/belief, self-report behavior, incentivized behavior) |
+| `mc_model.py` | Monte Carlo engine over uncertain parameters with seeded RNG |
+| `pilot_calibration.py` | Given pilot logs (minutes, tokens, completion, attrition, retest consistency), update priors/distributions (simple Bayesian or empirical-Bayes); report which unknowns are now well-estimated and what remains uncertain |
+| `sampling_model.py` | For scale-up configs: stratified sampling simulation + design weights + raking to target margins + effective sample size + representativeness metrics. For pilot configs: simple quota/convenience modeling |
+| `product_model.py` | "Modules/topics" as incremental interview minutes + incremental fatigue + incremental quality |
+| `deliverables_model.py` | Generate mock client-facing outputs: synthetic microdata extract with weights column, standard demographic crosstabs (configurable vars), short QA appendix (weighting diagnostics, representativeness metrics, quality tier results) |
+| `competition_model.py` | Outside options + internal portfolio interaction with win probability vs price/quality/turnaround; MUST include cannibalization parameter and market tailwind knob |
+| `revenue_model.py` | Pricing tiers + demand curve + NPV/break-even + cross-price elasticity |
+| `reporting.py` | CSV outputs + markdown exec brief + visualization generation |
+
+### 2) CLI Entrypoint
+
+```bash
+# Run a single scenario
+twin-econ run --config configs/base.yaml --out outputs/run_001/
+
+# Parameter sweeps
+twin-econ sweep --param interview_minutes=30,60,90,120 --param attrition=0.1,0.2,0.3
+
+# Monte Carlo simulation
+twin-econ mc --n 20000 --seed 123 --config configs/base.yaml --out outputs/mc_001/
+
+# Calibrate from pilot data
+twin-econ calibrate --pilot_csv pilot_logs/runA.csv --config configs/base.yaml --out outputs/calibrated_run/
+
+# Show federal reliability benchmarks
+twin-econ benchmark --out outputs/benchmarks/
+```
+
+**Outputs:** CSV tables + a markdown "exec brief" highlighting top drivers, feasible regions, and (for `calibrate`) which unknowns are now pinned down.
+
+### 3) Example Configs
+
+| Config | Purpose |
+|--------|---------|
+| `configs/base.yaml` | **Pilot mode** — small N (50–150), convenience/quota sample, includes 2-week retest subset, logs all cost drivers for future calibration |
+| `configs/scaleup_national.yaml` | Hypothetical national-rep scale-up (stratified sampling, weighting/raking, larger N) — for planning projections only |
+| `configs/optimistic.yaml` | Optimistic cost/quality assumptions |
+| `configs/pessimistic.yaml` | Pessimistic cost/quality assumptions |
+| `configs/topic_module_template.yaml` | Template for adding a topic-specific module |
+
+### 4) Demonstration Notebook or Equivalent
+
+Produce a notebook (`.ipynb`) or markdown + generated plots that demonstrates:
+- Baseline scenario summary (pilot mode)
+- **1-way sensitivity analysis** (tornado chart of top cost and NPV drivers)
+- **2-way sensitivity analysis** (heatmap, e.g., interview_minutes × attrition)
+- **Monte Carlo distributions** of: cost per completed interview, cost per usable synthetic case, and NPV
+- Comparison of pilot vs scale-up unit economics
+
+### 5) Unit Tests
+
+`pytest` tests for core math in cost, quality, revenue, and calibration modules. Include type hints throughout.
+
+---
+
+## Model Specifications
+
+### A) COST MODEL (voice-first)
+
+Break total cost into the following categories. All parameters must be configurable.
+
+**Recruitment / Sample Management:**
+- `recruitment_mode`: pilot = convenience/quota; scale-up = stratified
+- `cost_per_invite`, `invites_per_complete` (derived from response rate), `screening_time_cost`
+- `response_rate` (scalar for pilot; vector by stratum for scale-up), `contact_attempts`
+- `scheduling_admin_time_per_participant`
+- `panel_overhead_per_active_member` (per month or per interview)
+- `attrition_rate` (to retest) + rescheduling costs
+- `panel_fatigue_function`: contacts reduce future completion rate and/or response richness (configurable decay)
+- For scale-up: `weighting_raking_cost` (labor + compute)
+
+**Incentives:**
+- `base_incentive_phase1` (default $60)
+- `base_incentive_phase2` (default $30)
+- `bonus_expected_value` (default $5, range $0–$10; optionally provide distribution)
+
+**AI Interview Operations (voice pipeline):**
+- `asr_cost_per_minute` (speech-to-text)
+- `tts_cost_per_minute` (text-to-speech)
+- LLM token costs: `price_per_1k_input_tokens`, `price_per_1k_output_tokens`
+- Interviewer turn structure:
+  - `avg_scripted_questions`
+  - `avg_followups_per_block` (default ~82 total follow-ups)
+  - `avg_tokens_per_question` (interviewer output)
+  - `avg_tokens_per_answer` (participant; or use `words_to_tokens_ratio` × `avg_words_per_participant`)
+  - `reflection_update_tokens_per_turn`
+- Memory strategies (distinct for two phases):
+  - **Interview time:** reflection notes + last N characters of transcript (default ~5,000 chars)
+  - **Prediction time:** `full_transcript_injection` (default) vs `summary_memory` vs `hybrid` — each has different token cost and quality implications
+- Post-processing:
+  - `transcript_cleaning_cost_per_participant`
+  - `summarization_cost` (optional "interview-summary" memory creation)
+  - `storage_security_compliance_cost_per_participant`
+
+**Internal Labor:**
+- `protocol_design_hours`, `engineering_hours`, `qa_hours`, `pm_hours`, `irb_compliance_hours`
+- `fully_loaded_hourly_rate` (or per-role rates)
+
+**Overhead:**
+- `overhead_rate` applied to eligible direct costs (configurable eligible base)
+
+**Returns (detailed breakdown + unit economics):**
+- `total_cost`
+- `cost_per_completed_interview`
+- `cost_per_retained_agent` (after attrition)
+- `cost_per_usable_synthetic_case` (after quality gating)
+- Full line-item breakdown
+
+---
+
+### B) QUALITY / RELIABILITY MODEL (attitudes-first; behaviors explicitly harder)
+
+Implement a **transparent proxy** — we don't have true empirical rates yet (that's what the pilot will estimate), so the model must be honestly calibrated to paper anchors and clearly labeled as provisional.
+
+**Core function:**
+```
+quality_score = f(interview_minutes, memory_strategy, effective_context_tokens, fatigue, construct_type)
+```
+
+**Construct types (MUST be separated):**
+- `attitude_belief`: calibrate to GSS ≈ 0.85 at 120 min, full transcript
+- `self_report_behavior`: intermediate tier, configurable (default ~0.75)
+- `incentivized_behavior`: calibrate to ≈ 0.66 at 120 min baseline
+
+**Calibration constraints** (at 120 minutes, attitude_belief tier):
+- Full transcript injection → quality ≈ 0.85
+- Only 20% transcript retained → quality ≈ 0.79
+- Summary memory → quality ≈ 0.83
+
+**Per-module quality:**
+- `module_topic_coverage` (0–1)
+- `module_question_count`
+- `domain_complexity_scalar`
+- Decay with panel fatigue (more contacts reduce future quality)
+
+**Quality gating:**
+- Only synthetic outputs with `quality >= threshold` are sellable
+- Threshold is configurable by client risk profile:
+  - `federal_high_risk`: higher threshold (e.g., 0.80+)
+  - `commercial_exploratory`: lower threshold (e.g., 0.70+)
+- Provide option for multiple quality tiers in deliverables
+
+**Allow multiple functional forms** (e.g., logarithmic, piecewise linear, logistic) so the pilot can test which best fits observed data.
+
+---
+
+### C) FEDERAL "GOLD-STANDARD" RELIABILITY BENCHMARKS
+
+Add a benchmark library so the model can contextualize quality scores against established survey reliability:
+
+**Store in `benchmarks/benchmarks.yaml`:**
+- `instrument_name`, `agency`, `retest_interval_days`, `metric_type` (percent agreement / kappa / ICC / etc.), `typical_range_or_distribution`, `construct_type` mapping
+- Include at minimum: GSS, NSDUH, BRFSS
+
+**`twin-econ benchmark` outputs markdown that:**
+1. Explains normalized accuracy and why retest reliability matters
+2. Shows benchmark ranges from federal surveys
+3. Suggests default sellability thresholds under different client risk profiles
+
+---
+
+### D) PILOT DESIGN AS PARAMETER ESTIMATION
+
+The `configs/base.yaml` should default to pilot mode:
+- `pilot_n`: 50–150
+- `recruitment_mode`: convenience or quota (not stratified)
+- Include a 2-week retest subset to estimate the internal consistency denominator (for the normalized accuracy metric)
+- Log every cost driver (minutes, ASR/TTS usage, tokens consumed, drop-off points) to feed `calibrate`
+
+**Report output should include:**
+- Which unknowns become well-estimated after the pilot (with expected precision)
+- What remains uncertain and what a second pilot wave would de-risk
+- Recommended next steps given pilot results
+
+**`pilot_calibration.py`:**
+- Accepts pilot log CSV with columns: participant_id, interview_minutes, tokens_input, tokens_output, asr_minutes, tts_minutes, completed, retested, retest_consistency, cost_actual
+- Updates prior distributions (simple Bayesian or empirical-Bayes)
+- Outputs updated config YAML for use in subsequent `run` or `mc` commands
+
+---
+
+### E) NATIONAL REPRESENTATIVENESS + WEIGHTING (Scale-Up Only)
+
+For `configs/scaleup_national.yaml`, implement in `sampling_model.py`:
+- Simulate recruitment with stratum-specific response rates (`target_strata`: e.g., age × gender × race × region × education)
+- Compute design weights and raking to target margins (targets provided in config; allow importing from CSV)
+
+**Outputs:**
+- Weighted vs unweighted marginal differences
+- Effective sample size after weighting
+- "Representativeness penalty" that can optionally reduce sellable quality (configurable linkage)
+- For pilot configs: skip this module or return pass-through values
+
+---
+
+### F) PRODUCTIZATION ("Modules")
+
+**Base interview** covers general life story + broad topical coverage.
+
+**Modules** add:
+- Incremental interview minutes
+- Incremental incentives (if any)
+- Topic-specific probes
+- Incremental quality for that domain
+
+**Returns:**
+- `max_modules_per_participant` before fatigue threshold
+- `marginal_cost_per_module`
+- `marginal_quality_gain_per_module`
+
+---
+
+### G) COMPETITION + INTERNAL PORTFOLIO INTERACTION
+
+Model **3 outside options** as adjustable "reference products" with ranges:
+1. **Probability-based survey offering** (AmeriSpeak-like): higher quality, higher cost, slower turnaround
+2. **Calibrated hybrid offering** (TrueNorth-like): lower cost, medium quality
+3. **External synthetic twin offerings**: price/quality uncertain; model as ranges
+
+**Implement:**
+- Discrete-choice win probability: `P(win | price, turnaround, quality, brand_trust, client_risk_profile)`
+- Cross-price elasticity and substitution between products
+- **Cannibalization parameter:** some synthetic-twin wins may replace internal AmeriSpeak or TrueNorth revenue rather than add net-new; estimate net incremental profit
+
+**Market tailwind knob:**
+- As online survey fraud increases, willingness-to-pay for higher-integrity options rises and/or demand shifts away from opt-in panels
+- Treat as a scenario parameter (do not hard-code); allow sweeping
+
+---
+
+### H) REVENUE + FINANCE
+
+**Product catalog:**
+- Base product: synthetic sample of N agents + analysis deliverable
+- Add-on: topic modules (pricing tiers)
+- "Refresh wave" to update agents annually (shorter re-interview)
+
+**Inputs:**
+- `price_per_project`, `module_addon_price`, `refresh_wave_price`
+- `projects_per_year`, `growth_rate`, `churn_rate`
+- `CAC` (optional)
+- COGS from the cost model
+
+**Outputs:**
+- Gross margin, contribution margin
+- Break-even month/year
+- NPV over configurable horizon (default 36 or 60 months) with discount rate
+
+---
+
+### I) DECISION SUPPORT + OPTIMIZATION
+
+**Visualizations:**
+- **Tornado chart** of top 10 drivers of cost_per_agent and NPV
+- **2-way sensitivity heatmaps** (e.g., interview_minutes × attrition, price × response_rate)
+- **Monte Carlo posterior distributions** for unit costs and NPV
+
+**Optimization:**
+- Parameter sweeps to find **feasible region** where:
+  - `quality >= threshold` (by construct type)
+  - `NPV > 0`
+  - (For scale-up) representativeness constraints met
+- Identify **top 5 drivers** of NPV and cost_per_agent via correlations / OLS regression on Monte Carlo draws
+
+---
+
+## Implementation Constraints
+
+- **Dependencies:** numpy, pandas, pydantic (or dataclasses), matplotlib only. No external API calls.
+- **Configs:** all assumptions explicit in YAML; no magic numbers buried in code.
+- **Reproducibility:** seeded RNG everywhere; document seeds in output metadata.
+- **Code quality:** type hints, docstrings explaining assumptions, clean module boundaries.
+- **README:** include exact commands to install, run tests, and execute each CLI command.
+
+---
+
+## Final Step
+
+After generating the project:
+1. Run `pytest` and show results.
+2. Show `twin-econ --help` output.
+3. Run `twin-econ run --config configs/base.yaml` and show the baseline pilot summary as markdown.
+4. Run `twin-econ benchmark` and show the benchmark comparison output.

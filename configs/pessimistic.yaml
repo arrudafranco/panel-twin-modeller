@@ -1,0 +1,20 @@
+﻿{
+  "scenario_name": "pessimistic",
+  "seed": 222,
+  "mode": "pilot",
+  "interview_minutes": 120,
+  "cost": {
+    "response_rate": 0.16,
+    "attrition_rate": 0.3,
+    "price_per_1k_input_tokens": 0.012,
+    "price_per_1k_output_tokens": 0.02,
+    "overhead_rate": 0.18
+  },
+  "quality": {
+    "quality_threshold": 0.8
+  },
+  "competition": {
+    "market_tailwind": 0.0,
+    "cannibalization_rate": 0.45
+  }
+}

@@ -1,0 +1,98 @@
+﻿{
+  "benchmarks": [
+    {
+      "instrument_name": "NSDUH Reliability Study (Perceived Risk / Attitude-Belief Items)",
+      "agency": "SAMHSA",
+      "federal_national_representative": true,
+      "near_2week": true,
+      "retest_interval_days": "5-15",
+      "metric_type": "kappa + exact agreement",
+      "typical_range_or_distribution": "Kappa ~0.39-0.56; exact agreement ~79.8%-90.5% for perceived-risk items",
+      "construct_type": "attitude_belief",
+      "metrics": {
+        "kappa_range": [0.39, 0.56],
+        "agreement_range": [0.798, 0.905]
+      },
+      "comparability_note": "Closest federal national benchmark for attitude/belief with near-2-week retest, but still not fixed exactly at 14 days.",
+      "citations": [
+        "https://www.ncbi.nlm.nih.gov/books/NBK519788/",
+        "https://www.ncbi.nlm.nih.gov/books/NBK519791/",
+        "https://pubmed.ncbi.nlm.nih.gov/30199182/"
+      ]
+    },
+    {
+      "instrument_name": "NSDUH Reliability Study (Substance Use / Behavior Items)",
+      "agency": "SAMHSA",
+      "federal_national_representative": true,
+      "near_2week": true,
+      "retest_interval_days": "5-15",
+      "metric_type": "kappa + exact agreement",
+      "typical_range_or_distribution": "Kappa ~0.69-0.94; exact agreement ~85%-99% across core behavior-use items",
+      "construct_type": "self_report_behavior",
+      "metrics": {
+        "kappa_range": [0.69, 0.94],
+        "agreement_range": [0.85, 0.99]
+      },
+      "comparability_note": "Behavioral self-report reliability is generally higher than attitude/belief items in the same reinterview window.",
+      "citations": [
+        "https://www.ncbi.nlm.nih.gov/books/NBK519788/",
+        "https://pubmed.ncbi.nlm.nih.gov/30199182/"
+      ]
+    },
+    {
+      "instrument_name": "BRFSS HRQOL Reliability Reinterview (MO/WA, BRFSS core items)",
+      "agency": "CDC (BRFSS program)",
+      "federal_national_representative": true,
+      "near_2week": true,
+      "retest_interval_days": "mean 13.5",
+      "metric_type": "kappa + ICC",
+      "typical_range_or_distribution": "Kappa ~0.57-0.75; ICC ~0.67-0.74",
+      "construct_type": "self_report_health_status",
+      "metrics": {
+        "kappa_range": [0.57, 0.75],
+        "icc_range": [0.67, 0.74]
+      },
+      "comparability_note": "Near-2-week design and large BRFSS samples; construct differs from broad civic/political attitudes.",
+      "citations": [
+        "https://pubmed.ncbi.nlm.nih.gov/12700216/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC1732444/"
+      ]
+    },
+    {
+      "instrument_name": "HINTS Test-Retest (Federally Sponsored National Health Communication Survey)",
+      "agency": "NCI",
+      "federal_national_representative": true,
+      "near_2week": false,
+      "retest_interval_days": "mean 34 (range 15-168)",
+      "metric_type": "kappa + Spearman",
+      "typical_range_or_distribution": "Several communication confidence/attitude items in fair-to-moderate reliability range",
+      "construct_type": "attitude_belief",
+      "metrics": {
+        "kappa_range": [0.35, 0.6],
+        "spearman_range": [0.4, 0.7]
+      },
+      "comparability_note": "Useful attitude/belief comparator, but not a 2-week retest benchmark.",
+      "citations": [
+        "https://doi.org/10.1089/jpm.2015.0501"
+      ]
+    },
+    {
+      "instrument_name": "GSS Panel Reliability Literature (Contextual Comparator)",
+      "agency": "NSF-sponsored national survey program",
+      "federal_national_representative": true,
+      "near_2week": false,
+      "retest_interval_days": "multi-year panel waves",
+      "metric_type": "response consistency / panel reliability",
+      "typical_range_or_distribution": "Not directly comparable to 2-week retest metrics",
+      "construct_type": "attitude_belief",
+      "metrics": {
+        "contextual_range": [0.55, 0.75]
+      },
+      "comparability_note": "Important attitude/belief context, but interval mismatch prevents direct benchmark equivalence.",
+      "citations": [
+        "https://www.nsf.gov/statistics/srvygss/",
+        "https://sociologicalscience.com/articles-v3-43-971/"
+      ]
+    }
+  ]
+}

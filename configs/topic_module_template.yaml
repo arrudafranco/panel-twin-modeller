@@ -1,0 +1,8 @@
+﻿{
+  "module_name": "health_policy",
+  "incremental_interview_minutes": 15,
+  "incremental_incentive": 8,
+  "module_topic_coverage": 0.85,
+  "module_question_count": 12,
+  "domain_complexity_scalar": 1.1
+}

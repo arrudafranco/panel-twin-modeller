@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel Twin Modeller - Explorer</title>
+  <style>
+    :root { --ink:#0b2e4f; --sky:#0a79b7; --bg:#f4f8fb; --card:#ffffff; --line:#d6e2ef; }
+    body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; background: linear-gradient(180deg, var(--bg), #fff); color:#162738; }
+    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    h1 { color: var(--ink); margin: 0 0 8px; }
+    .sub { margin: 0 0 18px; color:#35506a; }
+    .grid { display:grid; grid-template-columns: 320px 1fr; gap:16px; }
+    .card { background: var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+    .kpis { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; }
+    .kpi { border:1px solid var(--line); border-radius:10px; padding:12px; }
+    .kpi .label { font-size: 12px; color:#54708a; }
+    .kpi .val { font-size: 22px; font-weight: 700; color: var(--ink); }
+    label { display:block; margin-top:10px; font-weight:600; font-size:13px; }
+    input[type="range"] { width:100%; }
+    .hint { font-size:12px; color:#4a647e; margin-top:6px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; white-space:pre-wrap; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Panel Twin Modeller</h1>
+    <p class="sub">Interactive feasibility explorer for quality thresholds, economics, and pilot planning.</p>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Scenario Controls</h2>
+        <label>Interview Minutes: <span id="v_minutes">90</span></label>
+        <input id="minutes" type="range" min="30" max="180" step="5" value="90">
+
+        <label>Response Rate: <span id="v_rr">0.35</span></label>
+        <input id="rr" type="range" min="0.05" max="0.9" step="0.01" value="0.35">
+
+        <label>Attrition Rate: <span id="v_attr">0.20</span></label>
+        <input id="attr" type="range" min="0" max="0.6" step="0.01" value="0.20">
+
+        <label>Price Per Project ($): <span id="v_price">120000</span></label>
+        <input id="price" type="range" min="10000" max="500000" step="5000" value="120000">
+
+        <label>Projects Per Year: <span id="v_ppy">8</span></label>
+        <input id="ppy" type="range" min="1" max="30" step="1" value="8">
+
+        <p class="hint">This static page is for transparent, shareable scenario exploration. Full model logic remains in Python CLI/app.</p>
+      </section>
+
+      <section class="card">
+        <h2>Decision Snapshot</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="label">Sellable Quality</div><div class="val" id="k_quality">0.00</div></div>
+          <div class="kpi"><div class="label">Threshold</div><div class="val" id="k_threshold">0.00</div></div>
+          <div class="kpi"><div class="label">Cost / Complete</div><div class="val" id="k_cost">$0</div></div>
+          <div class="kpi"><div class="label">Projected NPV</div><div class="val" id="k_npv">$0</div></div>
+        </div>
+        <h3>Interpretation</h3>
+        <p id="interp"></p>
+        <h3>Assumption Sensitivity</h3>
+        <div class="mono" id="sens"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const ctl = ["minutes","rr","attr","price","ppy"];
+    const fmtMoney = (n) => "$" + Math.round(n).toLocaleString();
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+    function compute() {
+      const minutes = +$("minutes").value;
+      const rr = +$("rr").value;
+      const attr = +$("attr").value;
+      const price = +$("price").value;
+      const ppy = +$("ppy").value;
+
+      $("v_minutes").textContent = minutes;
+      $("v_rr").textContent = rr.toFixed(2);
+      $("v_attr").textContent = attr.toFixed(2);
+      $("v_price").textContent = price.toFixed(0);
+      $("v_ppy").textContent = ppy.toFixed(0);
+
+      const baseQ = 0.82 - (minutes - 90) * 0.0012 - attr * 0.18 + rr * 0.08;
+      const quality = clamp(baseQ, 0, 1);
+      const threshold = 0.74;
+      const cost = 70 + minutes * 0.55 + (1 / Math.max(rr, 0.05)) * 18 + attr * 35;
+      const winProb = clamp(0.15 + (quality - threshold) * 1.8, 0.03, 0.95);
+      const annual = (price - cost * 1000) * ppy * winProb;
+      const npv = annual * 2.8 - 180000;
+
+      $("k_quality").textContent = quality.toFixed(3);
+      $("k_threshold").textContent = threshold.toFixed(3);
+      $("k_cost").textContent = fmtMoney(cost);
+      $("k_npv").textContent = fmtMoney(npv);
+
+      let text = "Quality and economics are below target. Redesign assumptions before pilot scale-up.";
+      if (quality >= threshold && npv > 0) text = "Quality clears threshold and expected value is positive. Focus on execution and pilot precision.";
+      else if (quality < threshold && npv > 0) text = "Economics are promising, but quality is below policy threshold. Upgrade methodology first.";
+      else if (quality >= threshold && npv <= 0) text = "Method quality is acceptable, but economics are weak. Revisit pricing and demand assumptions.";
+      $("interp").textContent = text;
+
+      const shifts = [
+        {name:"conservative", t: threshold + 0.03},
+        {name:"base", t: threshold},
+        {name:"optimistic", t: threshold - 0.03},
+      ];
+      const rows = shifts.map(s => {
+        const wp = clamp(0.15 + (quality - s.t) * 1.8, 0.03, 0.95);
+        const n = ((price - cost * 1000) * ppy * wp) * 2.8 - 180000;
+        return `${s.name.padEnd(12)} threshold=${s.t.toFixed(3)}  win=${wp.toFixed(3)}  npv=${fmtMoney(n)}`;
+      });
+      $("sens").textContent = rows.join("\n");
+    }
+    ctl.forEach(id => $(id).addEventListener("input", compute));
+    compute();
+  </script>
+</body>
+</html>

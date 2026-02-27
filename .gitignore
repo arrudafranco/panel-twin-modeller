@@ -1,0 +1,9 @@
+.pytest_tmp*
+.tmp_runtime*
+.tmp_runtime_runs*
+.mplconfig/
+__pycache__/
+*.pyc
+outputs/
+dist/
+build/
