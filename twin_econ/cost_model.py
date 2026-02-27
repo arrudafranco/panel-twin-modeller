@@ -39,12 +39,16 @@ def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
     )
 
     turns = cfg.cost.avg_scripted_questions + cfg.cost.avg_followups_per_block
+    reflection_turns = 0.0
+    if cfg.quality.reflection_enabled:
+        reflection_turns = turns / max(float(cfg.quality.reflection_interval_turns), 1.0)
+    reflection_tokens_per_participant = reflection_turns * cfg.cost.reflection_update_tokens_per_turn
     if cfg.cost.use_word_based_token_estimate:
         tokens_in = n * cfg.cost.avg_words_per_participant * cfg.cost.words_to_tokens_ratio
         tokens_out = n * cfg.cost.avg_words_interviewer * cfg.cost.words_to_tokens_ratio
     else:
         tokens_out = n * turns * cfg.cost.avg_tokens_per_question
-        tokens_in = n * turns * (cfg.cost.avg_tokens_per_answer + cfg.cost.reflection_update_tokens_per_turn)
+        tokens_in = n * (turns * cfg.cost.avg_tokens_per_answer + reflection_tokens_per_participant)
 
     context_tokens = n * cfg.cost.interview_context_chars * cfg.cost.chars_to_tokens_ratio
     if cfg.cost.full_transcript_injection:
@@ -101,4 +105,6 @@ def compute_costs(cfg: ScenarioConfig) -> dict[str, Any]:
         "tokens_input": tokens_in,
         "tokens_output": tokens_out,
         "context_tokens": context_tokens,
+        "reflection_turns_per_participant": reflection_turns,
+        "reflection_tokens_per_participant": reflection_tokens_per_participant,
     }

@@ -490,6 +490,33 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
             cfg.cost.full_transcript_injection = bool(
                 st.checkbox("Full transcript injection at prediction time", value=bool(cfg.cost.full_transcript_injection))
             )
+        with st.expander("Memory Retrieval Controls (optional)"):
+            cfg.quality.memory_retrieval_k = int(
+                st.slider("Retrieved memory items", 1, 20, int(cfg.quality.memory_retrieval_k), 1)
+            )
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                cfg.quality.memory_recency_weight = float(
+                    st.slider("Recency weight", 0.0, 3.0, float(cfg.quality.memory_recency_weight), 0.1)
+                )
+            with m2:
+                cfg.quality.memory_relevance_weight = float(
+                    st.slider("Relevance weight", 0.0, 3.0, float(cfg.quality.memory_relevance_weight), 0.1)
+                )
+            with m3:
+                cfg.quality.memory_importance_weight = float(
+                    st.slider("Importance weight", 0.0, 3.0, float(cfg.quality.memory_importance_weight), 0.1)
+                )
+            cfg.quality.reflection_enabled = bool(
+                st.checkbox("Enable reflection summaries", value=bool(cfg.quality.reflection_enabled))
+            )
+            if cfg.quality.reflection_enabled:
+                cfg.quality.reflection_interval_turns = int(
+                    st.slider("Reflection interval (turns)", 1, 30, int(cfg.quality.reflection_interval_turns), 1)
+                )
+                cfg.quality.reflection_summary_count = int(
+                    st.slider("Reflection summary count", 1, 8, int(cfg.quality.reflection_summary_count), 1)
+                )
         with st.expander("Competition and Substitution Controls"):
             cfg.competition.cross_price_elasticity = float(
                 st.slider("Cross-price elasticity", 0.0, 1.0, float(cfg.competition.cross_price_elasticity), 0.01)
@@ -769,3 +796,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

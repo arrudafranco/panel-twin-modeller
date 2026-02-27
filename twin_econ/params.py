@@ -56,6 +56,13 @@ class CostParams:
 class QualityParams:
     functional_form: str = "log"
     memory_strategy: str = "full_transcript"
+    memory_retrieval_k: int = 8
+    memory_recency_weight: float = 1.0
+    memory_relevance_weight: float = 1.0
+    memory_importance_weight: float = 1.0
+    reflection_enabled: bool = True
+    reflection_interval_turns: int = 8
+    reflection_summary_count: int = 3
     quality_threshold: float = 0.75
     fatigue_decay_per_contact: float = 0.03
     self_report_behavior_base: float = 0.75
@@ -164,3 +171,4 @@ def load_config(path: str | Path) -> ScenarioConfig:
 
 def dump_config(cfg: ScenarioConfig, path: str | Path) -> None:
     Path(path).write_text(yaml.safe_dump(asdict(cfg), sort_keys=False), encoding="utf-8")
+

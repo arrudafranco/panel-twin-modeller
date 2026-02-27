@@ -59,6 +59,29 @@ def test_quality_bounds_and_ordering():
     assert q_full > q_partial
 
 
+def test_memory_retrieval_knobs_affect_quality():
+    cfg = ScenarioConfig()
+    baseline = quality_score(cfg, "attitude_belief")
+
+    cfg.quality.memory_retrieval_k = 2
+    cfg.quality.memory_recency_weight = 0.2
+    cfg.quality.memory_relevance_weight = 2.0
+    cfg.quality.memory_importance_weight = 0.2
+    cfg.quality.reflection_enabled = False
+    reduced = quality_score(cfg, "attitude_belief")
+
+    assert reduced < baseline
+
+
+def test_reflection_cadence_changes_token_costs():
+    cfg = ScenarioConfig()
+    base = compute_costs(cfg)
+
+    cfg.quality.reflection_interval_turns = 4
+    denser = compute_costs(cfg)
+
+    assert denser["reflection_tokens_per_participant"] > base["reflection_tokens_per_participant"]
+    assert denser["tokens_input"] > base["tokens_input"]
 def test_finance_npv_numeric():
     cfg = ScenarioConfig()
     cost = compute_costs(cfg)
@@ -96,3 +119,4 @@ def test_finance_break_even_not_reached_within_horizon():
     assert fin["time_to_break_even_months"] is None
     assert float(fin["break_even_month"]) == float(cfg.revenue.horizon_months)
     assert float(fin["total_upfront_investment"]) == 60000.0
+

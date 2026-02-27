@@ -2,6 +2,22 @@
 
 Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
 
+## Inspiration And Scope
+
+This project is directly inspired by Stanford HCI's `genagents` project and the paper
+*Generative Agent Simulations of 1,000 People*.
+
+It does not claim to reproduce that codebase or its exact empirical evaluation. Instead, it uses that work as:
+- a conceptual anchor for interview-based generative agents
+- a reference point for paper-backed quality anchors where explicitly noted
+- a design precedent for memory and reflection-centered agent construction
+
+This repository extends beyond that scope into:
+- feasibility and cost modeling
+- sampling and representativeness adjustments
+- pilot calibration
+- commercialization, pricing, NPV, and break-even analysis
+- internal and public decision-support apps
 ## Install
 
 ```bash
@@ -82,3 +98,7 @@ This writes a publish-ready copy to `C:\Users\gusta\panel-twin-public` and fails
 - Pilot mode emphasizes unknown-parameter estimation; scale-up mode emphasizes representativeness diagnostics.
 - Plain-English architecture and rationale are documented in [docs/design_decisions.md](C:\Users\gusta\panel-twin-public\docs\design_decisions.md).
 - Optional external anchor references are documented in [docs/external_reference_defaults.md](C:\Users\gusta\panel-twin-public\docs\external_reference_defaults.md).
+
+
+
+

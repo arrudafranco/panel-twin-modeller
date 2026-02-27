@@ -24,6 +24,32 @@ def _construct_base(cfg: ScenarioConfig, construct_type: str) -> float:
     return 0.75
 
 
+def _memory_system_adjustment(cfg: ScenarioConfig) -> float:
+    weights = [
+        max(0.0, float(cfg.quality.memory_recency_weight)),
+        max(0.0, float(cfg.quality.memory_relevance_weight)),
+        max(0.0, float(cfg.quality.memory_importance_weight)),
+    ]
+    avg_weight = max(sum(weights) / 3.0, 1e-6)
+    imbalance = sum(abs(w - avg_weight) for w in weights) / (3.0 * avg_weight)
+    balance_effect = max(0.85, 1.0 - 0.12 * imbalance)
+
+    retrieval_k = max(1.0, float(cfg.quality.memory_retrieval_k))
+    retrieval_effect = 0.9 + 0.1 * math.log(retrieval_k) / math.log(8.0)
+    retrieval_effect = max(0.9, min(1.06, retrieval_effect))
+
+    if cfg.quality.reflection_enabled:
+        cadence = max(1.0, float(cfg.quality.reflection_interval_turns))
+        cadence_ratio = 8.0 / cadence
+        cadence_effect = max(0.95, min(1.03, 0.97 + 0.03 * math.sqrt(cadence_ratio)))
+        summary_effect = max(0.97, min(1.03, 0.97 + 0.01 * min(float(cfg.quality.reflection_summary_count), 6.0)))
+        reflection_effect = cadence_effect * summary_effect
+    else:
+        reflection_effect = 0.96
+
+    return max(0.82, min(1.08, balance_effect * retrieval_effect * reflection_effect))
+
+
 def quality_score(
     cfg: ScenarioConfig,
     construct_type: str,
@@ -41,7 +67,7 @@ def quality_score(
     else:
         minute_effect = min(1.0, 0.7 + 0.3 * math.log(max(minutes, 10.0)) / math.log(120.0))
 
-    memory_effect = _memory_adjustment(cfg.memory_strategy_prediction)
+    memory_effect = _memory_adjustment(cfg.memory_strategy_prediction) * _memory_system_adjustment(cfg)
     if cfg.cost.full_transcript_injection:
         context_tokens = cfg.cost.interview_context_chars * cfg.cost.chars_to_tokens_ratio
     else:

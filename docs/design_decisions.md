@@ -1,6 +1,6 @@
-# Design Decisions and Architecture
+﻿# Design Decisions and Architecture
 
-Version: 0.1.0
+Version: 0.1.1
 Last updated: 2026-02-27
 Status: active working design record
 
@@ -46,6 +46,59 @@ The system is designed to support internal decision making across multiple audie
 - product and engineering stakeholders
 
 The project is deliberately transparent. It is not built to hide assumptions behind a black box.
+
+## External Inspiration and Evidence Boundaries
+
+This project is directly inspired by Stanford HCI's `genagents` project and the paper
+*Generative Agent Simulations of 1,000 People*.
+
+That inspiration is real and should be stated explicitly. At the same time, this
+project is not a reimplementation of `genagents`, and it should not imply that it
+reproduces the paper's exact methodology or measured results.
+
+### What We Inherit Conceptually
+
+We inherit several core ideas from that work:
+- interview-based agent construction
+- memory and reflection as explicit parts of the agent design
+- benchmarking against human-response consistency as a useful quality anchor
+
+The public `genagents` repository also makes the architecture influence visible:
+- `genagents/genagents.py` centers a `GenerativeAgent` wrapper
+- `genagents/modules/interaction.py` handles categorical, numerical, and open-ended response generation
+- `genagents/modules/memory_stream.py` combines recency, relevance, and importance in retrieval and reflection workflows
+
+These are architecture precedents, not source-code dependencies in this project.
+
+### What We Add Beyond That Scope
+
+This project extends the interview-agent idea into planning and decision support.
+
+It adds:
+- cost and operations modeling
+- pilot calibration
+- sampling and representativeness adjustments
+- competition and substitution scenarios
+- pricing, NPV, and break-even logic
+- internal and public-facing planning interfaces
+
+### How We Label Evidence
+
+We use three evidence labels in practice, even when they are not surfaced as formal tags everywhere:
+
+1. Paper-backed anchors
+- Values or methodological distinctions directly supported by the paper.
+
+2. Repo-inspired implementation patterns
+- Architecture ideas taken from the public `genagents` codebase.
+
+3. Project planning defaults
+- Practical placeholders used so the model remains usable before more calibration data exist.
+
+One concrete example:
+- the paper title says "1,000 People," but the reported empirical sample is 1,052 participants
+- the ~6,491 participant-word figure is paper-backed
+- the ~5,373 interviewer-word and ~82 follow-up figures remain project operational defaults unless independently verified
 
 ## Core Design Philosophy
 
@@ -361,7 +414,17 @@ If a change only affects wording, styling, or minor implementation detail withou
 
 ## Version Updates
 
-### 0.1.0 — 2026-02-27
+### 0.1.1 - 2026-02-27
+
+Clarified external inspiration, evidence boundaries, and citation discipline.
+
+Included:
+- explicit attribution to Stanford HCI `genagents`
+- separation of paper-backed anchors from repo-inspired architecture patterns
+- explicit note that the paper's reported sample is 1,052 participants
+- explicit note that some operational defaults remain placeholders pending independent verification
+
+### 0.1.0 - 2026-02-27
 
 Initial formal design record created.
 
@@ -372,3 +435,7 @@ Included:
 - app and frontend design rationale
 - guardrails and limitations philosophy
 - documentation and maintenance conventions
+
+
+
+
