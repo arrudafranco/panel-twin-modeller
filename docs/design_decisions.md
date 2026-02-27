@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.1.4
+Version: 0.1.5
 Last updated: 2026-02-27
 Status: active working design record
 
@@ -102,6 +102,7 @@ So in this project:
 - response-mode reliability is handled as a transparent multiplier rather than buried inside one headline quality number
 - pilot calibration can optionally update response-mode shares and multipliers when the pilot log includes those columns
 - the active source of response-mode assumptions is tracked explicitly as preset-driven, manual, or pilot-calibrated
+- run artifacts now surface assumption provenance directly so downstream readers do not need to infer it from configs alone
 
 ### How We Label Evidence
 
@@ -434,6 +435,15 @@ When a meaningful design or architecture change is made:
 If a change only affects wording, styling, or minor implementation detail without changing design intent, an update may not be necessary.
 
 ## Version Updates
+
+### 0.1.5 - 2026-02-27
+
+Added visible assumption provenance in run outputs and app sessions.
+
+Included:
+- `summary.json` and baseline summaries now expose response-mode assumption source and calibration status
+- Streamlit now flags when a session changes from preset-driven to manual response-mode assumptions
+- a sample pilot CSV template documents optional response-mode calibration columns
 
 ### 0.1.4 - 2026-02-27
 
