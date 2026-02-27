@@ -7,7 +7,7 @@ Feasibility modelling toolkit for evaluating panel-twin quality, operations, and
 - Python modelling package (`twin_econ/`) for cost, quality, sampling, revenue, and Monte Carlo risk.
 - Streamlit app (`webapp/app.py`) for interactive scenario exploration.
 - Automated UI audit tooling (`scripts/playwright_ui_audit.py`) with cross-browser checks and accessibility scans.
-- Public interactive project page at `docs/index.html` (served via GitHub Pages).
+- Vite + React + TypeScript frontend (`docs-app/`) deployed to GitHub Pages.
 
 ## Quick Start
 
@@ -46,8 +46,17 @@ python scripts/playwright_ui_audit.py
 
 ## Public Interactive Page
 
-The repository includes a lightweight interactive page in `docs/index.html` for broad stakeholder exploration.  
+The repository includes a Vite + React + TypeScript frontend in `docs-app/` for broad stakeholder exploration.  
 GitHub Pages deployment is automated by `.github/workflows/pages.yml`.
+
+Build locally:
+
+```bash
+cd docs-app
+npm install
+npm run build
+npm run dev
+```
 
 ## Notes
 

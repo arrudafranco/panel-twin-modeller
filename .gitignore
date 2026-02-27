@@ -8,3 +8,7 @@ outputs/
 dist/
 build/
 .keys/
+node_modules/
+docs-app/dist/
+docs-app/node_modules/
+docs-app/*.tsbuildinfo
