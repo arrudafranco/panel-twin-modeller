@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.1.1
+Version: 0.1.2
 Last updated: 2026-02-27
 Status: active working design record
 
@@ -81,6 +81,24 @@ It adds:
 - competition and substitution scenarios
 - pricing, NPV, and break-even logic
 - internal and public-facing planning interfaces
+
+We also make some design ideas more explicit than before:
+- memory retrieval is modeled with configurable recency, relevance, and importance weights
+- response-mode mix is modeled explicitly, so categorical, numeric, and open-ended instruments can carry different reliability expectations
+
+### Prompt and Reflection Implications
+
+The `genagents` architecture uses prompt-driven interactions and prompt-driven reflection.
+
+That matters for this project because:
+- reflection summaries are not direct observations
+- importance is not an objective scalar measured from the world
+- both are generated intermediate artifacts shaped by prompts and model behavior
+
+So in this project:
+- reflection cadence and summary count are configurable operational assumptions
+- memory importance is treated as a weighting heuristic, not a ground-truth score
+- response-mode reliability is handled as a transparent multiplier rather than buried inside one headline quality number
 
 ### How We Label Evidence
 
@@ -413,6 +431,15 @@ When a meaningful design or architecture change is made:
 If a change only affects wording, styling, or minor implementation detail without changing design intent, an update may not be necessary.
 
 ## Version Updates
+
+### 0.1.2 - 2026-02-27
+
+Added explicit interaction-type and memory-architecture design notes.
+
+Included:
+- response-mode reliability assumptions for categorical, numeric, and open-ended items
+- explicit framing that reflection and importance are prompt-mediated heuristics
+- alignment of app controls with the newer memory and response-mode model structure
 
 ### 0.1.1 - 2026-02-27
 

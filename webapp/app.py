@@ -18,7 +18,7 @@ from twin_econ.deliverables_model import generate_client_deliverables
 from twin_econ.mc_model import run_monte_carlo
 from twin_econ.params import ScenarioConfig, load_config
 from twin_econ.product_model import module_economics
-from twin_econ.quality_model import quality_score, quality_tiers
+from twin_econ.quality_model import memory_architecture_summary, quality_score, quality_tiers
 from twin_econ.revenue_model import compute_finance
 from twin_econ.sampling_model import run_sampling
 
@@ -517,6 +517,29 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
                 cfg.quality.reflection_summary_count = int(
                     st.slider("Reflection summary count", 1, 8, int(cfg.quality.reflection_summary_count), 1)
                 )
+        with st.expander("Response Mode Reliability Controls (optional)"):
+            r1, r2, r3 = st.columns(3)
+            with r1:
+                cfg.quality.categorical_question_share = float(
+                    st.slider("Categorical share", 0.0, 1.0, float(cfg.quality.categorical_question_share), 0.01)
+                )
+                cfg.quality.categorical_mode_reliability = float(
+                    st.slider("Categorical reliability", 0.7, 1.2, float(cfg.quality.categorical_mode_reliability), 0.01)
+                )
+            with r2:
+                cfg.quality.numeric_question_share = float(
+                    st.slider("Numeric share", 0.0, 1.0, float(cfg.quality.numeric_question_share), 0.01)
+                )
+                cfg.quality.numeric_mode_reliability = float(
+                    st.slider("Numeric reliability", 0.7, 1.2, float(cfg.quality.numeric_mode_reliability), 0.01)
+                )
+            with r3:
+                cfg.quality.open_ended_question_share = float(
+                    st.slider("Open-ended share", 0.0, 1.0, float(cfg.quality.open_ended_question_share), 0.01)
+                )
+                cfg.quality.open_ended_mode_reliability = float(
+                    st.slider("Open-ended reliability", 0.7, 1.2, float(cfg.quality.open_ended_mode_reliability), 0.01)
+                )
         with st.expander("Competition and Substitution Controls"):
             cfg.competition.cross_price_elasticity = float(
                 st.slider("Cross-price elasticity", 0.0, 1.0, float(cfg.competition.cross_price_elasticity), 0.01)
@@ -530,26 +553,26 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
 
             s1, s2, s3 = st.columns(3)
             with s1:
-                st.markdown("**Probability benchmark**")
+                st.markdown("**AmeriSpeak**")
                 cfg.competition.amerispeak_price = float(
-                    st.slider("Probability benchmark price", 20000, 600000, int(cfg.competition.amerispeak_price), 5000)
+                    st.slider("AmeriSpeak price", 20000, 600000, int(cfg.competition.amerispeak_price), 5000)
                 )
                 cfg.competition.amerispeak_quality = float(
-                    st.slider("Probability benchmark quality", 0.4, 1.0, float(cfg.competition.amerispeak_quality), 0.01)
+                    st.slider("AmeriSpeak quality", 0.4, 1.0, float(cfg.competition.amerispeak_quality), 0.01)
                 )
                 cfg.competition.amerispeak_turnaround_days = float(
-                    st.slider("Probability benchmark turnaround", 3.0, 45.0, float(cfg.competition.amerispeak_turnaround_days), 1.0)
+                    st.slider("AmeriSpeak turnaround", 3.0, 45.0, float(cfg.competition.amerispeak_turnaround_days), 1.0)
                 )
             with s2:
-                st.markdown("**Calibrated hybrid**")
+                st.markdown("**TrueNorth**")
                 cfg.competition.truenorth_price = float(
-                    st.slider("Calibrated hybrid price", 20000, 600000, int(cfg.competition.truenorth_price), 5000)
+                    st.slider("TrueNorth price", 20000, 600000, int(cfg.competition.truenorth_price), 5000)
                 )
                 cfg.competition.truenorth_quality = float(
-                    st.slider("Calibrated hybrid quality", 0.4, 1.0, float(cfg.competition.truenorth_quality), 0.01)
+                    st.slider("TrueNorth quality", 0.4, 1.0, float(cfg.competition.truenorth_quality), 0.01)
                 )
                 cfg.competition.truenorth_turnaround_days = float(
-                    st.slider("Calibrated hybrid turnaround", 3.0, 45.0, float(cfg.competition.truenorth_turnaround_days), 1.0)
+                    st.slider("TrueNorth turnaround", 3.0, 45.0, float(cfg.competition.truenorth_turnaround_days), 1.0)
                 )
             with s3:
                 st.markdown("**External synthetic**")
@@ -598,6 +621,7 @@ def main() -> None:
     for w in warnings:
         st.warning(w)
     out = _run_scenario(cfg, modules_count, mc_n=mc_n, mc_seed=cfg.seed)
+    memory_summary = memory_architecture_summary(cfg)
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Sellable quality", f"{out['sellable_quality']:.3f}")
@@ -680,6 +704,8 @@ def main() -> None:
                 use_container_width=True,
                 hide_index=True,
             )
+        with st.expander("Active memory architecture", expanded=False):
+            st.dataframe(_kv_table(memory_summary), use_container_width=True, hide_index=True)
 
     with tabs[2]:
         st.header("Operations and Cost")
@@ -689,6 +715,7 @@ def main() -> None:
                     "tokens_input_total": round(float(out["cost"]["tokens_input"]), 0),
                     "tokens_output_total": round(float(out["cost"]["tokens_output"]), 0),
                     "memory_strategy": cfg.memory_strategy_prediction,
+                    "reflection_tokens_per_participant": round(float(out["cost"]["reflection_tokens_per_participant"]), 1),
                     "effective_response_rate": round(float(out["cost"]["effective_response_rate"]), 4),
                     "invites_per_complete": round(float(out["cost"]["invites_per_complete"]), 2),
                     "rescheduling_cost_total": round(float(out["cost"]["rescheduling_cost"]), 2),
@@ -703,6 +730,21 @@ def main() -> None:
             lines = {k: v for k, v in out["cost"].items() if isinstance(v, (int, float))}
             cost_df = pd.DataFrame([lines]).T.rename(columns={0: "value"}).reset_index().rename(columns={"index": "metric"})
             st.dataframe(cost_df, use_container_width=True, hide_index=True)
+        with st.expander("Response mode assumptions", expanded=False):
+            st.dataframe(
+                _kv_table(
+                    {
+                        "categorical_question_share": cfg.quality.categorical_question_share,
+                        "numeric_question_share": cfg.quality.numeric_question_share,
+                        "open_ended_question_share": cfg.quality.open_ended_question_share,
+                        "categorical_mode_reliability": cfg.quality.categorical_mode_reliability,
+                        "numeric_mode_reliability": cfg.quality.numeric_mode_reliability,
+                        "open_ended_mode_reliability": cfg.quality.open_ended_mode_reliability,
+                    }
+                ),
+                use_container_width=True,
+                hide_index=True,
+            )
 
     with tabs[3]:
         st.header("Economics and Risk")

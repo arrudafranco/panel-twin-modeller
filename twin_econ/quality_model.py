@@ -50,6 +50,50 @@ def _memory_system_adjustment(cfg: ScenarioConfig) -> float:
     return max(0.82, min(1.08, balance_effect * retrieval_effect * reflection_effect))
 
 
+def _normalized_response_shares(cfg: ScenarioConfig) -> dict[str, float]:
+    raw = {
+        "categorical": max(0.0, float(cfg.quality.categorical_question_share)),
+        "numeric": max(0.0, float(cfg.quality.numeric_question_share)),
+        "open_ended": max(0.0, float(cfg.quality.open_ended_question_share)),
+    }
+    total = sum(raw.values())
+    if total <= 0:
+        return {"categorical": 1 / 3, "numeric": 1 / 3, "open_ended": 1 / 3}
+    return {k: v / total for k, v in raw.items()}
+
+
+def _response_mode_adjustment(cfg: ScenarioConfig) -> float:
+    shares = _normalized_response_shares(cfg)
+    weighted = (
+        shares["categorical"] * float(cfg.quality.categorical_mode_reliability)
+        + shares["numeric"] * float(cfg.quality.numeric_mode_reliability)
+        + shares["open_ended"] * float(cfg.quality.open_ended_mode_reliability)
+    )
+    return max(0.85, min(1.10, weighted))
+
+
+def memory_architecture_summary(cfg: ScenarioConfig) -> dict[str, object]:
+    shares = _normalized_response_shares(cfg)
+    return {
+        "memory_strategy_prediction": cfg.memory_strategy_prediction,
+        "memory_retrieval_k": int(cfg.quality.memory_retrieval_k),
+        "memory_recency_weight": round(float(cfg.quality.memory_recency_weight), 3),
+        "memory_relevance_weight": round(float(cfg.quality.memory_relevance_weight), 3),
+        "memory_importance_weight": round(float(cfg.quality.memory_importance_weight), 3),
+        "reflection_enabled": bool(cfg.quality.reflection_enabled),
+        "reflection_interval_turns": int(cfg.quality.reflection_interval_turns),
+        "reflection_summary_count": int(cfg.quality.reflection_summary_count),
+        "full_transcript_injection": bool(cfg.cost.full_transcript_injection),
+        "interview_context_chars": int(cfg.cost.interview_context_chars),
+        "response_mode_mix": (
+            f"categorical={shares['categorical']:.2f}, "
+            f"numeric={shares['numeric']:.2f}, "
+            f"open_ended={shares['open_ended']:.2f}"
+        ),
+        "response_mode_reliability_adjustment": round(_response_mode_adjustment(cfg), 4),
+    }
+
+
 def quality_score(
     cfg: ScenarioConfig,
     construct_type: str,
@@ -68,6 +112,7 @@ def quality_score(
         minute_effect = min(1.0, 0.7 + 0.3 * math.log(max(minutes, 10.0)) / math.log(120.0))
 
     memory_effect = _memory_adjustment(cfg.memory_strategy_prediction) * _memory_system_adjustment(cfg)
+    response_mode_effect = _response_mode_adjustment(cfg)
     if cfg.cost.full_transcript_injection:
         context_tokens = cfg.cost.interview_context_chars * cfg.cost.chars_to_tokens_ratio
     else:
@@ -76,7 +121,7 @@ def quality_score(
     fatigue = max(0.6, 1.0 - (contacts - 1) * cfg.quality.fatigue_decay_per_contact)
     complexity = max(0.75, 1.0 - 0.08 * (domain_complexity_scalar - 1.0))
 
-    score = base * minute_effect * memory_effect * context_effect * fatigue * complexity
+    score = base * minute_effect * memory_effect * response_mode_effect * context_effect * fatigue * complexity
     return max(0.0, min(1.0, score))
 
 

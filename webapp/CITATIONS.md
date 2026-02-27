@@ -13,6 +13,7 @@
 - Paper-backed empirical anchors should be attributed to the paper, not to this project.
 - Repo structure and implementation patterns should be attributed to the `genagents` codebase, not to the paper's exact evaluation setup.
 - Project defaults that are operational placeholders for later calibration should be treated as project estimates, even when they are paper-inspired.
+- In both the paper and the reference codebase, reflection and "importance" are prompt-mediated heuristics. In this project they are treated as configurable modeling assumptions, not direct observed quantities.
 
 ## Federal/National Benchmark Sources Used
 

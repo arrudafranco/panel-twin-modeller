@@ -13,6 +13,19 @@ type Scenario = {
   projectsPerYear: number
   horizonMonths: number
   otherInitialInvestment: number
+  memoryRetrievalK: number
+  memoryRecencyWeight: number
+  memoryRelevanceWeight: number
+  memoryImportanceWeight: number
+  reflectionEnabled: boolean
+  reflectionIntervalTurns: number
+  reflectionSummaryCount: number
+  categoricalQuestionShare: number
+  numericQuestionShare: number
+  openEndedQuestionShare: number
+  categoricalModeReliability: number
+  numericModeReliability: number
+  openEndedModeReliability: number
   contactAttempts: number
   responseLiftPerExtraAttempt: number
   responseDecayPerExtraAttempt: number
@@ -40,6 +53,19 @@ const INITIAL: Scenario = {
   projectsPerYear: 8,
   horizonMonths: 36,
   otherInitialInvestment: 0,
+  memoryRetrievalK: 8,
+  memoryRecencyWeight: 1,
+  memoryRelevanceWeight: 1,
+  memoryImportanceWeight: 1,
+  reflectionEnabled: true,
+  reflectionIntervalTurns: 8,
+  reflectionSummaryCount: 3,
+  categoricalQuestionShare: 0.45,
+  numericQuestionShare: 0.2,
+  openEndedQuestionShare: 0.35,
+  categoricalModeReliability: 1.02,
+  numericModeReliability: 0.95,
+  openEndedModeReliability: 0.98,
   contactAttempts: 1,
   responseLiftPerExtraAttempt: 0,
   responseDecayPerExtraAttempt: 0,
@@ -105,6 +131,46 @@ function App() {
     0.01,
     0.99
   )
+  const responseShareTotal = Math.max(
+    cfg.categoricalQuestionShare + cfg.numericQuestionShare + cfg.openEndedQuestionShare,
+    0.0001
+  )
+  const categoricalShare = cfg.categoricalQuestionShare / responseShareTotal
+  const numericShare = cfg.numericQuestionShare / responseShareTotal
+  const openEndedShare = cfg.openEndedQuestionShare / responseShareTotal
+  const meanMemoryWeight =
+    (cfg.memoryRecencyWeight + cfg.memoryRelevanceWeight + cfg.memoryImportanceWeight) / 3
+  const memoryImbalance =
+    (Math.abs(cfg.memoryRecencyWeight - meanMemoryWeight) +
+      Math.abs(cfg.memoryRelevanceWeight - meanMemoryWeight) +
+      Math.abs(cfg.memoryImportanceWeight - meanMemoryWeight)) /
+    Math.max(meanMemoryWeight * 3, 0.0001)
+  const memoryBalanceEffect = clamp(1 - 0.12 * memoryImbalance, 0.85, 1)
+  const memoryRetrievalEffect = clamp(
+    0.9 + (0.1 * Math.log(Math.max(cfg.memoryRetrievalK, 1))) / Math.log(8),
+    0.9,
+    1.06
+  )
+  const reflectionEffect = cfg.reflectionEnabled
+    ? clamp(
+        (0.97 + 0.03 * Math.sqrt(8 / Math.max(cfg.reflectionIntervalTurns, 1))) *
+          (0.97 + 0.01 * Math.min(cfg.reflectionSummaryCount, 6)),
+        0.95,
+        1.03
+      )
+    : 0.96
+  const memorySystemAdjustment = clamp(
+    memoryBalanceEffect * memoryRetrievalEffect * reflectionEffect,
+    0.82,
+    1.08
+  )
+  const responseModeAdjustment = clamp(
+    categoricalShare * cfg.categoricalModeReliability +
+      numericShare * cfg.numericModeReliability +
+      openEndedShare * cfg.openEndedModeReliability,
+    0.85,
+    1.1
+  )
   const quality = clamp(
     0.83 -
       (cfg.minutes - 90) * 0.0012 -
@@ -113,7 +179,8 @@ function App() {
       (Math.log10(cfg.pilotN) - 2.1) * 0.03,
     0,
     1
-  )
+  ) * memorySystemAdjustment * responseModeAdjustment
+  const boundedQuality = clamp(quality, 0, 1)
   const reschedulingCost =
     cfg.pilotN * 0.8 * cfg.retestRescheduleFraction * cfg.reschedulingCostPerEvent
   const cost =
@@ -124,7 +191,7 @@ function App() {
     reschedulingCost / Math.max(cfg.pilotN, 1)
 
   const ownU = utility(
-    quality,
+    boundedQuality,
     cfg.price,
     10,
     cfg.risk,
@@ -186,7 +253,7 @@ function App() {
     breakEvenMonths === null
       ? `Not reached in ${cfg.horizonMonths} months`
       : `${breakEvenMonths} months (${(breakEvenMonths / 12).toFixed(1)} years)`
-  const favorable = quality >= threshold && npv > 0
+  const favorable = boundedQuality >= threshold && npv > 0
   const warnings: string[] = []
   if (cfg.minutes > 150) warnings.push('Interview duration is high relative to common calibration windows.')
   if (cfg.contactAttempts > 4) warnings.push('Contact attempts are high and may overstate response uplift.')
@@ -196,9 +263,9 @@ function App() {
 
   const plainLanguage = favorable
     ? 'Quality clears threshold and expected value is positive. Focus on implementation rigor and pilot precision.'
-    : quality < threshold && npv > 0
+    : boundedQuality < threshold && npv > 0
       ? 'Economics look promising, but quality is below benchmark policy. Prioritize methodological upgrades.'
-      : quality >= threshold && npv <= 0
+      : boundedQuality >= threshold && npv <= 0
         ? 'Method quality appears acceptable, but economics are weak. Revisit pricing and project volume assumptions.'
         : 'Quality and economics are below target. Rework assumptions before scale-up decisions.'
 
@@ -207,7 +274,7 @@ function App() {
     ['base', threshold],
     ['optimistic', threshold - 0.03],
   ].map(([name, t]) => {
-    const wp = clamp(winProb + (quality - (t as number)) * 0.3, 0.01, 0.99)
+    const wp = clamp(winProb + (boundedQuality - (t as number)) * 0.3, 0.01, 0.99)
     const n = ((cfg.price - cost * 1000) * cfg.projectsPerYear * wp) * 2.8 - totalUpfrontInvestment
     const low = n - Math.abs(n) * 0.15
     const high = n + Math.abs(n) * 0.15
@@ -365,6 +432,29 @@ function App() {
               step={0.01}
               onChange={(v) => update('crossPriceElasticity', Number(v.toFixed(2)))}
             />
+            <Range label="Retrieved memory items" value={cfg.memoryRetrievalK} min={1} max={20} step={1} onChange={(v) => update('memoryRetrievalK', v)} />
+            <Range label="Recency weight" value={cfg.memoryRecencyWeight} min={0} max={3} step={0.1} onChange={(v) => update('memoryRecencyWeight', Number(v.toFixed(1)))} />
+            <Range label="Relevance weight" value={cfg.memoryRelevanceWeight} min={0} max={3} step={0.1} onChange={(v) => update('memoryRelevanceWeight', Number(v.toFixed(1)))} />
+            <Range label="Importance weight" value={cfg.memoryImportanceWeight} min={0} max={3} step={0.1} onChange={(v) => update('memoryImportanceWeight', Number(v.toFixed(1)))} />
+            <label className="field">
+              <span>Reflection summaries</span>
+              <select value={cfg.reflectionEnabled ? 'on' : 'off'} onChange={(e) => update('reflectionEnabled', e.target.value === 'on')}>
+                <option value="on">enabled</option>
+                <option value="off">disabled</option>
+              </select>
+            </label>
+            {cfg.reflectionEnabled && (
+              <>
+                <Range label="Reflection interval (turns)" value={cfg.reflectionIntervalTurns} min={1} max={30} step={1} onChange={(v) => update('reflectionIntervalTurns', v)} />
+                <Range label="Reflection summary count" value={cfg.reflectionSummaryCount} min={1} max={8} step={1} onChange={(v) => update('reflectionSummaryCount', v)} />
+              </>
+            )}
+            <Range label="Categorical share" value={cfg.categoricalQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('categoricalQuestionShare', Number(v.toFixed(2)))} />
+            <Range label="Numeric share" value={cfg.numericQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('numericQuestionShare', Number(v.toFixed(2)))} />
+            <Range label="Open-ended share" value={cfg.openEndedQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('openEndedQuestionShare', Number(v.toFixed(2)))} />
+            <Range label="Categorical reliability" value={cfg.categoricalModeReliability} min={0.7} max={1.2} step={0.01} onChange={(v) => update('categoricalModeReliability', Number(v.toFixed(2)))} />
+            <Range label="Numeric reliability" value={cfg.numericModeReliability} min={0.7} max={1.2} step={0.01} onChange={(v) => update('numericModeReliability', Number(v.toFixed(2)))} />
+            <Range label="Open-ended reliability" value={cfg.openEndedModeReliability} min={0.7} max={1.2} step={0.01} onChange={(v) => update('openEndedModeReliability', Number(v.toFixed(2)))} />
             <Range label="Probability benchmark price" value={cfg.probabilityPrice} min={20_000} max={600_000} step={5000} onChange={(v) => update('probabilityPrice', v)} />
             <Range label="Probability benchmark quality" value={cfg.probabilityQuality} min={0.4} max={1.0} step={0.01} onChange={(v) => update('probabilityQuality', Number(v.toFixed(2)))} />
             <Range label="Probability benchmark turnaround" value={cfg.probabilityTurnaroundDays} min={3} max={45} step={1} onChange={(v) => update('probabilityTurnaroundDays', v)} />
@@ -407,7 +497,7 @@ function App() {
                 </div>
               )}
               <div className="kpis">
-                <Kpi label="Sellable quality" value={quality.toFixed(3)} />
+                <Kpi label="Sellable quality" value={boundedQuality.toFixed(3)} />
                 <Kpi label="Quality threshold" value={threshold.toFixed(3)} />
                 <Kpi label="Cost per complete" value={money(cost)} />
                 <Kpi label="Projected NPV" value={money(npv)} />
@@ -428,8 +518,15 @@ function App() {
                   <tr><th>Mapping intercept</th><td>{cfg.risk === 'federal' ? '0.18' : '0.16'}</td></tr>
                   <tr><th>Mapping slope</th><td>{cfg.risk === 'federal' ? '0.82' : '0.80'}</td></tr>
                   <tr><th>Mapping uncertainty</th><td>0.04 (illustrative)</td></tr>
+                  <tr><th>Memory strategy</th><td>retrieval k={cfg.memoryRetrievalK}; reflection {cfg.reflectionEnabled ? 'on' : 'off'}</td></tr>
+                  <tr><th>Memory weights</th><td>recency {cfg.memoryRecencyWeight.toFixed(1)} / relevance {cfg.memoryRelevanceWeight.toFixed(1)} / importance {cfg.memoryImportanceWeight.toFixed(1)}</td></tr>
+                  <tr><th>Response mode mix</th><td>cat {categoricalShare.toFixed(2)} / num {numericShare.toFixed(2)} / open {openEndedShare.toFixed(2)}</td></tr>
+                  <tr><th>Response-mode reliability</th><td>{responseModeAdjustment.toFixed(3)} multiplier</td></tr>
                 </tbody>
               </table>
+              <p className="note">
+                Reflection and importance are prompt-mediated heuristics in the reference architecture. This app treats them as transparent assumptions, not direct measurements.
+              </p>
             </section>
           )}
 
@@ -444,6 +541,7 @@ function App() {
                   <tr><th>Effective response rate</th><td>{effectiveResponse.toFixed(2)}</td></tr>
                   <tr><th>Retest attrition</th><td>{cfg.attrition.toFixed(2)}</td></tr>
                   <tr><th>Rescheduling cost (total)</th><td>{money(reschedulingCost)}</td></tr>
+                  <tr><th>Reflection token proxy</th><td>{Math.round((cfg.minutes + cfg.memoryRetrievalK * 3) * (cfg.reflectionEnabled ? 1 + 8 / Math.max(cfg.reflectionIntervalTurns, 1) : 1)).toLocaleString()}</td></tr>
                   <tr><th>Cost per completed interview</th><td>{money(cost)}</td></tr>
                 </tbody>
               </table>
@@ -496,6 +594,7 @@ function App() {
 {`# Limitations Snapshot
 - This Pages model is illustrative and should be validated with calibrated backend outputs.
 - Triggered guardrails: ${warnings.length}
+- Reflection and response-mode settings are transparent heuristics, not validated empirical estimates.
 - P(positive economics): proxy signal from current scenario direction only (not full Monte Carlo).`}
               </pre>
               <pre className="mono">

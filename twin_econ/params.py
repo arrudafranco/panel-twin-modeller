@@ -63,6 +63,12 @@ class QualityParams:
     reflection_enabled: bool = True
     reflection_interval_turns: int = 8
     reflection_summary_count: int = 3
+    categorical_question_share: float = 0.45
+    numeric_question_share: float = 0.20
+    open_ended_question_share: float = 0.35
+    categorical_mode_reliability: float = 1.02
+    numeric_mode_reliability: float = 0.95
+    open_ended_mode_reliability: float = 0.98
     quality_threshold: float = 0.75
     fatigue_decay_per_contact: float = 0.03
     self_report_behavior_base: float = 0.75

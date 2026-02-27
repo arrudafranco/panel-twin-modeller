@@ -82,6 +82,19 @@ def test_reflection_cadence_changes_token_costs():
 
     assert denser["reflection_tokens_per_participant"] > base["reflection_tokens_per_participant"]
     assert denser["tokens_input"] > base["tokens_input"]
+
+
+def test_response_mode_mix_affects_quality():
+    cfg = ScenarioConfig()
+    baseline = quality_score(cfg, "attitude_belief")
+
+    cfg.quality.numeric_question_share = 0.8
+    cfg.quality.categorical_question_share = 0.1
+    cfg.quality.open_ended_question_share = 0.1
+    cfg.quality.numeric_mode_reliability = 0.8
+    shifted = quality_score(cfg, "attitude_belief")
+
+    assert shifted < baseline
 def test_finance_npv_numeric():
     cfg = ScenarioConfig()
     cost = compute_costs(cfg)
