@@ -38,6 +38,18 @@ def test_rescheduling_cost_is_optional_and_explicit():
     assert with_reschedule["total_cost"] > no_reschedule["total_cost"]
 
 
+def test_word_based_token_estimate_is_optional():
+    cfg = ScenarioConfig()
+    baseline = compute_costs(cfg)
+    cfg.cost.use_word_based_token_estimate = True
+    cfg.cost.avg_words_per_participant = 6500
+    cfg.cost.avg_words_interviewer = 5400
+    cfg.cost.words_to_tokens_ratio = 1.3
+    alt = compute_costs(cfg)
+    assert alt["tokens_input"] != baseline["tokens_input"]
+    assert alt["tokens_output"] != baseline["tokens_output"]
+
+
 def test_quality_bounds_and_ordering():
     cfg = ScenarioConfig()
     q_full = quality_score(cfg, "attitude_belief")

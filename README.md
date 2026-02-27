@@ -80,3 +80,4 @@ This writes a publish-ready copy to `C:\Users\gusta\panel-twin-public` and fails
 - Config files are real YAML and loaded with `PyYAML`.
 - All RNG-driven paths are seeded.
 - Pilot mode emphasizes unknown-parameter estimation; scale-up mode emphasizes representativeness diagnostics.
+- Optional external anchor references are documented in [docs/external_reference_defaults.md](C:\Users\gusta\panel-twin\docs\external_reference_defaults.md).

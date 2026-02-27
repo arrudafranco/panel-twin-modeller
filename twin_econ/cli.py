@@ -15,7 +15,14 @@ from .mc_model import run_monte_carlo
 from .params import ScenarioConfig, dump_config, load_config
 from .pilot_calibration import calibrate_from_csv, write_calibrated_config
 from .quality_model import quality_score, quality_tiers
-from .reporting import heatmap_2way, save_csv, top_driver_analysis, tornado_plot, write_exec_brief
+from .reporting import (
+    heatmap_2way,
+    save_csv,
+    top_driver_analysis,
+    tornado_plot,
+    write_exec_brief,
+    write_limitations_brief,
+)
 from .revenue_model import compute_finance
 from .sampling_model import run_sampling
 
@@ -24,6 +31,23 @@ def _ensure_out(path: str) -> Path:
     p = Path(path)
     p.mkdir(parents=True, exist_ok=True)
     return p
+
+
+def _guardrail_flags(cfg: ScenarioConfig) -> list[str]:
+    flags: list[str] = []
+    if cfg.interview_minutes > 150:
+        flags.append("Interview duration is above common calibration ranges.")
+    if cfg.cost.contact_attempts > 4:
+        flags.append("Contact attempts are high and may overstate response uplift.")
+    if cfg.cost.response_rate < 0.10:
+        flags.append("Response-rate assumption is low; cost/quality uncertainty likely elevated.")
+    if cfg.cost.attrition_rate > 0.40:
+        flags.append("Retest attrition is high; normalized-accuracy denominator may be unstable.")
+    if cfg.competition.cross_price_elasticity > 0.60:
+        flags.append("Cross-price elasticity is high relative to default stress-test range.")
+    if cfg.revenue.horizon_months > 84:
+        flags.append("Long horizon may amplify assumption drift and extrapolation risk.")
+    return flags
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -47,6 +71,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         "quality_pass": bool(quality_eval["quality_pass"]),
     }
     deliverables = generate_client_deliverables(cfg, str(out / "deliverables"), compliance=compliance)
+    guardrails = _guardrail_flags(cfg)
 
     summary = {
         "scenario": cfg.scenario_name,
@@ -92,6 +117,16 @@ def cmd_run(args: argparse.Namespace) -> int:
             ),
         },
     )
+    uncertainty_summary: dict[str, float] | None = None
+    if int(args.uncertainty_n) > 0:
+        mc_df = run_monte_carlo(cfg, n=int(args.uncertainty_n), seed=cfg.seed)
+        uncertainty_summary = {
+            "p_npv_positive": float((mc_df["npv"] > 0).mean()),
+            "p_break_even_within_horizon": float(mc_df["break_even_within_horizon"].mean()),
+            "p_break_even_le_24m": float((mc_df["time_to_break_even_months"] <= 24).fillna(False).mean()),
+        }
+        (out / "run_uncertainty_summary.json").write_text(json.dumps(uncertainty_summary, indent=2), encoding="utf-8")
+    write_limitations_brief(str(out / "limitations_brief.md"), cfg, guardrails, uncertainty=uncertainty_summary)
 
     md = [
         "# Baseline Pilot Summary",
@@ -356,6 +391,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_run = sub.add_parser("run", help="Run a single scenario")
     p_run.add_argument("--config", required=True)
     p_run.add_argument("--out", default="outputs/run_001")
+    p_run.add_argument("--uncertainty_n", type=int, default=0, help="Optional Monte Carlo draws for uncertainty summary")
     p_run.set_defaults(func=cmd_run)
 
     p_sweep = sub.add_parser("sweep", help="Run parameter sweep")

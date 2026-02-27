@@ -124,3 +124,29 @@ def test_compare_outputs_table_and_deltas(tmp_path: Path):
     )
     assert (out / "scenario_compare.csv").exists()
     assert (out / "scenario_compare_deltas.csv").exists()
+
+
+def test_run_can_emit_uncertainty_and_limitations(tmp_path: Path):
+    repo = Path(__file__).resolve().parents[1]
+    out = tmp_path / "run_uncertain"
+    mpl = tmp_path / "mpl"
+    mpl.mkdir(parents=True, exist_ok=True)
+
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "twin_econ.cli",
+            "run",
+            "--config",
+            "configs/base.yaml",
+            "--out",
+            str(out),
+            "--uncertainty_n",
+            "200",
+        ],
+        cwd=repo,
+        mpl_dir=mpl,
+    )
+    assert (out / "run_uncertainty_summary.json").exists()
+    assert (out / "limitations_brief.md").exists()

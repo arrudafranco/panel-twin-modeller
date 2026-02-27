@@ -200,6 +200,38 @@ def _assumption_warnings(cfg: ScenarioConfig) -> list[str]:
     return warns
 
 
+def _limitations_markdown(cfg: ScenarioConfig, warnings: list[str], mc: pd.DataFrame) -> str:
+    p_npv = float((mc["npv"] > 0).mean())
+    p_be_h = float(mc["break_even_within_horizon"].mean())
+    p_be_24 = float((mc["time_to_break_even_months"] <= 24).fillna(False).mean())
+    lines = [
+        "# Methodological Limitations and Guardrails",
+        "",
+        "## Scope",
+        "- Decision support for pilot and feasibility planning; not final causal validation.",
+        "- Parameters may be scenario assumptions unless pilot-calibrated.",
+        "",
+        "## Active Guardrails",
+    ]
+    if warnings:
+        lines.extend([f"- {w}" for w in warnings])
+    else:
+        lines.append("- No current guardrail warnings.")
+    lines.extend(
+        [
+            "",
+            "## Uncertainty Snapshot",
+            f"- P(NPV > 0): {p_npv:.3f}",
+            f"- P(Break-even within horizon): {p_be_h:.3f}",
+            f"- P(Break-even <= 24 months): {p_be_24:.3f}",
+            "",
+            "## Notes",
+            "- Use calibration outputs to narrow priors before external-facing commitments.",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def _sensitivity_table(cfg: ScenarioConfig, q_sellable: float, cost_per_complete: float) -> pd.DataFrame:
     rows: list[dict[str, float | str | bool]] = []
     original_mode = cfg.quality.benchmark_mapping_sensitivity
@@ -535,7 +567,8 @@ def main() -> None:
             st.write(rec["content"])
 
     cfg, modules_count, mc_n = _render_controls()
-    for w in _assumption_warnings(cfg):
+    warnings = _assumption_warnings(cfg)
+    for w in warnings:
         st.warning(w)
     out = _run_scenario(cfg, modules_count, mc_n=mc_n, mc_seed=cfg.seed)
 
@@ -714,7 +747,14 @@ def main() -> None:
     with tabs[5]:
         st.header("Download and Reuse")
         brief = _decision_brief(cfg, out)
+        limitations = _limitations_markdown(cfg, warnings, out["mc"])
         st.download_button("Download decision brief (md)", brief, file_name=f"{cfg.scenario_name}_brief.md", mime="text/markdown")
+        st.download_button(
+            "Download limitations brief (md)",
+            limitations,
+            file_name=f"{cfg.scenario_name}_limitations.md",
+            mime="text/markdown",
+        )
         st.download_button(
             "Download scenario config (yaml)",
             yaml.safe_dump(asdict(cfg), sort_keys=False),

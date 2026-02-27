@@ -2,6 +2,7 @@ import { useState, type JSX } from 'react'
 import './App.css'
 
 type TabKey = 'overview' | 'methods' | 'ops' | 'econ' | 'bench' | 'downloads'
+type FocusPreset = 'none' | 'economics' | 'sampling_quality' | 'operations'
 
 type Scenario = {
   minutes: number
@@ -92,6 +93,7 @@ function utility(
 function App() {
   const [tab, setTab] = useState<TabKey>('overview')
   const [cfg, setCfg] = useState<Scenario>(INITIAL)
+  const [focusPreset, setFocusPreset] = useState<FocusPreset>('none')
 
   const threshold = cfg.risk === 'federal' ? 0.77 : 0.72
   const tailwind = 0.1
@@ -185,6 +187,12 @@ function App() {
       ? `Not reached in ${cfg.horizonMonths} months`
       : `${breakEvenMonths} months (${(breakEvenMonths / 12).toFixed(1)} years)`
   const favorable = quality >= threshold && npv > 0
+  const warnings: string[] = []
+  if (cfg.minutes > 150) warnings.push('Interview duration is high relative to common calibration windows.')
+  if (cfg.contactAttempts > 4) warnings.push('Contact attempts are high and may overstate response uplift.')
+  if (cfg.responseRate < 0.1) warnings.push('Very low response rate increases uncertainty in cost and quality estimates.')
+  if (cfg.attrition > 0.4) warnings.push('High retest attrition can weaken normalized-accuracy grounding.')
+  if (cfg.crossPriceElasticity > 0.6) warnings.push('High cross-price elasticity may overstate substitution sensitivity.')
 
   const plainLanguage = favorable
     ? 'Quality clears threshold and expected value is positive. Focus on implementation rigor and pilot precision.'
@@ -210,6 +218,17 @@ function App() {
     setCfg((prev) => ({ ...prev, [key]: value }))
   }
 
+  function applyFocusPreset(preset: FocusPreset): void {
+    setFocusPreset(preset)
+    if (preset === 'economics') {
+      setCfg((prev) => ({ ...prev, horizonMonths: Math.max(prev.horizonMonths, 60), crossPriceElasticity: Math.max(prev.crossPriceElasticity, 0.25) }))
+    } else if (preset === 'sampling_quality') {
+      setCfg((prev) => ({ ...prev, responseRate: Math.max(prev.responseRate, 0.15), attrition: Math.min(prev.attrition, 0.3) }))
+    } else if (preset === 'operations') {
+      setCfg((prev) => ({ ...prev, contactAttempts: Math.max(prev.contactAttempts, 2), retestRescheduleFraction: Math.max(prev.retestRescheduleFraction, 0.1) }))
+    }
+  }
+
   return (
     <div className="page">
       <header className="hero">
@@ -223,6 +242,15 @@ function App() {
       <div className="layout">
         <aside className="card controls">
           <h2>Scenario Controls</h2>
+          <label className="field">
+            <span>Focus preset</span>
+            <select value={focusPreset} onChange={(e) => applyFocusPreset(e.target.value as FocusPreset)}>
+              <option value="none">none</option>
+              <option value="economics">economics</option>
+              <option value="sampling_quality">sampling & quality</option>
+              <option value="operations">operations</option>
+            </select>
+          </label>
           <Range
             label="Interview minutes"
             value={cfg.minutes}
@@ -368,6 +396,16 @@ function App() {
           {tab === 'overview' && (
             <section>
               <h2>Decision Overview</h2>
+              {warnings.length > 0 && (
+                <div className="note">
+                  <strong>Guardrails:</strong>
+                  <ul>
+                    {warnings.map((w) => (
+                      <li key={w}>{w}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="kpis">
                 <Kpi label="Sellable quality" value={quality.toFixed(3)} />
                 <Kpi label="Quality threshold" value={threshold.toFixed(3)} />
@@ -454,6 +492,12 @@ function App() {
             <section>
               <h2>Downloads</h2>
               <p>Use the full app/CLI in the repository for exportable deliverables and scenario files.</p>
+              <pre className="mono">
+{`# Limitations Snapshot
+- This Pages model is illustrative and should be validated with calibrated backend outputs.
+- Triggered guardrails: ${warnings.length}
+- P(positive economics): proxy signal from current scenario direction only (not full Monte Carlo).`}
+              </pre>
               <pre className="mono">
 Repo: https://github.com/arrudafranco/panel-twin-modeller{'\n'}
 Pages: https://arrudafranco.github.io/panel-twin-modeller/

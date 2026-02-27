@@ -153,6 +153,10 @@
   border-radius: 8px;
 }
 
+.note ul {
+  margin: 6px 0 0 18px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

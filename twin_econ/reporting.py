@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from .params import ScenarioConfig
 
 
 def write_exec_brief(path: str, sections: dict[str, str]) -> None:
@@ -13,6 +14,60 @@ def write_exec_brief(path: str, sections: dict[str, str]) -> None:
         lines.append(f"## {k}")
         lines.append(v)
         lines.append("")
+    Path(path).write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_limitations_brief(
+    path: str,
+    cfg: ScenarioConfig,
+    guardrails: list[str],
+    uncertainty: dict[str, float] | None = None,
+) -> None:
+    lines = [
+        "# Methodological Limitations and Guardrails",
+        "",
+        "## Scope",
+        "- This model is decision support for pilot/scaling planning, not a final causal or regulatory proof.",
+        "- Several economic and response-process parameters are scenario assumptions unless empirically calibrated.",
+        "",
+        "## Active Guardrails",
+    ]
+    if guardrails:
+        lines.extend([f"- {g}" for g in guardrails])
+    else:
+        lines.append("- No guardrail thresholds were triggered in this run.")
+
+    lines.extend(
+        [
+            "",
+            "## Calibration Status",
+            f"- Scenario: {cfg.scenario_name}",
+            "- Use `twin-econ calibrate` with pilot logs to tighten uncertainty on response/attrition/tokens/costs.",
+        ]
+    )
+    if uncertainty:
+        lines.extend(
+            [
+                "",
+                "## Uncertainty Snapshot",
+                f"- P(NPV > 0): {uncertainty.get('p_npv_positive', float('nan')):.3f}",
+                f"- P(Break-even within horizon): {uncertainty.get('p_break_even_within_horizon', float('nan')):.3f}",
+                f"- P(Break-even <= 24 months): {uncertainty.get('p_break_even_le_24m', float('nan')):.3f}",
+            ]
+        )
+
+    lines.extend(
+        [
+            "",
+            "## External Reference Notes",
+            "- Discount-rate policy context often uses 3% and 7% sensitivity anchors in federal analysis guidance.",
+            "- Telephone survey response-rate trends can be low in modern practice; weighting and design remain critical.",
+            "- English tokenization rule-of-thumb often approximates ~1 token per ~4 characters.",
+            "",
+            "## Operational Recommendation",
+            "- Treat favorable outputs as a prioritization signal; confirm with calibration and sensitivity checks before external commitments.",
+        ]
+    )
     Path(path).write_text("\n".join(lines), encoding="utf-8")
 
 
