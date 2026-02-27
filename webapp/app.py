@@ -52,13 +52,28 @@ def _inject_runtime_a11y_patch() -> None:
         """
         <script>
         (() => {
-          const main = document.querySelector("section.main");
-          if (main) {
+          // Streamlit renders nested wrappers outside semantic landmarks; patch roles at runtime.
+          const mainCandidates = [
+            document.querySelector("section.main"),
+            document.querySelector('[data-testid="stAppViewContainer"]'),
+            document.querySelector('.stMainBlockContainer')
+          ].filter(Boolean);
+          if (mainCandidates.length > 0) {
+            const main = mainCandidates[0];
             main.setAttribute("role", "main");
             if (!main.getAttribute("aria-label")) main.setAttribute("aria-label", "Feasibility content");
           }
+          const navCandidates = [
+            document.querySelector('[data-testid="stSidebar"]'),
+            document.querySelector('[data-baseweb="tab-list"]')?.closest('div'),
+          ].filter(Boolean);
+          if (navCandidates.length > 0) {
+            const nav = navCandidates[0];
+            nav.setAttribute("role", "navigation");
+            if (!nav.getAttribute("aria-label")) nav.setAttribute("aria-label", "Primary sections");
+          }
           const tablist = document.querySelector('[data-baseweb="tab-list"]');
-          if (tablist) tablist.setAttribute("aria-label", "Primary sections");
+          if (tablist && !tablist.getAttribute("aria-label")) tablist.setAttribute("aria-label", "Primary sections");
         })();
         </script>
         """,

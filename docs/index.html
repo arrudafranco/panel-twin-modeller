@@ -3,119 +3,255 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Panel Twin Modeller - Explorer</title>
+  <title>Panel Twin Modeller - Feasibility Explorer</title>
   <style>
-    :root { --ink:#0b2e4f; --sky:#0a79b7; --bg:#f4f8fb; --card:#ffffff; --line:#d6e2ef; }
-    body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; background: linear-gradient(180deg, var(--bg), #fff); color:#162738; }
-    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-    h1 { color: var(--ink); margin: 0 0 8px; }
-    .sub { margin: 0 0 18px; color:#35506a; }
-    .grid { display:grid; grid-template-columns: 320px 1fr; gap:16px; }
-    .card { background: var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
-    .kpis { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; }
-    .kpi { border:1px solid var(--line); border-radius:10px; padding:12px; }
-    .kpi .label { font-size: 12px; color:#54708a; }
-    .kpi .val { font-size: 22px; font-weight: 700; color: var(--ink); }
-    label { display:block; margin-top:10px; font-weight:600; font-size:13px; }
-    input[type="range"] { width:100%; }
-    .hint { font-size:12px; color:#4a647e; margin-top:6px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; white-space:pre-wrap; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr 1fr; } }
+    :root {
+      --ink:#07345c;
+      --sky:#0f7bb8;
+      --bg:#eef4fa;
+      --card:#ffffff;
+      --line:#d5e2ef;
+      --muted:#4c6881;
+      --ok:#1e7a45;
+      --warn:#9a5f00;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; color:#1a2a3b; background: radial-gradient(circle at 10% 0%, #f8fbff 0%, var(--bg) 45%, #ffffff 100%); }
+    .wrap { max-width: 1200px; margin: 24px auto 48px; padding: 0 16px; }
+    .hero { background: linear-gradient(120deg, #0b406f, #0f7bb8); color:#fff; border-radius: 14px; padding: 20px; box-shadow: 0 10px 22px rgba(9,45,76,.18); }
+    .hero h1 { margin:0 0 6px; font-size: 32px; }
+    .hero p { margin: 0; opacity: .92; }
+    .layout { display:grid; grid-template-columns: 330px 1fr; gap:16px; margin-top: 16px; }
+    .card { background: var(--card); border:1px solid var(--line); border-radius: 12px; padding: 14px; }
+    .controls h2, .panel h2 { margin:0 0 12px; color: var(--ink); }
+    .sub { color:var(--muted); font-size: 13px; margin:0 0 8px; }
+    .field { margin-bottom: 12px; }
+    .field label { display:flex; justify-content:space-between; font-size:13px; font-weight:600; color:#29445d; margin-bottom:4px; }
+    .field input, .field select { width:100%; }
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 12px; }
+    .tab { border:1px solid var(--line); background:#f8fbff; color:#21425f; padding:7px 10px; border-radius:9px; cursor:pointer; font-weight:600; font-size:13px; }
+    .tab.active { background: #dff0fb; border-color:#a8d4ef; color:#093a63; }
+    .kpis { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin:12px 0; }
+    .kpi { border:1px solid var(--line); border-radius:10px; padding:10px; background:#fff; }
+    .kpi .label { font-size:12px; color:var(--muted); }
+    .kpi .value { font-size:23px; font-weight:700; color:var(--ink); }
+    .pill { display:inline-block; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:700; }
+    .pill.ok { background:#e6f5ec; color:var(--ok); }
+    .pill.warn { background:#fff4e5; color:var(--warn); }
+    .note { border-left:4px solid var(--sky); background:#f6fbff; padding:10px; border-radius:8px; }
+    .panel { display:none; }
+    .panel.active { display:block; }
+    table { width:100%; border-collapse: collapse; font-size:13px; }
+    th, td { text-align:left; padding:8px; border-bottom:1px solid #e8eef5; vertical-align: top; }
+    .hint { color:var(--muted); font-size:12px; }
+    .twocol { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; font-size:12px; background:#f8fbff; border:1px solid #e3edf7; border-radius:8px; padding:10px; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .twocol { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Panel Twin Modeller</h1>
-    <p class="sub">Interactive feasibility explorer for quality thresholds, economics, and pilot planning.</p>
+    <section class="hero">
+      <h1>Panel Twin Modeller</h1>
+      <p>Interactive static explorer for feasibility decisions: quality thresholds, implementation costs, and economic risk.</p>
+    </section>
 
-    <div class="grid">
-      <section class="card">
+    <div class="layout">
+      <aside class="card controls" aria-label="Scenario controls">
         <h2>Scenario Controls</h2>
-        <label>Interview Minutes: <span id="v_minutes">90</span></label>
-        <input id="minutes" type="range" min="30" max="180" step="5" value="90">
-
-        <label>Response Rate: <span id="v_rr">0.35</span></label>
-        <input id="rr" type="range" min="0.05" max="0.9" step="0.01" value="0.35">
-
-        <label>Attrition Rate: <span id="v_attr">0.20</span></label>
-        <input id="attr" type="range" min="0" max="0.6" step="0.01" value="0.20">
-
-        <label>Price Per Project ($): <span id="v_price">120000</span></label>
-        <input id="price" type="range" min="10000" max="500000" step="5000" value="120000">
-
-        <label>Projects Per Year: <span id="v_ppy">8</span></label>
-        <input id="ppy" type="range" min="1" max="30" step="1" value="8">
-
-        <p class="hint">This static page is for transparent, shareable scenario exploration. Full model logic remains in Python CLI/app.</p>
-      </section>
-
-      <section class="card">
-        <h2>Decision Snapshot</h2>
-        <div class="kpis">
-          <div class="kpi"><div class="label">Sellable Quality</div><div class="val" id="k_quality">0.00</div></div>
-          <div class="kpi"><div class="label">Threshold</div><div class="val" id="k_threshold">0.00</div></div>
-          <div class="kpi"><div class="label">Cost / Complete</div><div class="val" id="k_cost">$0</div></div>
-          <div class="kpi"><div class="label">Projected NPV</div><div class="val" id="k_npv">$0</div></div>
+        <p class="sub">Adjust assumptions and inspect how they change the decision signal.</p>
+        <div class="field"><label>Interview minutes <span id="v_minutes">90</span></label><input id="minutes" type="range" min="30" max="180" step="5" value="90"></div>
+        <div class="field"><label>Pilot N <span id="v_n">150</span></label><input id="n" type="range" min="50" max="400" step="10" value="150"></div>
+        <div class="field"><label>Response rate <span id="v_rr">0.35</span></label><input id="rr" type="range" min="0.05" max="0.9" step="0.01" value="0.35"></div>
+        <div class="field"><label>Retest attrition <span id="v_attr">0.20</span></label><input id="attr" type="range" min="0" max="0.6" step="0.01" value="0.20"></div>
+        <div class="field"><label>Price per project <span id="v_price">120000</span></label><input id="price" type="range" min="10000" max="500000" step="5000" value="120000"></div>
+        <div class="field"><label>Projects/year <span id="v_ppy">8</span></label><input id="ppy" type="range" min="1" max="30" step="1" value="8"></div>
+        <div class="field">
+          <label>Risk profile</label>
+          <select id="risk">
+            <option value="commercial">commercial_exploratory</option>
+            <option value="federal">federal_high_risk</option>
+          </select>
         </div>
-        <h3>Interpretation</h3>
-        <p id="interp"></p>
-        <h3>Assumption Sensitivity</h3>
-        <div class="mono" id="sens"></div>
-      </section>
+        <p class="hint">This page is static (GitHub Pages). Full Python model and deliverable generation are in the main app/CLI.</p>
+      </aside>
+
+      <main class="card" role="main" aria-label="Feasibility panels">
+        <div class="tabs" role="tablist" aria-label="Primary sections">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="methods">Model & Methods</button>
+          <button class="tab" data-tab="ops">Operations & Cost</button>
+          <button class="tab" data-tab="econ">Economics & Risk</button>
+          <button class="tab" data-tab="bench">Benchmarks</button>
+          <button class="tab" data-tab="download">Downloads</button>
+        </div>
+
+        <section class="panel active" id="panel-overview">
+          <h2>Decision Overview</h2>
+          <div class="kpis">
+            <div class="kpi"><div class="label">Sellable quality</div><div class="value" id="k_quality">0.000</div></div>
+            <div class="kpi"><div class="label">Quality threshold</div><div class="value" id="k_threshold">0.000</div></div>
+            <div class="kpi"><div class="label">Cost per complete</div><div class="value" id="k_cost">$0</div></div>
+            <div class="kpi"><div class="label">Projected NPV</div><div class="value" id="k_npv">$0</div></div>
+          </div>
+          <p>Current feasibility status: <span id="status_pill" class="pill warn">needs work</span></p>
+          <div class="note" id="plain_lang"></div>
+        </section>
+
+        <section class="panel" id="panel-methods">
+          <h2>Model & Methods</h2>
+          <p class="sub">Method assumptions are explicit and sensitivity-tested.</p>
+          <div class="twocol">
+            <div>
+              <h3>Assumption Mapping</h3>
+              <table><tbody id="tbl_map"></tbody></table>
+            </div>
+            <div>
+              <h3>Interpretation</h3>
+              <p id="meth_text"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="panel-ops">
+          <h2>Operations & Cost</h2>
+          <table>
+            <tbody id="tbl_ops"></tbody>
+          </table>
+        </section>
+
+        <section class="panel" id="panel-econ">
+          <h2>Economics & Risk</h2>
+          <table><tbody id="tbl_econ"></tbody></table>
+          <h3>Assumption sensitivity (threshold and NPV bands)</h3>
+          <div class="mono" id="sens_box"></div>
+        </section>
+
+        <section class="panel" id="panel-bench">
+          <h2>Benchmarks</h2>
+          <p class="sub">Near-2-week national comparators are prioritized for strict thresholding.</p>
+          <table>
+            <thead><tr><th>Instrument</th><th>Agency</th><th>Interval</th><th>Construct</th></tr></thead>
+            <tbody>
+              <tr><td>NSDUH Reliability Study</td><td>SAMHSA</td><td>5-15 days</td><td>attitude_belief / self_report_behavior</td></tr>
+              <tr><td>BRFSS HRQOL Reinterview</td><td>CDC</td><td>mean 13.5 days</td><td>self_report_health_status</td></tr>
+              <tr><td>HINTS Test-Retest</td><td>NCI</td><td>mean 34 days</td><td>attitude_belief (contextual)</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="panel" id="panel-download">
+          <h2>Downloads / Reuse</h2>
+          <p>Use the full repository app/CLI for exportable briefs and generated deliverables.</p>
+          <div class="mono">Repository: https://github.com/arrudafranco/panel-twin-modeller
+Pages: https://arrudafranco.github.io/panel-twin-modeller/</div>
+        </section>
+      </main>
     </div>
   </div>
 
   <script>
     const $ = (id) => document.getElementById(id);
-    const ctl = ["minutes","rr","attr","price","ppy"];
-    const fmtMoney = (n) => "$" + Math.round(n).toLocaleString();
-    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    const clamp = (x,a,b) => Math.max(a, Math.min(b, x));
+    const money = (x) => "$" + Math.round(x).toLocaleString();
+
+    function fillRows(id, rows) {
+      const el = $(id); el.innerHTML = "";
+      rows.forEach(([k,v]) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<th>${k}</th><td>${v}</td>`;
+        el.appendChild(tr);
+      });
+    }
 
     function compute() {
       const minutes = +$("minutes").value;
+      const n = +$("n").value;
       const rr = +$("rr").value;
       const attr = +$("attr").value;
       const price = +$("price").value;
       const ppy = +$("ppy").value;
+      const risk = $("risk").value;
 
       $("v_minutes").textContent = minutes;
+      $("v_n").textContent = n;
       $("v_rr").textContent = rr.toFixed(2);
       $("v_attr").textContent = attr.toFixed(2);
-      $("v_price").textContent = price.toFixed(0);
-      $("v_ppy").textContent = ppy.toFixed(0);
+      $("v_price").textContent = Math.round(price).toString();
+      $("v_ppy").textContent = ppy;
 
-      const baseQ = 0.82 - (minutes - 90) * 0.0012 - attr * 0.18 + rr * 0.08;
-      const quality = clamp(baseQ, 0, 1);
-      const threshold = 0.74;
-      const cost = 70 + minutes * 0.55 + (1 / Math.max(rr, 0.05)) * 18 + attr * 35;
-      const winProb = clamp(0.15 + (quality - threshold) * 1.8, 0.03, 0.95);
-      const annual = (price - cost * 1000) * ppy * winProb;
-      const npv = annual * 2.8 - 180000;
+      const threshold = risk === "federal" ? 0.77 : 0.72;
+      const q = clamp(0.83 - (minutes-90)*0.0012 - attr*0.17 + rr*0.07 + (Math.log10(n)-2.1)*0.03, 0, 1);
+      const cost = 72 + minutes*0.58 + (1/Math.max(rr,0.05))*16 + attr*40;
+      const win = clamp(0.12 + (q-threshold)*1.9, 0.02, 0.96);
+      const annual = (price - cost*1000) * ppy * win;
+      const npv = annual * 2.8 - 210000;
+      const pass = q >= threshold;
 
-      $("k_quality").textContent = quality.toFixed(3);
+      $("k_quality").textContent = q.toFixed(3);
       $("k_threshold").textContent = threshold.toFixed(3);
-      $("k_cost").textContent = fmtMoney(cost);
-      $("k_npv").textContent = fmtMoney(npv);
+      $("k_cost").textContent = money(cost);
+      $("k_npv").textContent = money(npv);
 
-      let text = "Quality and economics are below target. Redesign assumptions before pilot scale-up.";
-      if (quality >= threshold && npv > 0) text = "Quality clears threshold and expected value is positive. Focus on execution and pilot precision.";
-      else if (quality < threshold && npv > 0) text = "Economics are promising, but quality is below policy threshold. Upgrade methodology first.";
-      else if (quality >= threshold && npv <= 0) text = "Method quality is acceptable, but economics are weak. Revisit pricing and demand assumptions.";
-      $("interp").textContent = text;
+      const status = $("status_pill");
+      status.textContent = pass && npv > 0 ? "favorable" : "needs work";
+      status.className = "pill " + (pass && npv > 0 ? "ok" : "warn");
 
-      const shifts = [
-        {name:"conservative", t: threshold + 0.03},
-        {name:"base", t: threshold},
-        {name:"optimistic", t: threshold - 0.03},
-      ];
-      const rows = shifts.map(s => {
-        const wp = clamp(0.15 + (quality - s.t) * 1.8, 0.03, 0.95);
-        const n = ((price - cost * 1000) * ppy * wp) * 2.8 - 180000;
-        return `${s.name.padEnd(12)} threshold=${s.t.toFixed(3)}  win=${wp.toFixed(3)}  npv=${fmtMoney(n)}`;
-      });
-      $("sens").textContent = rows.join("\n");
+      let msg = "Quality and economics are below target. Rework assumptions before pilot scale-up.";
+      if (pass && npv > 0) msg = "Quality clears threshold and expected value is positive. Focus on implementation rigor and pilot precision.";
+      else if (!pass && npv > 0) msg = "Economics are promising but quality is below threshold; prioritize methodological improvements first.";
+      else if (pass && npv <= 0) msg = "Quality is acceptable but economics are weak; revisit pricing and annual volume assumptions.";
+      $("plain_lang").textContent = msg;
+
+      fillRows("tbl_map", [
+        ["Risk profile", risk === "federal" ? "federal_high_risk" : "commercial_exploratory"],
+        ["Mapping intercept", risk === "federal" ? "0.18" : "0.16"],
+        ["Mapping slope", risk === "federal" ? "0.82" : "0.80"],
+        ["Mapping uncertainty", "0.04 (illustrative)"],
+        ["Threshold policy", "strict_near_2week_federal"]
+      ]);
+
+      $("meth_text").textContent = `Thresholding is benchmark-mapped and risk-adjusted. Current signal uses a ${risk === "federal" ? "stricter federal" : "commercial"} profile.`;
+
+      fillRows("tbl_ops", [
+        ["Pilot N", n],
+        ["Token burden proxy", (minutes * n).toLocaleString()],
+        ["Response rate", rr.toFixed(2)],
+        ["Retest attrition", attr.toFixed(2)],
+        ["Cost per completed interview", money(cost)]
+      ]);
+
+      fillRows("tbl_econ", [
+        ["Win probability", win.toFixed(3)],
+        ["Annual expected contribution", money(annual)],
+        ["Projected NPV", money(npv)],
+        ["Break-even signal", npv > 0 ? "Positive expected value" : "Negative expected value"]
+      ]);
+
+      const shifts = [["conservative", threshold+0.03],["base",threshold],["optimistic",threshold-0.03]];
+      $("sens_box").textContent = shifts.map(([name,t]) => {
+        const w = clamp(0.12 + (q-t)*1.9, 0.02, 0.96);
+        const n2 = ((price - cost*1000) * ppy * w) * 2.8 - 210000;
+        const low = n2 - 0.15*Math.abs(n2);
+        const high = n2 + 0.15*Math.abs(n2);
+        return `${name.padEnd(12)} threshold=${t.toFixed(3)} win=${w.toFixed(3)} npv=${money(n2)} band=[${money(low)}, ${money(high)}]`;
+      }).join("\n");
     }
-    ctl.forEach(id => $(id).addEventListener("input", compute));
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        $("panel-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    ["minutes","n","rr","attr","price","ppy","risk"].forEach(id => $(id).addEventListener("input", compute));
     compute();
   </script>
 </body>
