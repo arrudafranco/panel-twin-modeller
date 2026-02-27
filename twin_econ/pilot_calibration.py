@@ -20,6 +20,15 @@ REQUIRED_COLUMNS = {
     "cost_actual",
 }
 
+OPTIONAL_RESPONSE_MODE_COLUMNS = {
+    "categorical_question_share",
+    "numeric_question_share",
+    "open_ended_question_share",
+    "categorical_mode_reliability_observed",
+    "numeric_mode_reliability_observed",
+    "open_ended_mode_reliability_observed",
+}
+
 
 def _beta_posterior(successes: float, trials: float, prior_mean: float, prior_strength: float) -> tuple[float, float, float]:
     alpha0 = max(1e-6, prior_mean * prior_strength)
@@ -84,6 +93,31 @@ def calibrate_from_csv(cfg: ScenarioConfig, csv_path: str) -> tuple[ScenarioConf
     cfg.cost.price_per_1k_input_tokens *= max(0.5, min(1.5, token_in_rate / 500.0))
     cfg.cost.price_per_1k_output_tokens *= max(0.5, min(1.5, token_out_rate / 300.0))
 
+    response_mode_updates: dict[str, float] = {}
+    if OPTIONAL_RESPONSE_MODE_COLUMNS.issubset(df.columns):
+        for share_col in [
+            "categorical_question_share",
+            "numeric_question_share",
+            "open_ended_question_share",
+        ]:
+            prior = float(getattr(cfg.quality, share_col))
+            sample = float(df[share_col].mean())
+            updated = max(0.0, min(1.0, _shrink_mean(sample, n_total, prior, 8.0)))
+            setattr(cfg.quality, share_col, updated)
+            response_mode_updates[f"{share_col}_sample_mean"] = sample
+            response_mode_updates[f"{share_col}_posterior_mean"] = updated
+        for obs_col, target_attr in [
+            ("categorical_mode_reliability_observed", "categorical_mode_reliability"),
+            ("numeric_mode_reliability_observed", "numeric_mode_reliability"),
+            ("open_ended_mode_reliability_observed", "open_ended_mode_reliability"),
+        ]:
+            prior = float(getattr(cfg.quality, target_attr))
+            sample = float(df[obs_col].mean())
+            updated = max(0.7, min(1.2, _shrink_mean(sample, n_total, prior, 10.0)))
+            setattr(cfg.quality, target_attr, updated)
+            response_mode_updates[f"{obs_col}_sample_mean"] = sample
+            response_mode_updates[f"{target_attr}_posterior_mean"] = updated
+
     precision = {
         "response_rate_sample_mean": completed_rate_sample,
         "response_rate_posterior_mean": completed_post,
@@ -98,6 +132,7 @@ def calibrate_from_csv(cfg: ScenarioConfig, csv_path: str) -> tuple[ScenarioConf
         "interview_minutes_shrunk_mean": avg_minutes,
         "retest_consistency_mean": float(df["retest_consistency"].mean()),
     }
+    precision.update(response_mode_updates)
     return cfg, precision
 
 

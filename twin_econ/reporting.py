@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from .params import ScenarioConfig
+from .quality_model import memory_architecture_summary
 
 
 def write_exec_brief(path: str, sections: dict[str, str]) -> None:
@@ -68,6 +69,51 @@ def write_limitations_brief(
             "- Treat favorable outputs as a prioritization signal; confirm with calibration and sensitivity checks before external commitments.",
         ]
     )
+    Path(path).write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_method_assumptions_brief(
+    path: str,
+    cfg: ScenarioConfig,
+    guardrails: list[str],
+) -> None:
+    summary = memory_architecture_summary(cfg, cfg.quality_profile)
+    lines = [
+        "# Method Assumptions Summary",
+        "",
+        "## Scope",
+        "- Plain-English snapshot of the active method assumptions for this scenario.",
+        "- Intended for stakeholder review, reproducibility, and machine-readable context in human language.",
+        "",
+        "## Active Quality Profile",
+        f"- Construct focus: {cfg.quality_profile}",
+        f"- Functional form: {cfg.quality.functional_form}",
+        f"- Prediction memory strategy: {cfg.memory_strategy_prediction}",
+        "",
+        "## Memory Architecture",
+    ]
+    lines.extend([f"- {k}: {v}" for k, v in summary.items()])
+    lines.extend(
+        [
+            "",
+            "## Response Mode Reliability",
+            f"- Construct defaults enabled: {cfg.quality.use_construct_response_mode_defaults}",
+            f"- Categorical reliability multiplier: {cfg.quality.categorical_mode_reliability:.3f}",
+            f"- Numeric reliability multiplier: {cfg.quality.numeric_mode_reliability:.3f}",
+            f"- Open-ended reliability multiplier: {cfg.quality.open_ended_mode_reliability:.3f}",
+            "",
+            "## Interpretation Notes",
+            "- Reflection and importance are prompt-mediated heuristics, not directly observed quantities.",
+            "- Response-mode multipliers are transparent modeling assumptions unless learned from pilot calibration data.",
+            "- Favorable results should still be checked against uncertainty, guardrails, and benchmark policy.",
+            "",
+            "## Guardrails",
+        ]
+    )
+    if guardrails:
+        lines.extend([f"- {g}" for g in guardrails])
+    else:
+        lines.append("- No guardrail thresholds were triggered in this run.")
     Path(path).write_text("\n".join(lines), encoding="utf-8")
 
 

@@ -3,7 +3,7 @@
 from twin_econ.benchmark_model import recommended_quality_threshold
 from twin_econ.cost_model import compute_costs
 from twin_econ.params import ScenarioConfig
-from twin_econ.quality_model import quality_score
+from twin_econ.quality_model import memory_architecture_summary, quality_score
 from twin_econ.revenue_model import compute_finance
 
 
@@ -64,3 +64,13 @@ def test_longer_horizon_changes_npv_projection():
     cfg.revenue.horizon_months = 60
     fin_60 = compute_finance(cfg, cogs, quality=0.8)
     assert fin_60["npv"] != fin_12["npv"]
+
+
+def test_construct_specific_response_mode_defaults_change_mix():
+    cfg = ScenarioConfig()
+    cfg.quality.use_construct_response_mode_defaults = True
+
+    attitude = memory_architecture_summary(cfg, "attitude_belief")
+    incentivized = memory_architecture_summary(cfg, "incentivized_behavior")
+
+    assert attitude["response_mode_mix"] != incentivized["response_mode_mix"]

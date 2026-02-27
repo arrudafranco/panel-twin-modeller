@@ -22,6 +22,7 @@ This repository extends beyond that scope into:
 Recent extensions now also make two `genagents`-inspired ideas explicit in the model:
 - memory retrieval is configurable rather than treated as a single hidden assumption
 - response mode mix (categorical, numeric, open-ended) can affect quality expectations
+- construct-specific response-mode presets and pilot calibration can now update those assumptions explicitly
 
 ## Install
 

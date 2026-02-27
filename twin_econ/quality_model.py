@@ -50,20 +50,32 @@ def _memory_system_adjustment(cfg: ScenarioConfig) -> float:
     return max(0.82, min(1.08, balance_effect * retrieval_effect * reflection_effect))
 
 
-def _normalized_response_shares(cfg: ScenarioConfig) -> dict[str, float]:
-    raw = {
-        "categorical": max(0.0, float(cfg.quality.categorical_question_share)),
-        "numeric": max(0.0, float(cfg.quality.numeric_question_share)),
-        "open_ended": max(0.0, float(cfg.quality.open_ended_question_share)),
+def _construct_response_mode_defaults(construct_type: str) -> dict[str, float]:
+    presets = {
+        "attitude_belief": {"categorical": 0.60, "numeric": 0.15, "open_ended": 0.25},
+        "self_report_behavior": {"categorical": 0.35, "numeric": 0.25, "open_ended": 0.40},
+        "incentivized_behavior": {"categorical": 0.20, "numeric": 0.50, "open_ended": 0.30},
     }
+    return presets.get(construct_type, {"categorical": 0.45, "numeric": 0.20, "open_ended": 0.35})
+
+
+def _normalized_response_shares(cfg: ScenarioConfig, construct_type: str | None = None) -> dict[str, float]:
+    if cfg.quality.use_construct_response_mode_defaults and construct_type is not None:
+        raw = _construct_response_mode_defaults(construct_type)
+    else:
+        raw = {
+            "categorical": max(0.0, float(cfg.quality.categorical_question_share)),
+            "numeric": max(0.0, float(cfg.quality.numeric_question_share)),
+            "open_ended": max(0.0, float(cfg.quality.open_ended_question_share)),
+        }
     total = sum(raw.values())
     if total <= 0:
         return {"categorical": 1 / 3, "numeric": 1 / 3, "open_ended": 1 / 3}
     return {k: v / total for k, v in raw.items()}
 
 
-def _response_mode_adjustment(cfg: ScenarioConfig) -> float:
-    shares = _normalized_response_shares(cfg)
+def _response_mode_adjustment(cfg: ScenarioConfig, construct_type: str) -> float:
+    shares = _normalized_response_shares(cfg, construct_type)
     weighted = (
         shares["categorical"] * float(cfg.quality.categorical_mode_reliability)
         + shares["numeric"] * float(cfg.quality.numeric_mode_reliability)
@@ -72,9 +84,11 @@ def _response_mode_adjustment(cfg: ScenarioConfig) -> float:
     return max(0.85, min(1.10, weighted))
 
 
-def memory_architecture_summary(cfg: ScenarioConfig) -> dict[str, object]:
-    shares = _normalized_response_shares(cfg)
+def memory_architecture_summary(cfg: ScenarioConfig, construct_type: str | None = None) -> dict[str, object]:
+    active_construct = construct_type or cfg.quality_profile
+    shares = _normalized_response_shares(cfg, active_construct)
     return {
+        "quality_profile": active_construct,
         "memory_strategy_prediction": cfg.memory_strategy_prediction,
         "memory_retrieval_k": int(cfg.quality.memory_retrieval_k),
         "memory_recency_weight": round(float(cfg.quality.memory_recency_weight), 3),
@@ -83,6 +97,7 @@ def memory_architecture_summary(cfg: ScenarioConfig) -> dict[str, object]:
         "reflection_enabled": bool(cfg.quality.reflection_enabled),
         "reflection_interval_turns": int(cfg.quality.reflection_interval_turns),
         "reflection_summary_count": int(cfg.quality.reflection_summary_count),
+        "use_construct_response_mode_defaults": bool(cfg.quality.use_construct_response_mode_defaults),
         "full_transcript_injection": bool(cfg.cost.full_transcript_injection),
         "interview_context_chars": int(cfg.cost.interview_context_chars),
         "response_mode_mix": (
@@ -90,7 +105,7 @@ def memory_architecture_summary(cfg: ScenarioConfig) -> dict[str, object]:
             f"numeric={shares['numeric']:.2f}, "
             f"open_ended={shares['open_ended']:.2f}"
         ),
-        "response_mode_reliability_adjustment": round(_response_mode_adjustment(cfg), 4),
+        "response_mode_reliability_adjustment": round(_response_mode_adjustment(cfg, active_construct), 4),
     }
 
 
@@ -112,7 +127,7 @@ def quality_score(
         minute_effect = min(1.0, 0.7 + 0.3 * math.log(max(minutes, 10.0)) / math.log(120.0))
 
     memory_effect = _memory_adjustment(cfg.memory_strategy_prediction) * _memory_system_adjustment(cfg)
-    response_mode_effect = _response_mode_adjustment(cfg)
+    response_mode_effect = _response_mode_adjustment(cfg, construct_type)
     if cfg.cost.full_transcript_injection:
         context_tokens = cfg.cost.interview_context_chars * cfg.cost.chars_to_tokens_ratio
     else:

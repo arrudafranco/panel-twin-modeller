@@ -22,6 +22,7 @@ from .reporting import (
     tornado_plot,
     write_exec_brief,
     write_limitations_brief,
+    write_method_assumptions_brief,
 )
 from .revenue_model import compute_finance
 from .sampling_model import run_sampling
@@ -97,6 +98,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         "break_even_within_horizon": bool(finance["break_even_within_horizon"]),
         "effective_sample_size": round(float(sampling["effective_sample_size"]), 2),
         "deliverables": deliverables,
+        "method_assumptions_path": str(out / "method_assumptions.md"),
     }
 
     (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
@@ -127,6 +129,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         }
         (out / "run_uncertainty_summary.json").write_text(json.dumps(uncertainty_summary, indent=2), encoding="utf-8")
     write_limitations_brief(str(out / "limitations_brief.md"), cfg, guardrails, uncertainty=uncertainty_summary)
+    write_method_assumptions_brief(str(out / "method_assumptions.md"), cfg, guardrails)
 
     md = [
         "# Baseline Pilot Summary",

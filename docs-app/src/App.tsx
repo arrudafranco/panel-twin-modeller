@@ -5,6 +5,7 @@ type TabKey = 'overview' | 'methods' | 'ops' | 'econ' | 'bench' | 'downloads'
 type FocusPreset = 'none' | 'economics' | 'sampling_quality' | 'operations'
 
 type Scenario = {
+  instrumentProfile: 'attitude_belief' | 'self_report_behavior' | 'incentivized_behavior'
   minutes: number
   pilotN: number
   responseRate: number
@@ -20,6 +21,7 @@ type Scenario = {
   reflectionEnabled: boolean
   reflectionIntervalTurns: number
   reflectionSummaryCount: number
+  useConstructDefaults: boolean
   categoricalQuestionShare: number
   numericQuestionShare: number
   openEndedQuestionShare: number
@@ -45,6 +47,7 @@ type Scenario = {
 }
 
 const INITIAL: Scenario = {
+  instrumentProfile: 'attitude_belief',
   minutes: 90,
   pilotN: 150,
   responseRate: 0.35,
@@ -60,6 +63,7 @@ const INITIAL: Scenario = {
   reflectionEnabled: true,
   reflectionIntervalTurns: 8,
   reflectionSummaryCount: 3,
+  useConstructDefaults: true,
   categoricalQuestionShare: 0.45,
   numericQuestionShare: 0.2,
   openEndedQuestionShare: 0.35,
@@ -131,13 +135,21 @@ function App() {
     0.01,
     0.99
   )
+  const constructDefaults =
+    cfg.instrumentProfile === 'attitude_belief'
+      ? { categorical: 0.6, numeric: 0.15, openEnded: 0.25 }
+      : cfg.instrumentProfile === 'self_report_behavior'
+        ? { categorical: 0.35, numeric: 0.25, openEnded: 0.4 }
+        : { categorical: 0.2, numeric: 0.5, openEnded: 0.3 }
   const responseShareTotal = Math.max(
-    cfg.categoricalQuestionShare + cfg.numericQuestionShare + cfg.openEndedQuestionShare,
+    (cfg.useConstructDefaults ? constructDefaults.categorical : cfg.categoricalQuestionShare) +
+      (cfg.useConstructDefaults ? constructDefaults.numeric : cfg.numericQuestionShare) +
+      (cfg.useConstructDefaults ? constructDefaults.openEnded : cfg.openEndedQuestionShare),
     0.0001
   )
-  const categoricalShare = cfg.categoricalQuestionShare / responseShareTotal
-  const numericShare = cfg.numericQuestionShare / responseShareTotal
-  const openEndedShare = cfg.openEndedQuestionShare / responseShareTotal
+  const categoricalShare = (cfg.useConstructDefaults ? constructDefaults.categorical : cfg.categoricalQuestionShare) / responseShareTotal
+  const numericShare = (cfg.useConstructDefaults ? constructDefaults.numeric : cfg.numericQuestionShare) / responseShareTotal
+  const openEndedShare = (cfg.useConstructDefaults ? constructDefaults.openEnded : cfg.openEndedQuestionShare) / responseShareTotal
   const meanMemoryWeight =
     (cfg.memoryRecencyWeight + cfg.memoryRelevanceWeight + cfg.memoryImportanceWeight) / 3
   const memoryImbalance =
@@ -318,6 +330,14 @@ function App() {
               <option value="operations">operations</option>
             </select>
           </label>
+          <label className="field">
+            <span>Instrument profile</span>
+            <select value={cfg.instrumentProfile} onChange={(e) => update('instrumentProfile', e.target.value as Scenario['instrumentProfile'])}>
+              <option value="attitude_belief">attitude_belief</option>
+              <option value="self_report_behavior">self_report_behavior</option>
+              <option value="incentivized_behavior">incentivized_behavior</option>
+            </select>
+          </label>
           <Range
             label="Interview minutes"
             value={cfg.minutes}
@@ -443,15 +463,26 @@ function App() {
                 <option value="off">disabled</option>
               </select>
             </label>
+            <label className="field">
+              <span>Use construct defaults</span>
+              <select value={cfg.useConstructDefaults ? 'on' : 'off'} onChange={(e) => update('useConstructDefaults', e.target.value === 'on')}>
+                <option value="on">enabled</option>
+                <option value="off">manual</option>
+              </select>
+            </label>
             {cfg.reflectionEnabled && (
               <>
                 <Range label="Reflection interval (turns)" value={cfg.reflectionIntervalTurns} min={1} max={30} step={1} onChange={(v) => update('reflectionIntervalTurns', v)} />
                 <Range label="Reflection summary count" value={cfg.reflectionSummaryCount} min={1} max={8} step={1} onChange={(v) => update('reflectionSummaryCount', v)} />
               </>
             )}
-            <Range label="Categorical share" value={cfg.categoricalQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('categoricalQuestionShare', Number(v.toFixed(2)))} />
-            <Range label="Numeric share" value={cfg.numericQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('numericQuestionShare', Number(v.toFixed(2)))} />
-            <Range label="Open-ended share" value={cfg.openEndedQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('openEndedQuestionShare', Number(v.toFixed(2)))} />
+            {!cfg.useConstructDefaults && (
+              <>
+                <Range label="Categorical share" value={cfg.categoricalQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('categoricalQuestionShare', Number(v.toFixed(2)))} />
+                <Range label="Numeric share" value={cfg.numericQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('numericQuestionShare', Number(v.toFixed(2)))} />
+                <Range label="Open-ended share" value={cfg.openEndedQuestionShare} min={0} max={1} step={0.01} onChange={(v) => update('openEndedQuestionShare', Number(v.toFixed(2)))} />
+              </>
+            )}
             <Range label="Categorical reliability" value={cfg.categoricalModeReliability} min={0.7} max={1.2} step={0.01} onChange={(v) => update('categoricalModeReliability', Number(v.toFixed(2)))} />
             <Range label="Numeric reliability" value={cfg.numericModeReliability} min={0.7} max={1.2} step={0.01} onChange={(v) => update('numericModeReliability', Number(v.toFixed(2)))} />
             <Range label="Open-ended reliability" value={cfg.openEndedModeReliability} min={0.7} max={1.2} step={0.01} onChange={(v) => update('openEndedModeReliability', Number(v.toFixed(2)))} />
@@ -514,6 +545,7 @@ function App() {
               <table>
                 <tbody>
                   <tr><th>Threshold policy</th><td>strict_near_2week_federal</td></tr>
+                  <tr><th>Instrument profile</th><td>{cfg.instrumentProfile}</td></tr>
                   <tr><th>Risk profile</th><td>{cfg.risk === 'federal' ? 'federal_high_risk' : 'commercial_exploratory'}</td></tr>
                   <tr><th>Mapping intercept</th><td>{cfg.risk === 'federal' ? '0.18' : '0.16'}</td></tr>
                   <tr><th>Mapping slope</th><td>{cfg.risk === 'federal' ? '0.82' : '0.80'}</td></tr>
@@ -521,6 +553,7 @@ function App() {
                   <tr><th>Memory strategy</th><td>retrieval k={cfg.memoryRetrievalK}; reflection {cfg.reflectionEnabled ? 'on' : 'off'}</td></tr>
                   <tr><th>Memory weights</th><td>recency {cfg.memoryRecencyWeight.toFixed(1)} / relevance {cfg.memoryRelevanceWeight.toFixed(1)} / importance {cfg.memoryImportanceWeight.toFixed(1)}</td></tr>
                   <tr><th>Response mode mix</th><td>cat {categoricalShare.toFixed(2)} / num {numericShare.toFixed(2)} / open {openEndedShare.toFixed(2)}</td></tr>
+                  <tr><th>Construct defaults</th><td>{cfg.useConstructDefaults ? 'enabled' : 'manual'}</td></tr>
                   <tr><th>Response-mode reliability</th><td>{responseModeAdjustment.toFixed(3)} multiplier</td></tr>
                 </tbody>
               </table>

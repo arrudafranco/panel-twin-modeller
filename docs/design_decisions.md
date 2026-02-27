@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.1.2
+Version: 0.1.3
 Last updated: 2026-02-27
 Status: active working design record
 
@@ -85,6 +85,7 @@ It adds:
 We also make some design ideas more explicit than before:
 - memory retrieval is modeled with configurable recency, relevance, and importance weights
 - response-mode mix is modeled explicitly, so categorical, numeric, and open-ended instruments can carry different reliability expectations
+- construct-specific response-mode presets can be used so different study types start from different default interaction mixes
 
 ### Prompt and Reflection Implications
 
@@ -99,6 +100,7 @@ So in this project:
 - reflection cadence and summary count are configurable operational assumptions
 - memory importance is treated as a weighting heuristic, not a ground-truth score
 - response-mode reliability is handled as a transparent multiplier rather than buried inside one headline quality number
+- pilot calibration can optionally update response-mode shares and multipliers when the pilot log includes those columns
 
 ### How We Label Evidence
 
@@ -431,6 +433,15 @@ When a meaningful design or architecture change is made:
 If a change only affects wording, styling, or minor implementation detail without changing design intent, an update may not be necessary.
 
 ## Version Updates
+
+### 0.1.3 - 2026-02-27
+
+Added explicit construct presets, calibration hooks, and method-assumptions export.
+
+Included:
+- construct-specific response-mode presets by quality profile
+- optional calibration of response-mode shares and reliability multipliers from pilot logs
+- dedicated `method_assumptions.md` artifact for run outputs and app downloads
 
 ### 0.1.2 - 2026-02-27
 

@@ -378,6 +378,13 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
         with c1:
             st.markdown("## Core Specs")
             cfg.scenario_name = st.text_input("Scenario name", value=cfg.scenario_name)
+            cfg.quality_profile = st.selectbox(
+                "Quality profile",
+                ["attitude_belief", "self_report_behavior", "incentivized_behavior"],
+                index=["attitude_belief", "self_report_behavior", "incentivized_behavior"].index(cfg.quality_profile)
+                if cfg.quality_profile in ["attitude_belief", "self_report_behavior", "incentivized_behavior"]
+                else 0,
+            )
             cfg.interview_minutes = float(st.slider("Interview minutes", 30, 180, int(cfg.interview_minutes), 5))
             cfg.sampling.pilot_n = int(st.slider("Pilot N", 50, 400, int(cfg.sampling.pilot_n), 10))
             cfg.cost.response_rate = float(st.slider("Response rate", 0.05, 0.9, float(cfg.cost.response_rate), 0.01))
@@ -518,6 +525,13 @@ def _render_controls() -> tuple[ScenarioConfig, int, int]:
                     st.slider("Reflection summary count", 1, 8, int(cfg.quality.reflection_summary_count), 1)
                 )
         with st.expander("Response Mode Reliability Controls (optional)"):
+            cfg.quality.use_construct_response_mode_defaults = bool(
+                st.checkbox(
+                    "Use construct-specific defaults",
+                    value=bool(cfg.quality.use_construct_response_mode_defaults),
+                    help="When enabled, each quality profile starts from a different default mix of categorical, numeric, and open-ended items.",
+                )
+            )
             r1, r2, r3 = st.columns(3)
             with r1:
                 cfg.quality.categorical_question_share = float(
@@ -817,11 +831,26 @@ def main() -> None:
         st.header("Download and Reuse")
         brief = _decision_brief(cfg, out)
         limitations = _limitations_markdown(cfg, warnings, out["mc"])
+        method_assumptions = "\n".join(
+            ["# Method Assumptions Summary", ""]
+            + [f"- {k}: {v}" for k, v in memory_summary.items()]
+            + [
+                "",
+                "## Guardrails",
+            ]
+            + ([f"- {w}" for w in warnings] if warnings else ["- No guardrail warnings."])
+        )
         st.download_button("Download decision brief (md)", brief, file_name=f"{cfg.scenario_name}_brief.md", mime="text/markdown")
         st.download_button(
             "Download limitations brief (md)",
             limitations,
             file_name=f"{cfg.scenario_name}_limitations.md",
+            mime="text/markdown",
+        )
+        st.download_button(
+            "Download method assumptions (md)",
+            method_assumptions,
+            file_name=f"{cfg.scenario_name}_method_assumptions.md",
             mime="text/markdown",
         )
         st.download_button(

@@ -150,3 +150,8 @@ def test_run_can_emit_uncertainty_and_limitations(tmp_path: Path):
     )
     assert (out / "run_uncertainty_summary.json").exists()
     assert (out / "limitations_brief.md").exists()
+    assert (out / "method_assumptions.md").exists()
+
+    method_text = (out / "method_assumptions.md").read_text(encoding="utf-8")
+    assert "Method Assumptions Summary" in method_text
+    assert "Memory Architecture" in method_text
