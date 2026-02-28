@@ -85,10 +85,9 @@ const INSIGHTS: InsightDef[] = [
 interface ModalProps {
   insight: InsightDef;
   onClose: () => void;
-  triggerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-function InsightModal({ insight, onClose, triggerRef }: ModalProps) {
+function InsightModal({ insight, onClose }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -160,7 +159,7 @@ interface Props {
 
 export function ExecutiveLanding({ onEnterExplorer }: Props) {
   const [openInsightIdx, setOpenInsightIdx] = useState<number | null>(null);
-  const triggerRefs = useRef<Array<React.RefObject<HTMLDivElement | null>>>(
+  const triggerRefs = useRef<Array<{ current: HTMLDivElement | null }>>(
     INSIGHTS.map(() => ({ current: null }))
   );
 
@@ -324,7 +323,6 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           <InsightModal
             insight={INSIGHTS[openInsightIdx]}
             onClose={closeModal}
-            triggerRef={triggerRefs.current[openInsightIdx]}
           />
         )}
       </section>

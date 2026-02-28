@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactNode, useCallback } from 'react';
+import { useState, useRef, type ReactNode, useCallback, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 
 interface TooltipProps {
@@ -10,7 +10,7 @@ const TOOLTIP_WIDTH = 260;
 
 export function Tooltip({ content, children }: TooltipProps) {
   const [visible, setVisible] = useState(false);
-  const [style, setStyle] = useState<React.CSSProperties>({});
+  const [style, setStyle] = useState<CSSProperties>({});
   const triggerRef = useRef<HTMLSpanElement>(null);
 
   const computePosition = useCallback(() => {

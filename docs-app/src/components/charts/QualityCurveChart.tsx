@@ -56,9 +56,9 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
             tick={{ fontSize: 11 }}
           />
           <RTooltip
-            formatter={(value: number, name: string) => {
-              if (name.includes('_')) return [null, null]; // hide band series from tooltip
-              return [value.toFixed(3), name];
+            formatter={(value: number | undefined, name: string | undefined) => {
+              if (!name || name.includes('_')) return [null, null]; // hide band series from tooltip
+              return [value != null ? value.toFixed(3) : '', name];
             }}
             labelFormatter={(label) => `${label} minutes`}
           />

@@ -94,7 +94,7 @@ export function MarketRadarChart({ cfg, quality, finance }: Props) {
             tickFormatter={(v: number) => v.toFixed(1)}
           />
           <YAxis type="category" dataKey="dimension" tick={{ fontSize: 11 }} width={104} />
-          <RTooltip formatter={(v: number) => v.toFixed(3)} />
+          <RTooltip formatter={(v: number | undefined) => v != null ? v.toFixed(3) : ''} />
           <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
           {(Object.keys(COLORS) as Array<keyof typeof COLORS>).map((name) => (
             <Bar
