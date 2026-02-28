@@ -79,7 +79,7 @@ export const BENCHMARKS: BenchmarkEntry[] = [
     construct_type: "attitude_belief",
     metrics: { kappa_range: [0.35, 0.6], spearman_range: [0.4, 0.7] },
     comparability_note: "Useful attitude/belief comparator, but not a 2-week retest benchmark.",
-    citations: ["https://hints.cancer.gov/", "https://pubmed.ncbi.nlm.nih.gov/18360718/"],
+    citations: ["https://hints.cancer.gov/"],
   },
   {
     instrument_name: "GSS Panel Reliability Literature (Contextual Comparator)",

@@ -240,7 +240,7 @@ export function ScenarioControls({
             <label className="select-field">
               <span>
                 Reflection{' '}
-                <Tooltip content="When enabled, the agent periodically synthesizes memories into higher-level reflections (e.g., 'I tend to distrust government institutions'). This modestly improves consistency.">
+                <Tooltip content="Enables periodic synthesis of stored memories into higher-level beliefs. In the quality model, this adds a small uplift to the memory architecture score. Enabling this reveals the reflection interval and summary count controls.">
                   <span className="info-icon" aria-hidden="true">i</span>
                 </Tooltip>
               </span>

@@ -20,7 +20,7 @@ const INSIGHTS: InsightDef[] = [
       "Extrapolation to constructs or LLMs not studied in the original paper should be treated with caution. The uncertainty bands are a modeling convention, not empirically validated confidence intervals.",
     ],
     citations: [
-      "Park et al. (2024). Generative Agent Simulations of 1,000 People. Nature.",
+      "Park et al. (2024). Generative Agent Simulations of 1,000 People. arXiv:2411.10109. https://arxiv.org/abs/2411.10109",
     ],
   },
   {
@@ -32,7 +32,7 @@ const INSIGHTS: InsightDef[] = [
       "The threshold crossover point (minimum interview length to clear the quality benchmark) depends on construct type, memory architecture, and the benchmark filter mode. Under default settings, attitude/belief constructs typically clear the threshold well before 60 minutes.",
     ],
     citations: [
-      "Park et al. (2024). Generative Agent Simulations of 1,000 People. Nature.",
+      "Park et al. (2024). Generative Agent Simulations of 1,000 People. arXiv:2411.10109. https://arxiv.org/abs/2411.10109",
     ],
   },
   {
@@ -123,7 +123,7 @@ function InsightModal({ insight, onClose }: ModalProps) {
           <button
             className="insight-modal-close-x"
             onClick={onClose}
-            aria-label="Close methodology details"
+            aria-label="Close model notes"
           >
             ×
           </button>
@@ -297,7 +297,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
         <p className="landing-section-intro">
           Even before adjusting parameters, the model's structure reveals several
           important patterns about the feasibility landscape. Click any card to read
-          the methodology and assumptions behind each finding.
+          the model logic and assumptions behind each finding.
         </p>
         <div className="insight-grid">
           {INSIGHTS.map((ins, i) => (
@@ -307,14 +307,14 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
               role="button"
               tabIndex={0}
               aria-haspopup="dialog"
-              aria-label={`${ins.title}. Click to read methodology.`}
+              aria-label={`${ins.title}. Click for model notes.`}
               ref={(el) => { triggerRefs.current[i].current = el; }}
               onClick={() => setOpenInsightIdx(i)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpenInsightIdx(i); } }}
             >
               <h3>{ins.title}</h3>
               <p>{ins.summary}</p>
-              <div className="insight-card-hint">Click to read methodology</div>
+              <div className="insight-card-hint">Click for model notes</div>
             </div>
           ))}
         </div>
