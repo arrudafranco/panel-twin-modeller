@@ -65,21 +65,7 @@ export const BENCHMARKS: BenchmarkEntry[] = [
     comparability_note: "Near-2-week design and large BRFSS samples; construct differs from broad civic/political attitudes.",
     citations: [
       "https://pubmed.ncbi.nlm.nih.gov/12700216/",
-      "https://pmc.ncbi.nlm.nih.gov/articles/PMC1732444/",
     ],
-  },
-  {
-    instrument_name: "HINTS Test-Retest (Federally Sponsored National Health Communication Survey)",
-    agency: "NCI",
-    federal_national_representative: true,
-    near_2week: false,
-    retest_interval_days: "mean 34 (range 15-168)",
-    metric_type: "kappa + Spearman",
-    typical_range_or_distribution: "Several communication confidence/attitude items in fair-to-moderate reliability range",
-    construct_type: "attitude_belief",
-    metrics: { kappa_range: [0.35, 0.6], spearman_range: [0.4, 0.7] },
-    comparability_note: "Useful attitude/belief comparator, but not a 2-week retest benchmark.",
-    citations: ["https://hints.cancer.gov/"],
   },
   {
     instrument_name: "GSS Panel Reliability Literature (Contextual Comparator)",

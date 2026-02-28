@@ -70,7 +70,7 @@ const INSIGHTS: InsightDef[] = [
     title: "Federal applications face a higher bar",
     summary: "Federal and high-risk settings apply a quality threshold uplift and a market utility penalty, meaningfully narrowing the window of viable configurations.",
     methodology: [
-      "Federal/high-risk quality threshold: benchmark quality + 0.05 uplift. This reflects stricter evidence requirements for federal research procurement, consistent with standards applied to longitudinal federal surveys like the NSDUH, BRFSS, and HINTS.",
+      "Federal/high-risk quality threshold: benchmark quality + 0.05 uplift. This reflects stricter evidence requirements for federal research procurement, consistent with standards applied to longitudinal federal surveys like the NSDUH and BRFSS.",
       "Federal utility penalty: −0.08 applied to the market win probability. This reflects conservative federal buying behavior and risk-aversion in adopting novel research methods.",
       "Together, these adjustments mean that only configurations with near-attitude-level quality, strong brand trust, and competitive pricing are viable for federal contracts under current parameter assumptions.",
       "These are modeling conventions intended to distinguish commercial exploratory from federal high-stakes use cases. Actual federal procurement behavior varies substantially by agency, program, and contracting officer.",
@@ -285,7 +285,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
             <h3>Benchmarks against federal standards</h3>
             <p>
               How does agent quality compare to human survey retest reliability?
-              Validated against NSDUH, BRFSS, HINTS, and GSS benchmarks.
+              Validated against NSDUH, BRFSS, and GSS benchmarks.
             </p>
           </div>
         </div>
