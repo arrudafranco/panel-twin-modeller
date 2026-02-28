@@ -1,8 +1,8 @@
-﻿# Panel Twin
+# Panel Twin Modeller
 
 Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
 
-## Inspiration And Scope
+## Inspiration and Scope
 
 This project is directly inspired by Stanford HCI's `genagents` project and the paper
 *Generative Agent Simulations of 1,000 People*.
@@ -17,14 +17,34 @@ This repository extends beyond that scope into:
 - sampling and representativeness adjustments
 - pilot calibration
 - commercialization, pricing, NPV, and break-even analysis
-- internal and public decision-support apps
+- an interactive public-facing web app with visualizations and executive narrative
 
-Recent extensions now also make two `genagents`-inspired ideas explicit in the model:
-- memory retrieval is configurable rather than treated as a single hidden assumption
-- response mode mix (categorical, numeric, open-ended) can affect quality expectations
-- construct-specific response-mode presets and pilot calibration can now update those assumptions explicitly
+Key modeling features:
+- Memory retrieval is configurable rather than treated as a single hidden assumption
+- Response mode mix (categorical, numeric, open-ended) can affect quality expectations
+- Construct-specific response-mode presets and pilot calibration can update those assumptions explicitly
 
-## Install
+## Interactive Web App
+
+The primary interface is a React app deployed via GitHub Pages. It includes:
+- An executive landing page with static model insights
+- Interactive scenario controls (interview duration, panel size, pricing, memory architecture)
+- Quality curves by interview duration with uncertainty bands
+- Cost breakdown waterfall chart
+- NPV timeline and Monte Carlo simulation (500 iterations, client-side)
+- Market positioning radar chart
+- Federal benchmark comparison
+- Dynamic plain-language narrative that adapts to parameters
+
+To run locally:
+
+```bash
+cd docs-app
+npm install
+npm run dev
+```
+
+## Install (Python model)
 
 ```bash
 python -m pip install -e .
@@ -33,15 +53,14 @@ python -m pip install -e .
 ## Test
 
 ```bash
-pytest -q
+pytest -q tests/
 ```
 
 ## CI
 
-- GitHub Actions workflow: [.github/workflows/ci.yml](C:\Users\gusta\panel-twin-public\.github\workflows\ci.yml)
+- GitHub Actions workflow: `.github/workflows/ci.yml`
 - Runs on every push and pull request.
 - Executes full `pytest` suite and CLI smoke tests (`run`, `sweep`, `mc`, `calibrate`, `benchmark`) on Python 3.10 and 3.12.
-- Runs a dedicated cross-browser (Chromium/Firefox/WebKit) Playwright + axe-core UI audit job and uploads reports/screenshots as CI artifacts.
 
 ## CLI
 
@@ -56,38 +75,6 @@ twin-econ compare --config configs/base.yaml --config configs/scaleup_national.y
 twin-econ benchmark --out outputs/benchmarks/
 ```
 
-## Web App
-
-```bash
-streamlit run webapp/app.py
-```
-
-- App docs: [webapp/README.md](C:\Users\gusta\panel-twin-public\webapp\README.md)
-- Citations: [webapp/CITATIONS.md](C:\Users\gusta\panel-twin-public\webapp\CITATIONS.md)
-
-### UI Accessibility Audit
-
-```bash
-python -m pip install playwright axe-playwright-python
-python -m playwright install chromium firefox webkit
-python scripts/playwright_ui_audit.py
-```
-
-Outputs are written to `outputs/ui_audit_001/` (screenshots + a11y/performance report).
-Approved visual baselines are stored at `webapp/visual_baseline/`.
-
-Approve baseline updates intentionally:
-
-```bash
-$env:UI_AUDIT_APPROVE_BASELINE='true'; python scripts/playwright_ui_audit.py
-```
-
-Run tests with isolated temp directories (Windows cleanup-safe):
-
-```bash
-python scripts/run_pytests_stable.py -q tests
-```
-
 ## Notes
 
 - Config files are real YAML and loaded with `PyYAML`.
@@ -95,11 +82,5 @@ python scripts/run_pytests_stable.py -q tests
 - A sample pilot CSV with optional response-mode calibration columns is available at `pilot_logs/template_response_modes.csv`.
 - All RNG-driven paths are seeded.
 - Pilot mode emphasizes unknown-parameter estimation; scale-up mode emphasizes representativeness diagnostics.
-- Plain-English architecture and rationale are documented in [docs/design_decisions.md](C:\Users\gusta\panel-twin-public\docs\design_decisions.md).
-- Optional external anchor references are documented in [docs/external_reference_defaults.md](C:\Users\gusta\panel-twin-public\docs\external_reference_defaults.md).
-
-
-
-
-
-
+- Plain-English architecture and rationale are documented in [docs/design_decisions.md](docs/design_decisions.md).
+- Optional external anchor references are documented in [docs/external_reference_defaults.md](docs/external_reference_defaults.md).

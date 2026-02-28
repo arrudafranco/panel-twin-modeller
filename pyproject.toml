@@ -14,7 +14,6 @@ dependencies = [
   "pydantic",
   "matplotlib",
   "PyYAML",
-  "streamlit",
 ]
 
 [project.scripts]

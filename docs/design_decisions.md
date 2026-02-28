@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.1.5
+Version: 0.2.0
 Last updated: 2026-02-27
 Status: active working design record
 
@@ -179,7 +179,7 @@ This layer is the source of truth for the model.
 
 ### 2. Internal Interactive App
 
-The Streamlit app in `webapp/app.py` is the main internal interactive interface.
+The React app in `docs-app/` is the primary public interactive interface, deployed via GitHub Pages.
 
 It is designed to:
 - expose core assumptions interactively
@@ -187,7 +187,7 @@ It is designed to:
 - support fast scanning and deeper technical review
 - use the same backend logic as the CLI
 
-The Streamlit app is meant to be the strongest operational interface for internal work.
+The React app is meant to be the primary interface for stakeholders and external audiences.
 
 ### 3. Public Interactive App
 
@@ -436,13 +436,46 @@ If a change only affects wording, styling, or minor implementation detail withou
 
 ## Version Updates
 
+### 0.2.0 - 2026-02-27
+
+Major redesign of the public-facing interface and full model port to TypeScript.
+
+**Model port (Python to TypeScript)**
+- All 8 Python model modules faithfully ported to TypeScript in `docs-app/src/model/`
+- Includes cost, quality, competition, revenue, benchmark, product, and Monte Carlo models
+- Monte Carlo uses mulberry32 seedable PRNG and Box-Muller normal distribution (replacing numpy)
+- All parameter defaults match the Python model exactly
+
+**React app redesign**
+- Complete rewrite of the React app with executive landing page and interactive explorer
+- Landing page includes static model insights (quality trends, cost structure, sensitivity patterns)
+- Five visualization tabs: Overview (KPIs + narrative), Quality (curves with uncertainty bands), Cost (waterfall), Economics (NPV timeline + radar + Monte Carlo histogram), Benchmarks (federal standards)
+- Dynamic plain-language narrative that adapts to parameter changes
+- Accessible design: ARIA labels, keyboard navigation, semantic HTML, screen reader support
+- Responsive layout with sidebar controls
+
+**Model fixes**
+- Fix 1: Stylized utility coefficients (quality=3.2, brand=1.1, tailwind=0.8, price=0.000012, turnaround=0.03) are now prominently flagged as illustrative, not market-fitted. Warning callout in Economics tab.
+- Fix 2: Quality uncertainty bands added. Attitudes ±0.06 (paper-anchored), self-reported behaviors ±0.10 (less evidence), incentivized behaviors ±0.12 (least evidence). Displayed in charts and incorporated into Monte Carlo noise terms.
+- Fix 3: Competitor labels genericized across all source files, config files, and the React app to use descriptive category names rather than specific product references.
+
+**Infrastructure changes**
+- Streamlit app removed from public repo (React app now covers the same functionality with richer visualizations)
+- Streamlit dependency removed from pyproject.toml
+- Recharts added as React app dependency for charting
+
+**Design rationale**
+- The React app serves as the public-facing interface (static GitHub Pages hosting, no Python backend needed, shareable URL).
+- The landing page's "What the model tells us" section provides static structural insights from the model itself (diminishing returns on interview duration, labor-dominated costs, sensitivity to win probability, asymmetric uncertainty by construct, higher federal bar) so stakeholders get value even before adjusting parameters.
+- Competitor labels use generic descriptive categories (e.g., "probability benchmark", "hybrid benchmark") to keep the model focused on structural comparisons rather than specific products.
+
 ### 0.1.5 - 2026-02-27
 
 Added visible assumption provenance in run outputs and app sessions.
 
 Included:
 - `summary.json` and baseline summaries now expose response-mode assumption source and calibration status
-- Streamlit now flags when a session changes from preset-driven to manual response-mode assumptions
+- App now flags when a session changes from preset-driven to manual response-mode assumptions
 - a sample pilot CSV template documents optional response-mode calibration columns
 
 ### 0.1.4 - 2026-02-27

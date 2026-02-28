@@ -36,8 +36,8 @@ def _utility(
 def _outside_option_utilities(cfg: ScenarioConfig, own_price: float) -> list[float]:
     c = cfg.competition
     return [
-        _utility(cfg, c.amerispeak_price, c.amerispeak_quality, c.amerispeak_turnaround_days, include_brand=False, own_price=own_price),
-        _utility(cfg, c.truenorth_price, c.truenorth_quality, c.truenorth_turnaround_days, include_brand=False, own_price=own_price),
+        _utility(cfg, c.probability_benchmark_price, c.probability_benchmark_quality, c.probability_benchmark_turnaround_days, include_brand=False, own_price=own_price),
+        _utility(cfg, c.hybrid_benchmark_price, c.hybrid_benchmark_quality, c.hybrid_benchmark_turnaround_days, include_brand=False, own_price=own_price),
         _utility(
             cfg,
             c.external_synthetic_price,
@@ -52,7 +52,7 @@ def _outside_option_utilities(cfg: ScenarioConfig, own_price: float) -> list[flo
 def market_shares(cfg: ScenarioConfig, price: float, quality: float, turnaround_days: float) -> dict[str, float]:
     own_u = _utility(cfg, price, quality, turnaround_days, include_brand=True)
     competitors = _outside_option_utilities(cfg, price)
-    labels = ["panel_twin", "amerispeak_like", "truenorth_like", "external_synthetic"]
+    labels = ["panel_twin", "probability_benchmark", "hybrid_benchmark", "external_synthetic"]
     values = [own_u, *competitors]
     max_u = max(values)
     exps = [math.exp(v - max_u) for v in values]

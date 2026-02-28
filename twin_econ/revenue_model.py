@@ -38,8 +38,8 @@ def compute_finance(cfg: ScenarioConfig, cogs_per_project: float, quality: float
     return {
         "win_probability": pwin,
         "market_share_panel_twin": shares["panel_twin"],
-        "market_share_amerispeak_like": shares["amerispeak_like"],
-        "market_share_truenorth_like": shares["truenorth_like"],
+        "market_share_probability_benchmark": shares["probability_benchmark"],
+        "market_share_hybrid_benchmark": shares["hybrid_benchmark"],
         "market_share_external_synthetic": shares["external_synthetic"],
         "gross_margin": gross_margin,
         "contribution_margin_total": monthly_margin,

@@ -265,14 +265,14 @@ For `configs/scaleup_national.yaml`, implement in `sampling_model.py`:
 ### G) COMPETITION + INTERNAL PORTFOLIO INTERACTION
 
 Model **3 outside options** as adjustable "reference products" with ranges:
-1. **Probability-based survey offering** (AmeriSpeak-like): higher quality, higher cost, slower turnaround
-2. **Calibrated hybrid offering** (TrueNorth-like): lower cost, medium quality
+1. **Probability-based survey offering**: higher quality, higher cost, slower turnaround
+2. **Calibrated hybrid offering**: lower cost, medium quality
 3. **External synthetic twin offerings**: price/quality uncertain; model as ranges
 
 **Implement:**
 - Discrete-choice win probability: `P(win | price, turnaround, quality, brand_trust, client_risk_profile)`
 - Cross-price elasticity and substitution between products
-- **Cannibalization parameter:** some synthetic-twin wins may replace internal AmeriSpeak or TrueNorth revenue rather than add net-new; estimate net incremental profit
+- **Cannibalization parameter:** some synthetic-twin wins may replace internal probability-based or hybrid offering revenue rather than add net-new; estimate net incremental profit
 
 **Market tailwind knob:**
 - As online survey fraud increases, willingness-to-pay for higher-integrity options rises and/or demand shifts away from opt-in panels

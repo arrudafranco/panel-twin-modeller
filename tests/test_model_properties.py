@@ -49,8 +49,8 @@ def test_market_shares_sum_to_one():
     fin = compute_finance(cfg, cogs, quality=0.8)
     total_share = (
         float(fin["market_share_panel_twin"])
-        + float(fin["market_share_amerispeak_like"])
-        + float(fin["market_share_truenorth_like"])
+        + float(fin["market_share_probability_benchmark"])
+        + float(fin["market_share_hybrid_benchmark"])
         + float(fin["market_share_external_synthetic"])
     )
     assert abs(total_share - 1.0) < 1e-6
