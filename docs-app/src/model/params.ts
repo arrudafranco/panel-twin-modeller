@@ -276,7 +276,7 @@ export const DEFAULT_COMPETITION: CompetitionParams = {
   hybrid_benchmark_price: 160000.0,
   hybrid_benchmark_quality: 0.80,
   hybrid_benchmark_turnaround_days: 12.0,
-  external_synthetic_price: 130000.0,
+  external_synthetic_price: 50000.0,
   external_synthetic_quality: 0.72,
   external_synthetic_turnaround_days: 7.0,
 };

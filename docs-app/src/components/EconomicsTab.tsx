@@ -28,10 +28,13 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
         <span>
           The <strong>Cost tab</strong> shows what the initial pilot study costs (recruitment,
           interviews, agent construction). The projections on this page model a
-          hypothetical <strong>commercial deployment</strong> after the pilot has validated quality.
-          They do not include the cost of training on a nationally representative panel,
-          nor periodic model refresh costs to keep agent profiles current as respondents' circumstances
-          change over time. Both are important additional considerations before committing to scale.
+          hypothetical deployment after the pilot has validated quality, to help frame
+          the investment decision and illustrate cost-quality trade-offs relative to
+          alternative research approaches. All project prices — Panel Twin and alternatives alike —
+          reflect full-service scope at equivalent deliverables: data collection or generation,
+          representativeness adjustments, and a weighted dataset. Custom analysis and reporting
+          are not included in any price. Refresh costs and nationally representative panel
+          build-out are also not included and are important additional considerations before committing to scale.
         </span>
       </div>
 

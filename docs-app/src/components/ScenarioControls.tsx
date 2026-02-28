@@ -89,7 +89,7 @@ export function ScenarioControls({
           min={50000} max={500000} step={5000}
           onChange={(v) => updateRevenue('price_per_project', v)}
           format={money}
-          tooltip="Revenue per client project. Combined with cost per project this determines the gross margin. Module add-ons and refresh waves generate additional revenue."
+          tooltip="Revenue per project. Represents the full-service price for data collection, agent construction, and basic deliverables (weighted dataset and crosstabs). Does not include custom analysis or reporting. Combined with cost per project this determines the gross margin."
         />
         <Slider
           label="Projects per year"
@@ -302,7 +302,7 @@ export function ScenarioControls({
         <fieldset className="control-group">
           <legend>
             Market benchmarks{' '}
-            <Tooltip content="Stylized defaults for competitor pricing, quality, and turnaround. Adjust to reflect your actual competitive landscape. These drive the market share and win probability estimates.">
+            <Tooltip content="Stylized defaults for alternative-approach pricing, quality, and turnaround. All prices represent full-service project scope at equivalent deliverables: data collection or generation, representativeness adjustments, and a weighted dataset. Custom analysis and reporting are not included in any of the four prices. Adjust to reflect your actual landscape.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
@@ -339,17 +339,17 @@ export function ScenarioControls({
           <Slider
             label="Fully synthetic price"
             value={cfg.competition.external_synthetic_price}
-            min={50000} max={600000} step={5000}
+            min={10000} max={200000} step={5000}
             onChange={(v) => updateCompetition('external_synthetic_price', v)}
             format={money}
-            tooltip="Typical project price for a fully synthetic data provider (no real human respondents)."
+            tooltip="Full-service project price for a purely synthetic data provider (no real human respondents). Raw data generation costs from pure-play vendors are substantially lower ($2–30 per synthetic profile); this default reflects a comparable full-service project engagement at equivalent deliverable scope."
           />
           <Slider
             label="Fully synthetic quality"
             value={cfg.competition.external_synthetic_quality}
             min={0.4} max={1.0} step={0.01}
             onChange={(v) => updateCompetition('external_synthetic_quality', Number(v.toFixed(2)))}
-            tooltip="Estimated quality score for fully synthetic data. Default 0.72 reflects reasonable but unanchored quality."
+            tooltip="Estimated representational quality for fully synthetic data (profiles generated from aggregate sources without individual human interviews). Default 0.72 reflects reasonable population-level accuracy but no person-level anchoring — unlike Panel Twin, fully synthetic agents cannot be validated against their source participants."
           />
         </fieldset>
       </details>
