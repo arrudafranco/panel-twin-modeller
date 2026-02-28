@@ -188,32 +188,33 @@
 
 .twin-diagram {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  align-items: flex-start;
   gap: 0;
-  margin: 28px 0;
-  flex-wrap: wrap;
+  margin: 44px 0 36px;
 }
 
+/* Steps: no card boxes — open editorial layout with icon as focal point */
 .twin-step {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 18px 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  min-width: 176px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-shadow: var(--shadow-sm);
+  padding: 0 20px;
+  min-width: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 .twin-step:hover {
-  border-color: var(--brand-orange);
-  box-shadow: var(--shadow-md);
+  border: none;
+  box-shadow: none;
 }
 
 .twin-step-icon {
-  width: 32px;
-  height: 32px;
+  width: 52px;
+  height: 52px;
   background: var(--brand-orange);
   color: #fff;
   border-radius: 50%;
@@ -222,39 +223,57 @@
   justify-content: center;
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 14px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+  /* Outer ring for visual weight without a card border */
+  box-shadow: 0 2px 14px rgba(232, 119, 34, 0.26), 0 0 0 7px rgba(232, 119, 34, 0.07);
 }
 
 .twin-step-label {
   font-weight: 700;
   color: var(--brand-charcoal);
-  font-size: 13px;
-  letter-spacing: 0.1px;
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+  margin-bottom: 7px;
 }
 
 .twin-step-detail {
   color: var(--text-muted);
   font-size: 12px;
-  margin-top: 4px;
-  line-height: 1.4;
+  line-height: 1.6;
+  margin-top: 0;
 }
 
+/* Arrow: fixed height matches the icon so the connector sits at icon center */
 .twin-arrow {
-  width: 28px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 52px;
+  position: relative;
+}
+
+/* Connector line */
+.twin-arrow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 10px;
+  top: 25px;
   height: 2px;
   background: var(--brand-orange);
-  position: relative;
-  flex-shrink: 0;
+  opacity: 0.35;
 }
 
+/* Arrowhead */
 .twin-arrow::after {
   content: '';
   position: absolute;
-  right: -1px;
-  top: -4px;
-  border: 5px solid transparent;
+  right: 0;
+  top: 19px;
+  border: 7px solid transparent;
   border-left-color: var(--brand-orange);
+  opacity: 0.5;
 }
 
 /* ----------------------------------------------------------------
@@ -1477,19 +1496,44 @@ details.methods-note summary {
   .twin-diagram {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0;
   }
+  .twin-step {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+    padding: 0;
+    gap: 16px;
+    width: 100%;
+  }
+  .twin-step-icon {
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+  .twin-step-label, .twin-step-detail {
+    text-align: left;
+  }
+  /* Vertical connector between steps */
   .twin-arrow {
+    width: 52px;
+    height: 28px;
+  }
+  .twin-arrow::before {
+    left: 25px;
+    right: auto;
     width: 2px;
-    height: 20px;
-    margin-left: 20px;
+    top: 0;
+    height: 100%;
   }
   .twin-arrow::after {
-    right: -4px;
+    left: 18px;
+    right: auto;
     top: auto;
-    bottom: -1px;
-    border: 5px solid transparent;
+    bottom: 0;
+    border: 7px solid transparent;
     border-top-color: var(--brand-orange);
     border-left-color: transparent;
+    opacity: 0.5;
   }
 }
 

@@ -150,7 +150,7 @@ export interface ScenarioConfig {
 }
 
 export const DEFAULT_COST: CostParams = {
-  cost_per_invite: 1.0,
+  cost_per_invite: 0.0,
   response_rate: 0.25,
   contact_attempts: 1.0,
   response_lift_per_extra_attempt: 0.0,

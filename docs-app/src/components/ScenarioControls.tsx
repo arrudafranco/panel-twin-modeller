@@ -69,7 +69,7 @@ export function ScenarioControls({
           min={0.05} max={0.9} step={0.01}
           onChange={(v) => updateCost('response_rate', Number(v.toFixed(2)))}
           format={pct}
-          tooltip="Fraction of invited participants who complete the interview. Lower rates require more outreach contacts, increasing recruitment cost."
+          tooltip="Fraction of invited panel members who complete the interview. For a 2-hour AI voice study via AmeriSpeak, 15–30% is a reasonable range. Determines how many panel slots to reserve, but does not drive per-invite outreach cost when sampling from an established panel."
         />
         <Slider
           label="Retest attrition"
@@ -156,7 +156,7 @@ export function ScenarioControls({
             min={0} max={10} step={0.25}
             onChange={(v) => updateCost('cost_per_invite', Number(v.toFixed(2)))}
             format={money}
-            tooltip="Outreach cost per invited participant (postage, email list, panel access fees). Multiplied by 1/response_rate to get cost per completion."
+            tooltip="Per-invite outreach cost. For an established probability panel like AmeriSpeak, this is $0 — panel members are already recruited and survey invitations are part of ongoing panel operations. Only non-zero if using external recruitment lists or cold outreach."
           />
         </fieldset>
 
@@ -280,7 +280,7 @@ export function ScenarioControls({
             value={cfg.cost.contact_attempts}
             min={1} max={6} step={1}
             onChange={(v) => updateCost('contact_attempts', v)}
-            tooltip="Number of outreach attempts per invitee before giving up. More attempts improve response rate but increase recruitment cost."
+            tooltip="Number of contact attempts per invitee (initial invitation plus reminders). For AmeriSpeak, 1–2 is typical (one invitation plus one reminder). Affects response rate modeling but not cost when per-invite cost is $0."
           />
           <Slider
             label="Other upfront investment"

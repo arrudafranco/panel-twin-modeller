@@ -15,11 +15,21 @@ export function CostTab({ cfg, results }: Props) {
   return (
     <section id="panel-cost" role="tabpanel" aria-labelledby="tab-cost">
       <h2>Operations and cost</h2>
+      <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
+        <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>ℹ</span>
+        <span>
+          This model reflects a pilot drawn from <strong>an existing probability panel
+          such as AmeriSpeak</strong>. Panel recruitment and ongoing maintenance are
+          infrastructure costs that already exist at NORC and are not included here.
+          The costs shown are per-study variable costs: incentives, voice and LLM
+          infrastructure, post-processing labor, and overhead. Set "Cost per invite"
+          to $0 (the default) when sampling from an established panel.
+        </span>
+      </div>
       <p>
-        Cost estimates cover the full pilot lifecycle, from recruitment through
-        agent construction. The model includes recruitment outreach, participant
-        incentives, voice infrastructure (ASR/TTS), LLM token costs, post-processing,
-        professional labor, and organizational overhead.
+        Cost estimates cover the per-study variable costs of the pilot: participant
+        incentives, AI voice infrastructure (ASR/TTS), LLM token costs,
+        post-processing, professional labor, and organizational overhead.
       </p>
 
       <CostWaterfallChart costs={costs} />
