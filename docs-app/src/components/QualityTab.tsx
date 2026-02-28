@@ -19,16 +19,31 @@ export function QualityTab({ cfg, results }: Props) {
 
   return (
     <section id="panel-quality" role="tabpanel" aria-labelledby="tab-quality">
-      <h2>Quality estimates</h2>
+      <h2>Agent fidelity estimates</h2>
       <p>
-        Quality scores estimate how closely an AI agent can replicate a real person's
-        survey responses. Scores are anchored to the 0.85 normalized accuracy reported
-        by Park et al. (2024) for attitudes measured with 2-hour GPT-4 interviews.
+        These scores estimate <strong>agent-human response fidelity</strong> — how
+        consistently an AI agent's answers match what the source participant would
+        actually say. This is meaningfully different from survey reliability in the
+        traditional sense. Reliability describes how consistently a human answers
+        the same question twice. Fidelity describes how accurately an agent
+        represents a specific person on measured items. The former is a property
+        of the instrument; the latter is a property of the agent's approximation
+        of the person.
+      </p>
+      <p>
+        The 0.85 anchor from Park et al. (2024, arXiv:2411.10109) represents
+        agent-human agreement <em>normalized against</em> human test-retest
+        consistency as a ceiling. The logic: since humans are not perfectly
+        consistent with themselves, expecting perfect agent-human agreement is an
+        unfair standard. The right question is whether agents track their source
+        participants about as well as those participants track themselves. At 0.85,
+        the Park et al. agents cleared that bar for GSS attitude items with
+        2-hour GPT-4 interviews.
       </p>
 
       <QualityCurveChart cfg={cfg} threshold={threshold} />
 
-      <h3>Quality by construct type</h3>
+      <h3>Estimated fidelity by construct type</h3>
       <table className="data-table">
         <thead>
           <tr>
@@ -61,22 +76,35 @@ export function QualityTab({ cfg, results }: Props) {
       <div className="methods-note">
         <h3>Methods and limitations</h3>
         <p>
-          The 0.85 base accuracy is anchored to 2-hour GSS attitude interviews using
-          GPT-4 (Park et al., 2024). Quality estimates for shorter interviews, different
-          constructs, or different LLMs carry wider uncertainty.
+          The 0.85 anchor is agent-human agreement on GSS attitude items, normalized
+          against human test-retest consistency, from 2-hour GPT-4 interviews
+          (Park et al., 2024, arXiv:2411.10109). It is the only direct published
+          anchor for this specific construction approach. All other estimates
+          extrapolate from it using construct-specific penalties and log-linear
+          duration scaling — modeling assumptions, not empirical measurements.
         </p>
         <p>
           Uncertainty bands are ±{QUALITY_UNCERTAINTY_BANDS.attitude_belief.toFixed(2)} for
           attitudes (paper-anchored),
-          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} for self-reported behaviors
-          (less evidence), and
-          ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} for incentivized behaviors
-          (least evidence).
+          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} for self-reported
+          behaviors (less published evidence), and
+          ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} for incentivized
+          behaviors (least published evidence). These are modeling conventions, not
+          empirically validated confidence intervals.
         </p>
         <p>
-          Memory architecture parameters (retrieval k, reflection cadence, importance weighting)
-          affect quality through transparent multipliers. These are prompt-mediated heuristics,
-          not direct measurements.
+          What fidelity comparisons can and cannot establish. This approach captures
+          one dimension of validity: whether agents reproduce their source participants'
+          responses on measured items. It does not establish construct validity (does the
+          instrument measure the intended latent construct?), discriminant validity
+          (do agents correctly differentiate respondents?), or topical generalizability
+          (does fidelity hold for questions outside the interview's domain?). Those
+          remain open empirical questions for a pilot to begin addressing.
+        </p>
+        <p>
+          Memory architecture parameters (retrieval k, reflection cadence, importance
+          weighting) affect scores through transparent multipliers. These are
+          theoretically motivated heuristics, not measured effect sizes.
         </p>
       </div>
     </section>

@@ -22,12 +22,12 @@ export function DynamicNarrative({ cfg, results }: Props) {
   // Quality vs threshold
   if (qualityEval.quality_pass) {
     sentences.push(
-      `At ${cfg.interview_minutes} minutes, estimated quality for ${constructLabel} (${quality.toFixed(2)}) clears the benchmark threshold of ${threshold.toFixed(2)}.`
+      `At ${cfg.interview_minutes} minutes, estimated agent fidelity for ${constructLabel} (${quality.toFixed(2)}) clears the benchmark-derived threshold of ${threshold.toFixed(2)}.`
     );
   } else {
     const gap = threshold - quality;
     sentences.push(
-      `At ${cfg.interview_minutes} minutes, estimated quality for ${constructLabel} (${quality.toFixed(2)}) falls ${gap.toFixed(2)} below the benchmark threshold of ${threshold.toFixed(2)}. Consider longer interviews or a different construct focus.`
+      `At ${cfg.interview_minutes} minutes, estimated agent fidelity for ${constructLabel} (${quality.toFixed(2)}) falls ${gap.toFixed(2)} below the benchmark-derived threshold of ${threshold.toFixed(2)}. Consider longer interviews or a different construct focus.`
     );
   }
 

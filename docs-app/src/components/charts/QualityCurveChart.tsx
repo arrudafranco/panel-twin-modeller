@@ -36,11 +36,12 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
   }, [cfg]);
 
   return (
-    <div className="chart-container" role="img" aria-label="Quality score by interview duration. Shows three construct types as lines with uncertainty bands. A horizontal dashed line marks the quality threshold.">
-      <h3 className="chart-title">Quality by interview duration</h3>
+    <div className="chart-container" role="img" aria-label="Estimated agent fidelity by interview duration. Shows three construct types as lines with uncertainty bands. A horizontal dashed line marks the fidelity threshold.">
+      <h3 className="chart-title">Estimated agent fidelity by interview duration</h3>
       <p className="chart-subtitle">
-        Shaded regions show uncertainty bands (wider for less-studied constructs).
-        The 0.85 attitude base is anchored to Park et al. (2024).
+        Shaded regions show uncertainty bands (wider for constructs with less published evidence).
+        The 0.85 attitude anchor reflects agent-human agreement normalized against human
+        test-retest consistency (Park et al., 2024, arXiv:2411.10109).
       </p>
       <ResponsiveContainer width="100%" height={340}>
         <ComposedChart data={data} margin={{ top: 14, right: 64, bottom: 32, left: 10 }}>
@@ -52,7 +53,7 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
           />
           <YAxis
             domain={[0.4, 1.0]}
-            label={{ value: 'Quality score', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+            label={{ value: 'Fidelity score', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
             tick={{ fontSize: 11 }}
           />
           <RTooltip

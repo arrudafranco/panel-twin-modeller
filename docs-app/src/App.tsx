@@ -14,7 +14,7 @@ type View = 'landing' | 'explorer';
 
 const TABS = [
   { key: 'overview', label: 'Overview' },
-  { key: 'quality', label: 'Quality' },
+  { key: 'quality', label: 'Fidelity' },
   { key: 'cost', label: 'Cost' },
   { key: 'economics', label: 'Economics' },
   { key: 'benchmarks', label: 'Benchmarks' },

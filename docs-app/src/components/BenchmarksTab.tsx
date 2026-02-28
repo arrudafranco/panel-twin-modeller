@@ -5,10 +5,26 @@ export function BenchmarksTab() {
     <section id="panel-benchmarks" role="tabpanel" aria-labelledby="tab-benchmarks">
       <h2>Federal survey benchmarks</h2>
       <p>
-        Quality thresholds are grounded in retest reliability from major federal
-        surveys. These benchmarks represent how consistently real human respondents
-        answer the same questions when re-interviewed. An AI agent that matches or
-        exceeds this reliability is performing at research-grade levels.
+        These benchmarks serve a specific and limited role: they characterize how
+        self-consistent real human respondents are when re-interviewed on similar
+        constructs. That human test-retest consistency becomes the <strong>normalizing
+        ceiling</strong> for agent fidelity comparisons, following the logic of
+        Park et al. (2024).
+      </p>
+      <p>
+        The comparison works like this. If humans agree with their own earlier
+        answers roughly X% of the time on a given construct, then an agent that
+        agrees with its source participant X% of the time is performing at the
+        ceiling of what we could reasonably expect. The fidelity threshold in this
+        model is set at a percentile of the benchmark distribution, not as a claim
+        that agents are "reliable" in the same sense these surveys are.
+      </p>
+      <p>
+        What these benchmarks do not address: whether agents validly represent
+        their source participants beyond the measured items, whether the underlying
+        constructs are well-specified, or whether fidelity generalizes to topics not
+        covered in the interview. They are a practical ceiling for a specific
+        comparison, not a comprehensive validity standard.
       </p>
 
       <div className="benchmarks-grid">

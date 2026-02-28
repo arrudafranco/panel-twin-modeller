@@ -21,7 +21,7 @@ export function OverviewTab({ cfg, results }: Props) {
 
       <div className="kpi-grid">
         <Kpi
-          label="Quality score"
+          label="Fidelity score"
           value={quality.toFixed(3)}
           status={qualityEval.quality_pass ? 'positive' : 'negative'}
           detail={`Threshold: ${threshold.toFixed(3)}`}
