@@ -18,12 +18,13 @@ export function CostTab({ cfg, results }: Props) {
       <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>ℹ</span>
         <span>
-          This model reflects a pilot drawn from <strong>an existing probability panel
-          such as AmeriSpeak</strong>. Panel recruitment and ongoing maintenance are
-          infrastructure costs that already exist at NORC and are not included here.
-          The costs shown are per-study variable costs: incentives, voice and LLM
-          infrastructure, post-processing labor, and overhead. Set "Cost per invite"
-          to $0 (the default) when sampling from an established panel.
+          This model reflects a pilot drawn from an <strong>existing probability
+          panel</strong>. Panel recruitment and ongoing maintenance are fixed
+          infrastructure costs not included here. The costs shown are per-study
+          variable costs: incentives, voice and LLM infrastructure, post-processing
+          labor, and overhead. Set "Cost per invite" to $0 (the default) when
+          sampling from an established panel where outreach is part of panel
+          operations.
         </span>
       </div>
       <p>
