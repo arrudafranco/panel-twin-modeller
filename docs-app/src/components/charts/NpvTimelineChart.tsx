@@ -27,7 +27,7 @@ export function NpvTimelineChart({ finance }: Props) {
         }
       </p>
       <ResponsiveContainer width="100%" height={320}>
-        <AreaChart data={data} margin={{ top: 10, right: 20, bottom: 20, left: 20 }}>
+        <AreaChart data={data} margin={{ top: 32, right: 64, bottom: 24, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="month"

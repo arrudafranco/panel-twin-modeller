@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import {
   Line, XAxis, YAxis, CartesianGrid,
-  ReferenceLine, Legend, ResponsiveContainer, Area, ComposedChart,
+  ReferenceLine, Legend, ResponsiveContainer, Area, ComposedChart, Tooltip as RTooltip,
 } from 'recharts';
 import type { ScenarioConfig } from '../../model/params.ts';
 import { QUALITY_UNCERTAINTY_BANDS } from '../../model/params.ts';
@@ -24,7 +24,6 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
         'Attitudes & beliefs': Number(ab.toFixed(4)),
         'Self-reported behaviors': Number(sr.toFixed(4)),
         'Incentivized behaviors': Number(ib.toFixed(4)),
-        // Fix 2: Uncertainty bands
         ab_upper: Number(Math.min(1, ab + QUALITY_UNCERTAINTY_BANDS.attitude_belief).toFixed(4)),
         ab_lower: Number(Math.max(0, ab - QUALITY_UNCERTAINTY_BANDS.attitude_belief).toFixed(4)),
         sr_upper: Number(Math.min(1, sr + QUALITY_UNCERTAINTY_BANDS.self_report_behavior).toFixed(4)),
@@ -44,11 +43,11 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
         The 0.85 attitude base is anchored to Park et al. (2024).
       </p>
       <ResponsiveContainer width="100%" height={340}>
-        <ComposedChart data={data} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
+        <ComposedChart data={data} margin={{ top: 14, right: 64, bottom: 32, left: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="minutes"
-            label={{ value: 'Interview duration (minutes)', position: 'insideBottom', offset: -10, style: { fontSize: 12 } }}
+            label={{ value: 'Interview duration (minutes)', position: 'insideBottom', offset: -16, style: { fontSize: 12 } }}
             tick={{ fontSize: 11 }}
           />
           <YAxis
@@ -56,22 +55,30 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
             label={{ value: 'Quality score', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
             tick={{ fontSize: 11 }}
           />
-          {/* Uncertainty bands */}
-          <Area type="monotone" dataKey="ab_upper" stroke="none" fill="#E8772233" />
-          <Area type="monotone" dataKey="ab_lower" stroke="none" fill="#ffffff" />
-          <Area type="monotone" dataKey="sr_upper" stroke="none" fill="#3B82F622" />
-          <Area type="monotone" dataKey="sr_lower" stroke="none" fill="#ffffff" />
-          <Area type="monotone" dataKey="ib_upper" stroke="none" fill="#10B98122" />
-          <Area type="monotone" dataKey="ib_lower" stroke="none" fill="#ffffff" />
+          <RTooltip
+            formatter={(value: number, name: string) => {
+              if (name.includes('_')) return [null, null]; // hide band series from tooltip
+              return [value.toFixed(3), name];
+            }}
+            labelFormatter={(label) => `${label} minutes`}
+          />
+          {/* Uncertainty bands — legendType="none" hides them from the legend */}
+          <Area type="monotone" dataKey="ab_upper" stroke="none" fill="#E8772233" legendType="none" />
+          <Area type="monotone" dataKey="ab_lower" stroke="none" fill="#ffffff" legendType="none" />
+          <Area type="monotone" dataKey="sr_upper" stroke="none" fill="#3B82F622" legendType="none" />
+          <Area type="monotone" dataKey="sr_lower" stroke="none" fill="#ffffff" legendType="none" />
+          <Area type="monotone" dataKey="ib_upper" stroke="none" fill="#10B98122" legendType="none" />
+          <Area type="monotone" dataKey="ib_lower" stroke="none" fill="#ffffff" legendType="none" />
           {/* Main lines */}
           <Line type="monotone" dataKey="Attitudes & beliefs" stroke="#E87722" strokeWidth={2.5} dot={false} />
           <Line type="monotone" dataKey="Self-reported behaviors" stroke="#3B82F6" strokeWidth={2.5} dot={false} />
           <Line type="monotone" dataKey="Incentivized behaviors" stroke="#10B981" strokeWidth={2.5} dot={false} />
           {/* Threshold */}
-          <ReferenceLine y={threshold} stroke="#991B1B" strokeDasharray="6 4" label={{ value: `Threshold ${threshold.toFixed(2)}`, position: 'right', fontSize: 11, fill: '#991B1B' }} />
+          <ReferenceLine y={threshold} stroke="#991B1B" strokeDasharray="6 4" label={{ value: `Threshold ${threshold.toFixed(2)}`, position: 'insideTopRight', fontSize: 11, fill: '#991B1B' }} />
           {/* Current interview duration */}
           <ReferenceLine x={cfg.interview_minutes} stroke="#6B7280" strokeDasharray="4 4" />
-          <Legend wrapperStyle={{ fontSize: 11 }} />
+          {/* Legend at top to avoid x-axis collision */}
+          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 11, paddingBottom: 8 }} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>

@@ -79,7 +79,7 @@ export const BENCHMARKS: BenchmarkEntry[] = [
     construct_type: "attitude_belief",
     metrics: { kappa_range: [0.35, 0.6], spearman_range: [0.4, 0.7] },
     comparability_note: "Useful attitude/belief comparator, but not a 2-week retest benchmark.",
-    citations: ["https://doi.org/10.1089/jpm.2015.0501"],
+    citations: ["https://hints.cancer.gov/", "https://pubmed.ncbi.nlm.nih.gov/18360718/"],
   },
   {
     instrument_name: "GSS Panel Reliability Literature (Contextual Comparator)",
@@ -93,7 +93,7 @@ export const BENCHMARKS: BenchmarkEntry[] = [
     metrics: { contextual_range: [0.55, 0.75] },
     comparability_note: "Important attitude/belief context, but interval mismatch prevents direct benchmark equivalence.",
     citations: [
-      "https://www.nsf.gov/statistics/srvygss/",
+      "https://gss.norc.org/",
       "https://sociologicalscience.com/articles-v3-43-971/",
     ],
   },

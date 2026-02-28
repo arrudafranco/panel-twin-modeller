@@ -13,6 +13,7 @@ interface Props {
 }
 
 const money = (v: number) => `$${Math.round(v).toLocaleString()}`;
+const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 
 export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
   const { finance, mcResult } = results;
@@ -21,14 +22,28 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
     <section id="panel-economics" role="tabpanel" aria-labelledby="tab-economics">
       <h2>Economics and market positioning</h2>
 
+      {/* Scope clarification */}
+      <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
+        <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>ℹ</span>
+        <span>
+          The <strong>Cost tab</strong> shows what the initial pilot study costs (recruitment,
+          interviews, agent construction). The projections on this page model a
+          hypothetical <strong>commercial deployment</strong> after the pilot has validated quality.
+          They do not include the cost of training on a nationally representative panel,
+          nor periodic model refresh costs to keep agent profiles current as respondents' circumstances
+          change over time. Both are important additional considerations before committing to scale.
+        </span>
+      </div>
+
       {/* Fix 1: Prominent coefficient warning */}
       <div className="coefficient-warning">
-        <Tooltip content="quality=3.2, brand=1.1, tailwind=0.8, price=0.000012, turnaround=0.03. These are scenario planning defaults, not market-fitted estimates.">
+        <Tooltip content="Utility weights (quality=3.2, brand=1.1, tailwind=0.8, price=0.000012, turnaround=0.03) are scenario planning defaults, not fitted to historical market data. Market share is estimated from a multinomial logit model. Gross margin = (price − cost per project) / price.">
           <span className="info-icon" aria-hidden="true">i</span>
         </Tooltip>
-        {' '}These estimates use illustrative market coefficients. Actual win rates depend on
-        client relationships, proposal quality, and factors not captured here. Treat NPV and
-        win probability as directional signals for planning, not forecasts.
+        {' '}Win probability and market share use illustrative competition model coefficients. Actual
+        win rates depend on client relationships, proposal quality, and factors not captured here.
+        Treat NPV and break-even as directional planning signals, not forecasts. Competitor prices
+        and quality scores are editable in Advanced settings.
       </div>
 
       <NpvTimelineChart finance={finance} />
@@ -37,12 +52,28 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
       <h3>Financial summary</h3>
       <table className="data-table">
         <tbody>
-          <tr><th>Win probability</th><td>{(finance.win_probability * 100).toFixed(1)}%</td></tr>
-          <tr><th>Market share (Panel Twin)</th><td>{(finance.market_share_panel_twin * 100).toFixed(1)}%</td></tr>
-          <tr><th>Market share (Probability benchmark)</th><td>{(finance.market_share_probability_benchmark * 100).toFixed(1)}%</td></tr>
-          <tr><th>Market share (Hybrid benchmark)</th><td>{(finance.market_share_hybrid_benchmark * 100).toFixed(1)}%</td></tr>
-          <tr><th>Market share (External synthetic)</th><td>{(finance.market_share_external_synthetic * 100).toFixed(1)}%</td></tr>
-          <tr><th>Gross margin</th><td>{(finance.gross_margin * 100).toFixed(1)}%</td></tr>
+          <tr>
+            <th>
+              Win probability
+              <Tooltip content="Probability Panel Twin wins a head-to-head proposal, derived from the utility-based competition model.">
+                {' '}<span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </th>
+            <td>{pct(finance.win_probability)}</td>
+          </tr>
+          <tr><th>Market share (Panel Twin)</th><td>{pct(finance.market_share_panel_twin)}</td></tr>
+          <tr><th>Market share (Probability benchmark)</th><td>{pct(finance.market_share_probability_benchmark)}</td></tr>
+          <tr><th>Market share (Hybrid benchmark)</th><td>{pct(finance.market_share_hybrid_benchmark)}</td></tr>
+          <tr><th>Market share (Fully synthetic)</th><td>{pct(finance.market_share_external_synthetic)}</td></tr>
+          <tr>
+            <th>
+              Gross margin
+              <Tooltip content="(Price per project − cost per completed interview) / price per project. Does not include CAC or other fixed costs.">
+                {' '}<span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </th>
+            <td>{pct(finance.gross_margin)}</td>
+          </tr>
           <tr><th>Total upfront investment</th><td>{money(finance.total_upfront_investment)}</td></tr>
           <tr><th>Cumulative contribution</th><td>{money(finance.contribution_margin_total)}</td></tr>
           <tr><th>Projected NPV</th><td><strong>{money(finance.npv)}</strong></td></tr>
@@ -50,12 +81,29 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
         </tbody>
       </table>
 
+      {/* Topical extrapolation note */}
+      <div className="methods-note" style={{ marginTop: 20 }}>
+        <h3>A key open question: topical extrapolation</h3>
+        <p>
+          We do not yet know how broadly an agent trained on one interview can be trusted to answer
+          questions outside the domains that interview covered. If topical extrapolation proves limited,
+          additional targeted "module" interviews for specific research topic areas may be needed.
+          This would add cost and participant burden but could enable coverage of multiple profitable
+          research verticals from a single base panel.
+        </p>
+        <p>
+          Similarly, agent profiles will drift as respondents' lives, opinions, and circumstances change.
+          The appropriate refresh interval is unknown and likely construct-dependent. Refresh wave pricing
+          is included in the revenue model but refresh costs are not yet modeled on the cost side.
+        </p>
+      </div>
+
       {/* Monte Carlo section */}
       <div className="mc-section">
         <h3>Uncertainty analysis (Monte Carlo)</h3>
         <p>
-          Run {cfg.mode === 'pilot' ? '500' : '500'} simulations varying interview duration,
-          response rate, and attrition to see the distribution of possible outcomes.
+          Run 500 simulations varying interview duration, response rate, and attrition
+          to see the distribution of possible NPV outcomes.
         </p>
         <label className="mc-toggle">
           <input

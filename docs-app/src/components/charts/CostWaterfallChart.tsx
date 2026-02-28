@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, LabelList, Tooltip as RTooltip } from 'recharts';
 import type { CostResult } from '../../model/costModel.ts';
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
 }
 
 const money = (v: number) => `$${Math.round(v).toLocaleString()}`;
+const shortMoney = (v: number) => v > 1000 ? `$${(v / 1000).toFixed(1)}k` : money(v);
 
 export function CostWaterfallChart({ costs }: Props) {
   const data = useMemo(() => [
@@ -24,21 +25,30 @@ export function CostWaterfallChart({ costs }: Props) {
     <div className="chart-container" role="img" aria-label={`Cost breakdown. Total cost is ${money(costs.total_cost)}.`}>
       <h3 className="chart-title">Cost breakdown</h3>
       <p className="chart-subtitle">
-        Per-pilot cost components. The largest driver is typically labor and recruitment.
+        Pilot cost components. Adjust incentives, labor rate, and overhead in the Advanced settings sidebar.
       </p>
-      <ResponsiveContainer width="100%" height={320}>
-        <BarChart data={data} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-25} textAnchor="end" height={60} />
-          <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} />
-          <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+      <ResponsiveContainer width="100%" height={310}>
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ top: 4, right: 72, bottom: 4, left: 110 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} />
+          <XAxis
+            type="number"
+            tick={{ fontSize: 10 }}
+            tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+          />
+          <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={104} />
+          <RTooltip formatter={(v: unknown) => [money(Number(v)), 'Cost']} />
+          <Bar dataKey="value" radius={[0, 3, 3, 0]}>
             {data.map((entry, i) => (
               <Cell key={i} fill={entry.fill} />
             ))}
             <LabelList
               dataKey="value"
-              position="top"
-              formatter={(v: unknown) => { const n = Number(v); return n > 1000 ? `$${(n / 1000).toFixed(1)}k` : money(n); }}
+              position="right"
+              formatter={(v: unknown) => shortMoney(Number(v))}
               style={{ fontSize: 10, fill: '#374151' }}
             />
           </Bar>

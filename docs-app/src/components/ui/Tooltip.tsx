@@ -1,39 +1,59 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, type ReactNode, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TooltipProps {
   content: string;
   children: ReactNode;
 }
 
+const TOOLTIP_WIDTH = 260;
+
 export function Tooltip({ content, children }: TooltipProps) {
   const [visible, setVisible] = useState(false);
-  const [position, setPosition] = useState<'above' | 'below'>('above');
+  const [style, setStyle] = useState<React.CSSProperties>({});
   const triggerRef = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
-    if (visible && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setPosition(rect.top < 120 ? 'below' : 'above');
+  const computePosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const r = triggerRef.current.getBoundingClientRect();
+    const above = r.top > 140;
+    // Horizontally center on trigger, but clamp to viewport
+    const left = Math.max(
+      8,
+      Math.min(r.left + r.width / 2 - TOOLTIP_WIDTH / 2, window.innerWidth - TOOLTIP_WIDTH - 8)
+    );
+    if (above) {
+      setStyle({ left, bottom: window.innerHeight - r.top + 6, top: 'auto' });
+    } else {
+      setStyle({ left, top: r.bottom + 6, bottom: 'auto' });
     }
-  }, [visible]);
+  }, []);
+
+  const show = useCallback(() => { computePosition(); setVisible(true); }, [computePosition]);
+  const hide = useCallback(() => setVisible(false), []);
 
   return (
     <span
       className="tooltip-trigger"
       ref={triggerRef}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
-      onFocus={() => setVisible(true)}
-      onBlur={() => setVisible(false)}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
       tabIndex={0}
       role="button"
       aria-label="More information"
     >
       {children}
-      {visible && (
-        <span className={`tooltip-content tooltip-${position}`} role="tooltip">
+      {visible && createPortal(
+        <span
+          className="tooltip-content tooltip-portal"
+          role="tooltip"
+          style={style}
+        >
           {content}
-        </span>
+        </span>,
+        document.body
       )}
     </span>
   );
