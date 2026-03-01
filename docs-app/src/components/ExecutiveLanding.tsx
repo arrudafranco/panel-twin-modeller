@@ -410,6 +410,18 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           Model defaults last updated March 2026. LLM (large language model), ASR (automatic speech recognition), and TTS (text-to-speech)
           pricing change rapidly, as do market conditions. Review Advanced settings against current figures before drawing conclusions.
         </p>
+        <p className="cta-credit">
+          Built by{' '}
+          <a href="https://github.com/arrudafranco" target="_blank" rel="noopener noreferrer" className="cta-credit-link">
+            Gustavo Arruda Franco
+          </a>
+          {'. '}
+          Bug reports and suggestions welcome via{' '}
+          <a href="https://github.com/arrudafranco/panel-twin-modeller/issues" target="_blank" rel="noopener noreferrer" className="cta-credit-link">
+            GitHub Issues
+          </a>
+          {'.'}
+        </p>
       </section>
     </div>
   );

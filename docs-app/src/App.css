@@ -547,6 +547,19 @@
   margin-top: 12px;
 }
 
+.cta-credit {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+.cta-credit-link {
+  color: var(--brand-orange);
+  text-decoration: none;
+}
+.cta-credit-link:hover { text-decoration: underline; }
+
 /* ----------------------------------------------------------------
    Explorer layout
    ---------------------------------------------------------------- */
@@ -600,6 +613,17 @@
   transition: color 0.15s;
 }
 .app-title-btn:hover { color: var(--brand-orange); }
+
+.app-header-credit {
+  margin-left: auto;
+  font-size: 11px;
+  color: #fff;
+  opacity: 0.45;
+  text-decoration: none;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.app-header-credit:hover { opacity: 0.85; text-decoration: underline; }
 
 .app-subtitle {
   font-size: 12px;

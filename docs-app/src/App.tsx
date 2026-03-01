@@ -43,6 +43,14 @@ function App() {
             </button>
           </h1>
           <span className="app-subtitle">Interactive feasibility explorer</span>
+          <a
+            href="https://github.com/arrudafranco"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="app-header-credit"
+          >
+            Gustavo Arruda Franco
+          </a>
         </div>
       </header>
 
