@@ -90,3 +90,7 @@ The underlying model draws on Park et al. (2024), *Generative Agent Simulations 
 - The Python model defaults (`twin_econ/params.py`, `configs/`) reflect an earlier calibration and may diverge from the React app's current defaults. See the Known Issues section in [docs/design_decisions.md](docs/design_decisions.md) before using the Python CLI for financial projections.
 - Plain-English architecture and rationale are documented in [docs/design_decisions.md](docs/design_decisions.md).
 - Optional external anchor references are documented in [docs/external_reference_defaults.md](docs/external_reference_defaults.md).
+
+## Feedback
+
+Bug reports, model critiques, and suggestions are welcome via [GitHub Issues](https://github.com/arrudafranco/panel-twin-modeller/issues). This includes model assumption challenges, UX friction, and parameter range requests.
