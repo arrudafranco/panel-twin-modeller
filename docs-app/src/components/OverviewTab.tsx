@@ -34,7 +34,7 @@ export function OverviewTab({ cfg, results }: Props) {
         <Kpi
           label="Win probability"
           value={`${(finance.win_probability * 100).toFixed(1)}%`}
-          detail="Market share estimate"
+          detail="Modeled market share"
         />
         <Kpi
           label="Net present value (NPV)"
