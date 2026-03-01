@@ -80,7 +80,7 @@ export function ScenarioControls({
       <fieldset className="control-group">
         <legend>
           Study scale{' '}
-          <Tooltip content="Two distinct spending events. The validation pilot is a small study run first to check quality, operations, and assumptions before committing to the full build — its cost appears in the Cost tab. The library build is the full one-time investment: AI interviews with the target number of participants that creates the synthetic twin library — its cost is the initial investment in the Economics tab. Both events use the same per-participant interview design above. Per-interview costs (incentives, panel access) are in Advanced settings.">
+          <Tooltip content="Two distinct spending events. The validation pilot is a small study run first to check quality, operations, and assumptions before committing to the full build — its cost appears in the Cost tab. The library build is the full one-time investment: AI interviews with the target number of participants that creates the agent library — its cost is the initial investment in the Economics tab. Both events use the same per-participant interview design above. Per-interview costs (incentives, panel access) are in Advanced settings.">
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>
@@ -100,7 +100,7 @@ export function ScenarioControls({
           onChange={(v) => {
             update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
           }}
-          tooltip="Number of participants to interview for the full synthetic twin library. Shown as the initial investment in the Economics tab. Once built, subsequent survey projects run against this library at marginal cost — no new interviews needed. A nationally representative U.S. sample typically requires at least 2,000 participants."
+          tooltip="Number of participants to interview for the full agent library. Shown as the initial investment in the Economics tab. Once built, subsequent survey projects run against this library at marginal cost — no new interviews needed. A nationally representative U.S. sample typically requires at least 2,000 participants."
         />
       </fieldset>
 

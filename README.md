@@ -22,9 +22,9 @@ This repository extends beyond that scope into:
 - an interactive public-facing web app with visualizations and executive narrative
 
 Key modeling features:
-- Memory retrieval is configurable rather than treated as a single hidden assumption
-- Response mode mix (categorical, numeric, open-ended) can affect quality expectations
-- Construct-specific response-mode presets and pilot calibration can update those assumptions explicitly
+- Study-type presets (mixed general survey, behavioral recall, incentivized behavior) set quality expectations and uncertainty bands
+- Memory architecture is configurable (full transcript, summary memory, hybrid) and affects both quality estimates and token costs
+- Pilot calibration via the `calibrate` CLI command can update model parameters from observed field data
 
 ## Interactive Web App
 
@@ -84,7 +84,7 @@ The underlying model draws on Park et al. (2024), *Generative Agent Simulations 
 ## Notes
 
 - Config files are real YAML and loaded with `PyYAML`.
-- Construct-focused presets are available in `configs/attitude_profile.yaml`, `configs/self_report_profile.yaml`, and `configs/incentivized_profile.yaml`.
+- Python CLI study-type presets (for the `calibrate` command) are in `configs/attitude_profile.yaml`, `configs/self_report_profile.yaml`, and `configs/incentivized_profile.yaml`.
 - A sample pilot CSV with optional response-mode calibration columns is available at `pilot_logs/template_response_modes.csv`.
 - All RNG-driven paths are seeded.
 - The Python model defaults (`twin_econ/params.py`, `configs/`) reflect an earlier calibration and may diverge from the React app's current defaults. See the Known Issues section in [docs/design_decisions.md](docs/design_decisions.md) before using the Python CLI for financial projections.

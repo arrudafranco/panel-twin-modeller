@@ -138,7 +138,7 @@ export function QualityTab({ cfg, results }: Props) {
           what those participants would currently say. The rate of this drift has no
           published estimates for interview-based AI agents. A library may remain
           accurate for months or degrade within weeks for fast-moving topics. The
-          economics model includes refresh wave revenue but not refresh operational
+          economics model does not currently include refresh wave revenue or operational
           costs, because the trigger conditions are not yet estimable. Net present value (NPV) projections
           beyond 12–18 months should be treated as conditional on library validity.
         </p>

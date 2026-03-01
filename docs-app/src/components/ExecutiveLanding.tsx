@@ -74,7 +74,7 @@ const INSIGHTS: InsightDef[] = [
     methodology: [
       "At ~55% variable margin, win probability sensitivity has a meaningful but not dominant NPV impact. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
       "Library useful life is the dominant uncertainty. As real participants' views evolve over time, agent responses gradually diverge from what those participants would currently say. The rate of this divergence — and when it crosses a meaningful threshold — has no published estimates for this construction approach.",
-      "Refresh wave revenue ($60K default) is included in the model, but per-refresh operational costs are not modeled. The cost of a partial re-interview campaign depends on how many agents need updating and whether source participants remain reachable.",
+      "The current model does not include refresh wave revenue or operational costs, because the trigger conditions for re-interviewing are not yet estimable. The cost of a partial re-interview campaign depends on how many agents need updating and whether source participants remain reachable.",
       "Monte Carlo simulations draw uncertainty from interview duration, response rate, and attrition. Library longevity uncertainty is not included because there is no distributional basis for it yet. This means the MC output understates total uncertainty for projections beyond 12–18 months.",
     ],
   },

@@ -366,7 +366,7 @@ If you want either parameter to affect win probability, it would need to be appl
 The revenue model runs a month-by-month NPV loop over `horizon_months` (default 36). Each month:
 - Demand scales with `projects_per_year`, `growth_rate` (0.08/year), and `churn_rate` (0.05/year)
 - Projects sold = demand × win_probability × net_new_fraction
-- Revenue per project = price + 0.4 × module_addon_price ($25K) + 0.2 × refresh_wave_price ($60K)
+- Revenue per project = `price_per_project` (base price only; removed attachment rates in v0.2.8)
 - Total upfront investment = `cac` ($20K) + `other_initial_investment` ($0 default) + library build cost
 - NPV uses a 12% annual discount rate (`discount_rate`)
 
