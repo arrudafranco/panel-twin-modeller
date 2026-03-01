@@ -63,7 +63,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
           <tr><th>Market share (Panel Twin)</th><td>{pct(finance.market_share_panel_twin)}</td></tr>
           <tr><th>Market share (Probability benchmark)</th><td>{pct(finance.market_share_probability_benchmark)}</td></tr>
           <tr><th>Market share (Hybrid benchmark)</th><td>{pct(finance.market_share_hybrid_benchmark)}</td></tr>
-          <tr><th>Market share (Fully synthetic)</th><td>{pct(finance.market_share_external_synthetic)}</td></tr>
+          <tr><th>Market share (Non-prob panel)</th><td>{pct(finance.market_share_nonprob_panel)}</td></tr>
           <tr>
             <th>
               Library build cost

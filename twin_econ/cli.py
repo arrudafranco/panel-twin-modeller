@@ -96,7 +96,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         "market_share_panel_twin": round(float(finance["market_share_panel_twin"]), 4),
         "market_share_probability_benchmark": round(float(finance["market_share_probability_benchmark"]), 4),
         "market_share_hybrid_benchmark": round(float(finance["market_share_hybrid_benchmark"]), 4),
-        "market_share_external_synthetic": round(float(finance["market_share_external_synthetic"]), 4),
+        "market_share_nonprob_panel": round(float(finance["market_share_nonprob_panel"]), 4),
         "npv": round(finance["npv"], 2),
         "time_horizon_months": int(float(finance["time_horizon_months"])),
         "time_to_break_even_months": finance["time_to_break_even_months"],

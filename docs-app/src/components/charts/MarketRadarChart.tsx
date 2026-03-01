@@ -16,7 +16,7 @@ const COLORS = {
   'Panel Twin': '#E87722',
   'Probability benchmark': '#3B82F6',
   'Hybrid benchmark': '#10B981',
-  'Fully synthetic': '#8B5CF6',
+  'Non-prob panel': '#8B5CF6',
 };
 
 export function MarketRadarChart({ cfg, quality, finance }: Props) {
@@ -27,13 +27,13 @@ export function MarketRadarChart({ cfg, quality, finance }: Props) {
       cfg.revenue.price_per_project,
       c.probability_benchmark_price,
       c.hybrid_benchmark_price,
-      c.external_synthetic_price
+      c.nonprob_panel_price
     );
     const maxTurnaround = Math.max(
       c.turnaround_days,
       c.probability_benchmark_turnaround_days,
       c.hybrid_benchmark_turnaround_days,
-      c.external_synthetic_turnaround_days
+      c.nonprob_panel_turnaround_days
     );
 
     const priceComp = (p: number) => Number(Math.max(0, 1 - p / maxPrice).toFixed(3));
@@ -45,34 +45,34 @@ export function MarketRadarChart({ cfg, quality, finance }: Props) {
         'Panel Twin': Number(quality.toFixed(3)),
         'Probability benchmark': Number(c.probability_benchmark_quality.toFixed(3)),
         'Hybrid benchmark': Number(c.hybrid_benchmark_quality.toFixed(3)),
-        'Fully synthetic': Number(c.external_synthetic_quality.toFixed(3)),
+        'Non-prob panel': Number(c.nonprob_panel_quality.toFixed(3)),
       },
       {
         dimension: 'Price advantage',
         'Panel Twin': priceComp(cfg.revenue.price_per_project),
         'Probability benchmark': priceComp(c.probability_benchmark_price),
         'Hybrid benchmark': priceComp(c.hybrid_benchmark_price),
-        'Fully synthetic': priceComp(c.external_synthetic_price),
+        'Non-prob panel': priceComp(c.nonprob_panel_price),
       },
       {
         dimension: 'Speed',
         'Panel Twin': speedComp(c.turnaround_days),
         'Probability benchmark': speedComp(c.probability_benchmark_turnaround_days),
         'Hybrid benchmark': speedComp(c.hybrid_benchmark_turnaround_days),
-        'Fully synthetic': speedComp(c.external_synthetic_turnaround_days),
+        'Non-prob panel': speedComp(c.nonprob_panel_turnaround_days),
       },
       {
         dimension: 'Brand trust',
         'Panel Twin': Number(c.brand_trust.toFixed(3)),
         'Probability benchmark': 0.92,
         'Hybrid benchmark': 0.75,
-        'Fully synthetic': 0.55,
+        'Non-prob panel': 0.65,
       },
     ];
   }, [cfg, quality, c, finance]);
 
   return (
-    <div className="chart-container" role="img" aria-label="Market positioning comparison across four competitive dimensions. Horizontal grouped bar chart showing Panel Twin, Probability benchmark, Hybrid benchmark, and Fully synthetic competitors.">
+    <div className="chart-container" role="img" aria-label="Market positioning comparison across four competitive dimensions. Horizontal grouped bar chart showing Panel Twin, Probability benchmark, Hybrid benchmark, and Non-prob panel competitors.">
       <h3 className="chart-title">Market positioning</h3>
       <p className="chart-subtitle">
         Normalized 0–1 scores across four competitive dimensions (higher is better for all axes).
@@ -112,7 +112,7 @@ export function MarketRadarChart({ cfg, quality, finance }: Props) {
         <summary>View as table</summary>
         <table>
           <thead>
-            <tr><th>Dimension</th><th>Panel Twin</th><th>Probability</th><th>Hybrid</th><th>Fully synthetic</th></tr>
+            <tr><th>Dimension</th><th>Panel Twin</th><th>Probability</th><th>Hybrid</th><th>Non-prob panel</th></tr>
           </thead>
           <tbody>
             {data.map((row) => (
@@ -121,7 +121,7 @@ export function MarketRadarChart({ cfg, quality, finance }: Props) {
                 <td>{row['Panel Twin']}</td>
                 <td>{row['Probability benchmark']}</td>
                 <td>{row['Hybrid benchmark']}</td>
-                <td>{row['Fully synthetic']}</td>
+                <td>{row['Non-prob panel']}</td>
               </tr>
             ))}
           </tbody>

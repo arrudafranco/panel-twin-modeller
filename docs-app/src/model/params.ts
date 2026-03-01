@@ -129,9 +129,9 @@ export interface CompetitionParams {
   hybrid_benchmark_price: number;
   hybrid_benchmark_quality: number;
   hybrid_benchmark_turnaround_days: number;
-  external_synthetic_price: number;
-  external_synthetic_quality: number;
-  external_synthetic_turnaround_days: number;
+  nonprob_panel_price: number;
+  nonprob_panel_quality: number;
+  nonprob_panel_turnaround_days: number;
 }
 
 export interface ScenarioConfig {
@@ -278,9 +278,9 @@ export const DEFAULT_COMPETITION: CompetitionParams = {
   hybrid_benchmark_price: 60000.0,
   hybrid_benchmark_quality: 0.80,
   hybrid_benchmark_turnaround_days: 12.0,
-  external_synthetic_price: 20000.0,
-  external_synthetic_quality: 0.72,
-  external_synthetic_turnaround_days: 7.0,
+  nonprob_panel_price: 5000.0,
+  nonprob_panel_quality: 0.70,
+  nonprob_panel_turnaround_days: 3.0,
 };
 
 export function createDefaultConfig(): ScenarioConfig {

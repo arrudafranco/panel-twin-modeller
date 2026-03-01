@@ -106,8 +106,8 @@
     "hybrid_benchmark_price": 160000,
     "hybrid_benchmark_quality": 0.8,
     "hybrid_benchmark_turnaround_days": 12,
-    "external_synthetic_price": 130000,
-    "external_synthetic_quality": 0.72,
-    "external_synthetic_turnaround_days": 7
+    "nonprob_panel_price": 5000,
+    "nonprob_panel_quality": 0.70,
+    "nonprob_panel_turnaround_days": 3
   }
 }

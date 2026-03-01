@@ -60,7 +60,7 @@ function outsideOptionUtilities(cfg: ScenarioConfig, ownPrice: number): number[]
   return [
     utility(cfg, c.probability_benchmark_price, c.probability_benchmark_quality, c.probability_benchmark_turnaround_days, false, ownPrice),
     utility(cfg, c.hybrid_benchmark_price, c.hybrid_benchmark_quality, c.hybrid_benchmark_turnaround_days, false, ownPrice),
-    utility(cfg, c.external_synthetic_price, c.external_synthetic_quality, c.external_synthetic_turnaround_days, false, ownPrice),
+    utility(cfg, c.nonprob_panel_price, c.nonprob_panel_quality, c.nonprob_panel_turnaround_days, false, ownPrice),
   ];
 }
 
@@ -73,7 +73,7 @@ export function marketShares(
   const ownU = utility(cfg, price, quality, turnaroundDays, true);
   const competitors = outsideOptionUtilities(cfg, price);
   // Fix 3: Generic labels
-  const labels = ['panel_twin', 'probability_benchmark', 'hybrid_benchmark', 'external_synthetic'];
+  const labels = ['panel_twin', 'probability_benchmark', 'hybrid_benchmark', 'nonprob_panel'];
   const values = [ownU, ...competitors];
   const maxU = Math.max(...values);
   const exps = values.map((v) => Math.exp(v - maxU));

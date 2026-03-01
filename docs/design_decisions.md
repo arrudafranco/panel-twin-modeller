@@ -440,9 +440,15 @@ If a change only affects wording, styling, or minor implementation detail withou
 
 Pricing recalibration, per-project run cost correction, and GSS finding propagation.
 
+**Third benchmark replacement: fully synthetic → non-probability panel**
+- Replaced the "fully synthetic" competitor benchmark with a "non-probability panel" benchmark (opt-in online sample marketplace). Rationale: non-probability panels are the realistic budget alternative clients actually consider when evaluating Panel Twin. Fully synthetic data generation is not a comparable research service at the quality standard this project targets.
+- New defaults: nonprob_panel_price $5,000, nonprob_panel_quality 0.70, nonprob_panel_turnaround_days 3. Quality default (0.70) reflects real human responses but with known opt-in panel concerns (satisficing, panel conditioning, selection bias). Price reflects typical full-service-equivalent project cost for marketplace-based sample.
+- Field name renamed from external_synthetic_* to nonprob_panel_* across all model files, configs, tests, and the React app. TypeScript compiler and pytest suite used as safety nets.
+- Pricing hierarchy after this change: Non-prob panel ($5K) < Panel Twin ($55K) < Hybrid ($60K) < Probability ($80K).
+
 **Pricing recalibration**
-- Panel Twin price_per_project default lowered from $180,000 to $55,000. The prior default was in the range of established probability panel benchmarks (AmeriSpeak-class projects), which is the wrong positioning. Panel Twin's value proposition is delivering research-grade quality at a lower price point than traditional probability panels, not matching their pricing.
-- Competitor prices updated to reflect the corrected positioning: probability benchmark $80,000, hybrid benchmark $60,000 (publicly available pricing data for calibrated hybrid panels indicates approximately 25% below the probability benchmark), external synthetic $20,000. These form a logical pricing hierarchy: Synthetic ($20K) < Panel Twin ($55K) < Hybrid ($60K) < Probability ($80K).
+- Panel Twin price_per_project default lowered from $180,000 to $55,000. The prior default was in the range of established probability panel benchmarks, which is the wrong positioning. Panel Twin's value proposition is delivering research-grade quality at a lower price point than traditional probability panels, not matching their pricing.
+- Competitor prices updated to reflect the corrected positioning: probability benchmark $80,000, hybrid benchmark $60,000 (publicly available pricing data for calibrated hybrid panels indicates approximately 25% below the probability benchmark).
 - Price slider range updated accordingly (min $20K, max $300K).
 
 **Per-project run cost correction**
@@ -483,10 +489,11 @@ Methodological corrections, cost recalibration, and framing refinements.
 - Added info callout in the Cost tab explaining the established-panel context.
 
 **Competition model recalibration**
-- Lowered the fully synthetic benchmark default price from $130,000 to $50,000, reflecting full-service project pricing at equivalent deliverable scope. Raw data generation from pure-play synthetic vendors is substantially cheaper ($2–30 per profile); the previous default conflated different service scopes.
+- Lowered the fully synthetic benchmark default price from $130,000 to $50,000, reflecting full-service project pricing at equivalent deliverable scope. Raw data generation from pure-play vendors is substantially cheaper ($2–30 per profile); the previous default conflated different service scopes.
 - Added comparability scope note to the market benchmarks fieldset and the Economics tab callout. All four prices (Panel Twin and alternatives) now reflect the same scope: data collection or generation, representativeness adjustments, and a weighted dataset. Custom analysis and reporting are not included.
 - Updated slider range for the fully synthetic price to match the corrected scale (min $10,000, max $200,000).
 - Updated tooltips to clarify what "quality" means for fully synthetic data (population-level representational accuracy without person-level anchoring).
+- NOTE: the fully synthetic benchmark was subsequently replaced by a non-probability panel benchmark in v0.2.2 (see below).
 
 **Economics tab framing**
 - Renamed tab heading to "Feasibility and market context" to better reflect its role as investment decision support alongside competitive landscape analysis.

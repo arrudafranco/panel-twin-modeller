@@ -138,9 +138,9 @@ class CompetitionParams:
     hybrid_benchmark_price: float = 160000.0
     hybrid_benchmark_quality: float = 0.80
     hybrid_benchmark_turnaround_days: float = 12.0
-    external_synthetic_price: float = 130000.0
-    external_synthetic_quality: float = 0.72
-    external_synthetic_turnaround_days: float = 7.0
+    nonprob_panel_price: float = 5000.0
+    nonprob_panel_quality: float = 0.70
+    nonprob_panel_turnaround_days: float = 3.0
 
 
 @dataclass

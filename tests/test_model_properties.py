@@ -51,7 +51,7 @@ def test_market_shares_sum_to_one():
         float(fin["market_share_panel_twin"])
         + float(fin["market_share_probability_benchmark"])
         + float(fin["market_share_hybrid_benchmark"])
-        + float(fin["market_share_external_synthetic"])
+        + float(fin["market_share_nonprob_panel"])
     )
     assert abs(total_share - 1.0) < 1e-6
 

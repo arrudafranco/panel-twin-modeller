@@ -359,19 +359,19 @@ export function ScenarioControls({
             tooltip="Estimated quality score for the hybrid benchmark. Default 0.80 reflects good-but-not-gold-standard quality."
           />
           <Slider
-            label="Fully synthetic price"
-            value={cfg.competition.external_synthetic_price}
-            min={10000} max={200000} step={5000}
-            onChange={(v) => updateCompetition('external_synthetic_price', v)}
+            label="Non-prob panel price"
+            value={cfg.competition.nonprob_panel_price}
+            min={1000} max={30000} step={500}
+            onChange={(v) => updateCompetition('nonprob_panel_price', v)}
             format={money}
-            tooltip="Full-service project price for a purely synthetic data provider (no real human respondents). Raw data generation costs from pure-play vendors are substantially lower ($2–30 per synthetic profile); this default reflects a comparable full-service project engagement at equivalent deliverable scope."
+            tooltip="Full-service project price for a non-probability online panel (e.g. marketplace-based opt-in sample with representativeness weighting). Typically a few thousand dollars per project at equivalent deliverable scope."
           />
           <Slider
-            label="Fully synthetic quality"
-            value={cfg.competition.external_synthetic_quality}
+            label="Non-prob panel quality"
+            value={cfg.competition.nonprob_panel_quality}
             min={0.4} max={1.0} step={0.01}
-            onChange={(v) => updateCompetition('external_synthetic_quality', Number(v.toFixed(2)))}
-            tooltip="Estimated representational quality for fully synthetic data (profiles generated from aggregate sources without individual human interviews). Default 0.72 reflects reasonable population-level accuracy but no person-level anchoring — unlike Panel Twin, fully synthetic agents cannot be validated against their source participants."
+            onChange={(v) => updateCompetition('nonprob_panel_quality', Number(v.toFixed(2)))}
+            tooltip="Estimated data quality for a non-probability online panel. Default 0.70 reflects real human responses but with known opt-in panel quality concerns (satisficing, panel conditioning, selection bias) relative to probability-based approaches."
           />
           <Slider
             label="Cross-price elasticity"

@@ -12,7 +12,7 @@ export interface FinanceResult {
   market_share_panel_twin: number;
   market_share_probability_benchmark: number;
   market_share_hybrid_benchmark: number;
-  market_share_external_synthetic: number;
+  market_share_nonprob_panel: number;
   gross_margin: number;
   contribution_margin_total: number;
   npv: number;
@@ -67,7 +67,7 @@ export function computeFinance(
     market_share_panel_twin: shares['panel_twin'],
     market_share_probability_benchmark: shares['probability_benchmark'],
     market_share_hybrid_benchmark: shares['hybrid_benchmark'],
-    market_share_external_synthetic: shares['external_synthetic'],
+    market_share_nonprob_panel: shares['nonprob_panel'],
     gross_margin: grossMargin,
     contribution_margin_total: monthlyMargin,
     npv,
