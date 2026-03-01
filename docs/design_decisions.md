@@ -550,7 +550,7 @@ Parameter defaults recalibrated, hidden parameters exposed as sliders, tooltip a
 **Hidden parameters exposed as sliders**
 Seven parameters that materially affect NPV, break-even, or win probability were previously hidden at fixed defaults with no UI access. All seven now have sliders:
 - `cac` (Customer acquisition cost) — added to Per-project economics section
-- `retest_rate` (Fraction of participants completing the retest wave) — added to Per-interview costs (Advanced)
+- `retest_rate` (UI label: "Planned retest coverage") — added to Per-interview costs (Advanced). Labeled to distinguish it as a deliberate study design choice (what fraction you intend to retest) from "Retest attrition" (involuntary field dropout), which already appears in the main Interview design section. Both affect retest economics but from opposite directions of control.
 - `discount_rate` (Annual hurdle rate for NPV discounting)
 - `growth_rate` (Annual compound growth in project demand)
 - `churn_rate` (Annual compound decay in project demand)

@@ -179,12 +179,12 @@ export function ScenarioControls({
             </Tooltip>
           </legend>
           <Slider
-            label="Retest rate"
+            label="Planned retest coverage"
             value={cfg.retest_rate}
             min={0} max={1} step={0.05}
             onChange={(v) => update('retest_rate', Number(v.toFixed(2)))}
             format={pct}
-            tooltip="Fraction of initial interview participants who complete the retest wave. The retest validates agent fidelity by re-administering survey items to human participants and comparing their responses to the agents. At 80% (default), 800 of 1,000 library build participants complete the retest, each receiving the retest incentive. Lower retest rates reduce cost but weaken fidelity validation."
+            tooltip="Study design choice: what fraction of initial participants you intentionally include in the retest validation wave. This is not an involuntary field outcome (that is Retest attrition above) — it is a deliberate scope decision that trades off validation coverage against retest incentive cost. At 80% (default), 800 of 1,000 library participants are scheduled for retest, each receiving the retest incentive. Reducing coverage saves cost but narrows the fidelity validation base."
           />
           <Slider
             label="Interview incentive"
