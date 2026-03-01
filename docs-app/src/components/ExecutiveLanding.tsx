@@ -73,7 +73,7 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "The main uncertainty is now library longevity, not project margin",
-    summary: "With ~55% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does a twin library remain valid before agents need re-interviewing? The model tracks NPV but cannot estimate agent shelf life.",
+    summary: "With ~55% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does a twin library remain valid before agents need re-interviewing? The model tracks net present value (NPV) but cannot estimate agent shelf life.",
     methodology: [
       "At ~55% variable margin, win probability sensitivity has a meaningful but not dominant NPV impact. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
       "Library useful life is the dominant uncertainty. As real participants' views evolve over time, agent responses gradually diverge from what those participants would currently say. The rate of this divergence — and when it crosses a meaningful threshold — has no published estimates for this construction approach.",
@@ -279,7 +279,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
             <h3>Models commercial economics</h3>
             <p>
               If the pilot succeeds, is it commercially viable? When does deployment
-              break even? Includes market positioning against traditional and synthetic competitors.
+              break even? Includes market positioning against probability panels, calibrated hybrid panels, and non-probability online panels.
             </p>
           </div>
           <div className="landing-card">

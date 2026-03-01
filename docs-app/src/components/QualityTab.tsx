@@ -131,7 +131,7 @@ export function QualityTab({ cfg, results }: Props) {
           published estimates for interview-based AI agents. A library may remain
           accurate for months or degrade within weeks for fast-moving topics. The
           economics model includes refresh wave revenue but not refresh operational
-          costs, because the trigger conditions are not yet estimable. NPV projections
+          costs, because the trigger conditions are not yet estimable. Net present value (NPV) projections
           beyond 12–18 months should be treated as conditional on library validity.
         </p>
 

@@ -34,15 +34,15 @@ export function DynamicNarrative({ cfg, results }: Props) {
   // NPV signal
   if (finance.npv > 0 && finance.break_even_within_horizon) {
     sentences.push(
-      `Under these assumptions, the project would break even within ${finance.time_to_break_even_months} months, with projected NPV of $${Math.round(finance.npv).toLocaleString()}.`
+      `Under these assumptions, the project would break even within ${finance.time_to_break_even_months} months, with a projected net present value (NPV) of $${Math.round(finance.npv).toLocaleString()}.`
     );
   } else if (finance.npv > 0) {
     sentences.push(
-      `Projected NPV is positive ($${Math.round(finance.npv).toLocaleString()}), but break-even is not reached within the ${cfg.revenue.horizon_months}-month horizon.`
+      `Projected net present value (NPV) is positive ($${Math.round(finance.npv).toLocaleString()}), but break-even is not reached within the ${cfg.revenue.horizon_months}-month horizon.`
     );
   } else {
     sentences.push(
-      `Economics are challenging under current assumptions. Projected NPV is $${Math.round(finance.npv).toLocaleString()}. Revisit pricing, volume, or cost assumptions.`
+      `Economics are challenging under current assumptions. Projected net present value (NPV) is $${Math.round(finance.npv).toLocaleString()}. Revisit pricing, volume, or cost assumptions.`
     );
   }
 

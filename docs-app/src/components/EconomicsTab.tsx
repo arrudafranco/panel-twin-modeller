@@ -35,9 +35,9 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
         then incurs only per-project run costs: LLM inference, QA, PM, and data delivery against
         the existing agent library. This transforms the cost structure from linear (pay per study)
         toward fixed-plus-marginal. The Cost tab shows the smaller validation pilot.
-        All four alternative prices cover equivalent deliverable scope: data collection or
-        generation, representativeness adjustments, and a weighted dataset. Win probability and
-        NPV use{' '}
+        All four alternative prices cover equivalent deliverable scope: data collection,
+        representativeness adjustments, and a weighted dataset. Win probability and
+        net present value (NPV) projections use{' '}
         <Tooltip content="Utility weights (quality=3.2, brand=1.1, tailwind=0.8, price=0.000012, turnaround=0.03) are scenario planning defaults, not fitted to historical win/loss data. Market share is estimated from a multinomial logit model.">
           <span className="info-icon" aria-hidden="true">i</span>
         </Tooltip>
@@ -101,7 +101,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
             <td>{money(finance.total_upfront_investment)}</td>
           </tr>
           <tr><th>Cumulative contribution</th><td>{money(finance.contribution_margin_total)}</td></tr>
-          <tr><th>Projected NPV</th><td><strong>{money(finance.npv)}</strong></td></tr>
+          <tr><th>Projected net present value (NPV)</th><td><strong>{money(finance.npv)}</strong></td></tr>
           <tr><th>Break-even</th><td>{finance.time_to_break_even_months ? `${finance.time_to_break_even_months} months` : `Not within ${cfg.revenue.horizon_months} months`}</td></tr>
         </tbody>
       </table>

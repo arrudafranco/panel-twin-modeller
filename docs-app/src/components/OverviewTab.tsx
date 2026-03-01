@@ -37,7 +37,7 @@ export function OverviewTab({ cfg, results }: Props) {
           detail="Market share estimate"
         />
         <Kpi
-          label="Projected NPV"
+          label="Net present value (NPV)"
           value={money(finance.npv)}
           status={finance.npv > 0 ? 'positive' : 'negative'}
         />
