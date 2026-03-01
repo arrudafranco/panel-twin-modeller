@@ -61,7 +61,7 @@ export function ScenarioControls({
           onChange={(v) => {
             update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, pilot_n: v } as never);
           }}
-          tooltip="Number of participants in the pilot study. This drives the total pilot cost shown in the Cost tab."
+          tooltip="Number of participants per study. Drives the total study cost shown in the Cost tab, which in turn is used as cost-per-project in the Economics tab. Increase this to model the economics of larger commercial deployments."
         />
         <Slider
           label="Response rate"

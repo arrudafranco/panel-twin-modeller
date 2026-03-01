@@ -15,8 +15,8 @@ const INSIGHTS: InsightDef[] = [
     summary: "Attitudes and beliefs are the strongest candidates for digital twins. Self-reported behaviors are borderline. Incentivized and economic behaviors fall below threshold with current evidence.",
     methodology: [
       "The 0.85 base accuracy estimate is anchored to Park et al. (2024) genagents, where GPT-4 agents built from ~2-hour interviews on GSS attitude items matched human test-retest reliability at 85%. This is the only direct published anchor for this approach.",
-      "Construct-specific penalties are applied from that base: self-reported behaviors (−10%) have less direct evidence; incentivized/economic behaviors (−15%) have near-absent published evidence for this construction method.",
-      "Quality estimates carry uncertainty bands: ±0.06 for attitudes (paper-anchored), ±0.10 for self-reported behaviors, ±0.12 for incentivized behaviors. These bands widen as the construct moves further from the original study's design.",
+      "Two bases are paper-anchored: attitudes and beliefs at 0.85 (GSS attitude items, 1,052 participants) and incentivized/economic behaviors at 0.66 (economic game experiments in the same paper, showing lower agent-human agreement). Self-reported behaviors (0.75) are the most extrapolated of the three — interpolated between the two anchors, not directly measured.",
+      "Uncertainty bands reflect this evidence structure: ±0.06 for attitudes (most directly anchored), ±0.10 for incentivized behaviors (also anchored but smaller economic game sample), ±0.12 for self-reported behaviors (least directly tested). These are modeling conventions, not empirically validated confidence intervals.",
       "Extrapolation to constructs or LLMs not studied in the original paper should be treated with caution. The uncertainty bands are a modeling convention, not empirically validated confidence intervals.",
     ],
     citations: [
@@ -41,8 +41,8 @@ const INSIGHTS: InsightDef[] = [
     methodology: [
       "Recruitment cost: cost per invite ÷ response rate. At 25% response rate with $1 per invite and 100 participants, this implies 400 contacts. Incentives ($60 phase 1 + $30 phase 2) are the second largest per-participant cost.",
       "Labor costs cover one-time pilot setup: protocol design (20 hrs), engineering (60 hrs), QA (30 hrs), PM (25 hrs), IRB compliance (18 hrs) at $120/hr fully loaded. These are not ongoing operational staff costs.",
-      "LLM token costs are modest at current pricing ($0.008/1K input, $0.012/1K output) but will scale with panel size and interview length at national deployment.",
-      "Voice infrastructure: $0.03/min ASR (transcription) + $0.02/min TTS (AI interviewer voice). These are competitive AI voice API rates as of 2024–2025.",
+      "LLM token costs are modest at current pricing ($0.003/1K input, $0.012/1K output) but will scale with panel size and interview length at national deployment.",
+      "Voice infrastructure: $0.007/min ASR (transcription) + $0.02/min TTS (AI interviewer voice). These are representative AI voice API rates as of early 2026; pricing changes frequently.",
       "These estimates do not include the cost of training on a nationally representative panel (which would require a probability sample like an RDD or address-based sample), or periodic refresh costs.",
     ],
   },
@@ -178,7 +178,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     const threshold = recommendedQualityThreshold(cfg, 'attitude_belief');
     const costs = computeCosts(cfg);
     const qualEval = qualityMarketAdjustment(tiers.attitude_belief, threshold);
-    const finance = computeFinance(cfg, costs.cost_per_completed_interview, qualEval.effective_quality_for_market);
+    const finance = computeFinance(cfg, costs.total_cost, qualEval.effective_quality_for_market);
 
     let minViableMinutes = 0;
     for (let m = 30; m <= 180; m += 5) {
@@ -336,7 +336,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
         <div className="landing-kpis">
           <div className="landing-kpi">
             <div className="landing-kpi-value">{baseStats.attitudeQuality.toFixed(2)}</div>
-            <div className="landing-kpi-label">Attitude quality score</div>
+            <div className="landing-kpi-label">Attitude fidelity score</div>
           </div>
           <div className="landing-kpi">
             <div className="landing-kpi-value">${Math.round(baseStats.costPerInterview).toLocaleString()}</div>
@@ -385,6 +385,10 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
         </button>
         <p className="cta-note">
           Adjust parameters and see how quality, cost, and economics respond in real time.
+        </p>
+        <p className="cta-note" style={{ marginTop: 12, opacity: 0.6, fontSize: 11 }}>
+          Model defaults last updated February 2026. LLM pricing, ASR rates, and market conditions
+          change rapidly. Review Advanced settings against current figures before drawing conclusions.
         </p>
       </section>
     </div>

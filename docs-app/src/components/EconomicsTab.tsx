@@ -33,15 +33,15 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
       <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>ℹ</span>
         <span>
-          The <strong>Cost tab</strong> shows what the initial pilot study costs (recruitment,
-          interviews, agent construction). The projections on this page model a
-          hypothetical deployment after the pilot has validated quality, to help frame
-          the investment decision and illustrate cost-quality trade-offs relative to
-          alternative research approaches. All project prices — Panel Twin and alternatives alike —
-          reflect full-service scope at equivalent deliverables: data collection or generation,
-          representativeness adjustments, and a weighted dataset. Custom analysis and reporting
-          are not included in any price. Refresh costs and nationally representative panel
-          build-out are also not included and are important additional considerations before committing to scale.
+          The <strong>Cost tab</strong> shows what one study costs to run at the configured
+          sample size. The projections on this page use that same per-study cost as the cost
+          of one delivered project, and the configured price as the corresponding revenue.
+          To model commercial-scale deployment economics, increase the sample size slider —
+          larger studies cost more per project but the fidelity and pricing assumptions stay
+          the same. All project prices — Panel Twin and alternatives — reflect full-service
+          scope: data collection or generation, representativeness adjustments, and a weighted
+          dataset. Custom analysis and reporting are not included. Refresh costs and build-out
+          of a nationally representative panel are additional considerations not modeled here.
         </span>
       </div>
 
@@ -54,6 +54,9 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
         win rates depend on client relationships, proposal quality, and factors not captured here.
         Treat NPV and break-even as directional planning signals, not forecasts. Competitor prices
         and quality scores are editable in Advanced settings.
+        {' '}<span style={{ opacity: 0.6, fontSize: '0.88em' }}>
+          Defaults last updated February 2026. LLM pricing and market conditions change rapidly.
+        </span>
       </div>
 
       <NpvTimelineChart finance={finance} />
@@ -78,7 +81,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
           <tr>
             <th>
               Gross margin
-              <Tooltip content="(Price per project − cost per completed interview) / price per project. Does not include CAC or other fixed costs.">
+              <Tooltip content="(Price per project − total study cost at configured sample size) / price per project. Does not include CAC or other fixed costs.">
                 {' '}<span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </th>

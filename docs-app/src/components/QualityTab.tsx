@@ -109,6 +109,11 @@ export function QualityTab({ cfg, results }: Props) {
           weighting) affect scores through transparent multipliers. These are
           theoretically motivated heuristics, not measured effect sizes.
         </p>
+        <p style={{ opacity: 0.55, fontSize: '0.82em', marginTop: 12 }}>
+          Model defaults last updated February 2026. The evidence base for digital panel twin
+          approaches is evolving quickly. Anchors, penalties, and uncertainty bands should be
+          revisited as new published results become available.
+        </p>
       </div>
     </section>
   );

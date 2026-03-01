@@ -71,7 +71,9 @@ export function useScenario() {
     const threshold = recommendedQualityThreshold(cfg, cfg.quality_profile);
     const qualEval = qualityMarketAdjustment(qual, threshold);
     const costs = computeCosts(cfg);
-    const finance = computeFinance(cfg, costs.cost_per_completed_interview, qualEval.effective_quality_for_market);
+    // cogsPerProject = total cost of running one full study at the configured sample size.
+    // This is what a client project actually costs to deliver, not cost per single interview.
+    const finance = computeFinance(cfg, costs.total_cost, qualEval.effective_quality_for_market);
     const qualityUncertainty = QUALITY_UNCERTAINTY_BANDS[cfg.quality_profile] ?? 0.08;
 
     let mcResult: MCResult | null = null;
