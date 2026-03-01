@@ -32,16 +32,13 @@ const INSIGHTS: InsightDef[] = [
     ],
   },
   {
-    title: "Self-reported behaviors: the 0.75 base is a deliberate planning discount, not an empirical finding",
-    summary: "The paper's 0.85 accuracy figure covers the full GSS Core, which includes self-reported behaviors alongside attitudes. The model applies a more conservative 0.75 for this construct type as a planning choice — specific behaviors vary in recall accuracy, sensitivity, and verifiability in ways the aggregate may not capture. The ±0.12 band is the widest of the three, reflecting that this discount is a modeling convention rather than a measured result.",
+    title: "At default settings, NPV is negative — the model shows where the gaps are",
+    summary: "Six projects per year at $55K price and $25K run cost generates roughly $6,700/month in margin. Over 36 months that is about $248K cumulative — against a ~$297K upfront investment. NPV is negative. The investment case requires more project volume, higher price, or a longer amortization window. The interactive explorer shows exactly where the tipping points are.",
     methodology: [
-      "The paper provides two empirical anchors: the full GSS Core at 0.85 (1,052 participants, 177 items including both attitudes and self-reported behaviors like church attendance, voting, gun ownership, and work status) and economic game experiments at 0.66. Self-reported behaviors do not have a separate anchor — they are within the 0.85 figure. The model's 0.75 base is a deliberate conservative discount, not a separately measured result.",
-      "The rationale for the discount: behaviors tied to specific past events (did you vote? have you bought a gun?) introduce recall and verifiability factors not present in opinion items. Social desirability effects on sensitive behaviors may also differ. These are theoretical reasons, not measured effects — which is why the ±0.12 uncertainty band is wide enough to span from below-threshold to above the paper anchor.",
-      "At default settings, self-reported behaviors often clear the quality threshold at the margin (0.75 vs. ~0.75 threshold). A pessimistic draw from the uncertainty band puts them below threshold; an optimistic draw approaches the empirical 0.85. The pilot phase is the right time to measure which end of the range applies to your specific behavioral items.",
-      "If the primary use case is attitude and opinion measurement, the 0.85 anchor applies more directly and threshold margins are more comfortable. The three-way construct distinction is most useful as a planning signal — not a claim about inherent fidelity differences the paper has established.",
-    ],
-    citations: [
-      "Park et al. (2024). Generative Agent Simulations of 1,000 People. arXiv:2411.10109. https://arxiv.org/abs/2411.10109",
+      "At defaults: win probability ~37% (out of four competitors including a $5K non-probability panel option that captures ~39% of market share on price alone), net-new fraction 70% (30% cannibalization), gross margin ~55%. Monthly margin is modest — roughly $6,700 — because wins are diluted across four competitors.",
+      "Cumulative margin at 36 months (before discounting) is approximately $248,000 versus total upfront investment of ~$297,000. NPV is negative because discounting further reduces the present value of deferred cash flows.",
+      "The primary lever is not price or margin per project — it is win rate. With four competitors in the utility model and a non-probability panel option that is 11× cheaper, Panel Twin's market share is capped unless quality or turnaround advantages are decisive. Under the stylized coefficients, quality matters most (weight 3.2) but brand trust for competitors is set to zero, which already gives Panel Twin an advantage.",
+      "Adjustments that shift NPV toward positive: increase projects_per_year (6 is conservative for an established product), increase price, reduce CAC, or extend the horizon. The model is not a prediction — it is a tool for identifying which assumptions are load-bearing for the investment case.",
     ],
   },
   {
@@ -58,13 +55,13 @@ const INSIGHTS: InsightDef[] = [
     ],
   },
   {
-    title: "Federal viability applies two independent filters, not one",
-    summary: "The model applies a quality threshold uplift (0.05) and a separate market utility penalty (−0.08) for federal settings. These are independent. A configuration can clear the quality bar and still face market headwinds — and the interaction narrows the viable space substantially.",
+    title: "Federal mode raises the quality bar — and that alone can flip a viable scenario to not viable",
+    summary: "Switching to federal settings applies a +0.05 uplift to the quality threshold, derived from NSDUH, BRFSS, and GSS reliability benchmarks. A configuration that comfortably clears the commercial threshold may fall short in federal mode with the same interview design. The economic model also applies a risk penalty (−0.08 utility) to represent client conservatism, though because this applies across all options it is most meaningful as a signal of overall market difficulty rather than a change in relative win rates.",
     methodology: [
-      "Federal quality threshold: benchmark quality + 0.05 uplift applied to the recommended threshold derived from NSDUH, BRFSS, and GSS reliability benchmarks. This reflects stricter evidence requirements for federal research procurement.",
-      "Federal market utility penalty: −0.08 applied in the competition model, capturing the well-documented risk-aversion of federal procurement toward novel research methods, regardless of demonstrated quality.",
-      "The two adjustments are multiplicative in effect: a configuration that just barely passes quality thresholds in commercial settings typically fails in federal settings, and even configurations with sufficient quality face a harder market win probability path.",
-      "These are modeling conventions intended to make the federal/commercial distinction plannable, not predictions about any specific procurement. Actual federal buying behavior varies substantially by agency, program, and contracting officer.",
+      "Federal quality threshold: the benchmark-derived threshold increases by 0.05 in federal mode. This reflects the stricter evidence standards associated with federal research procurement, derived from published NSDUH, BRFSS, and GSS reliability benchmarks. The uplift is a modeling convention, not a formally measured procurement standard.",
+      "Federal risk penalty: the competition model applies a −0.08 utility reduction across all options in federal mode. Since this applies equally to all competitors, it does not change relative win probabilities within the four-way market. Its effect is better understood as a signal: the federal market is overall less favorable for novel methods, and that context should temper NPV projections rather than shift specific win probability estimates.",
+      "In practice, the most actionable federal-mode output is whether the quality score clears the stricter threshold. A configuration that passes in commercial mode but fails in federal mode is not federally viable regardless of economic assumptions.",
+      "These are modeling conventions intended to make the federal/commercial distinction plannable, not predictions about any specific procurement. Actual federal buying behavior varies substantially by agency, program office, and contracting officer.",
     ],
     citations: [
       "NSDUH Reliability Study (SAMHSA). https://www.ncbi.nlm.nih.gov/books/NBK519788/",
