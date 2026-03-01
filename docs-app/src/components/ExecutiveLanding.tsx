@@ -177,7 +177,6 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     const cfg = createDefaultConfig();
     const tiers = qualityTiers(cfg);
     const threshold = recommendedQualityThreshold(cfg, 'attitude_belief');
-    const costs = computeCosts(cfg);
     const deploymentCosts = computeCosts({ ...cfg, mode: 'scaleup' });
     let minViableMinutes = 0;
     for (let m = 30; m <= 180; m += 5) {
@@ -188,16 +187,17 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     }
 
     const pricePerProject = cfg.revenue.price_per_project;
-    const grossMargin = (pricePerProject - deploymentCosts.total_cost) / pricePerProject;
+    const perProjectRunCost = cfg.revenue.per_project_run_cost;
+    const grossMargin = (pricePerProject - perProjectRunCost) / pricePerProject;
 
     return {
       attitudeQuality: tiers.attitude_belief,
       behaviorQuality: tiers.self_report_behavior,
       incentivizedQuality: tiers.incentivized_behavior,
       threshold,
-      pilotTotalCost: costs.total_cost,
-      deploymentTotalCost: deploymentCosts.total_cost,
+      libraryBuildCost: deploymentCosts.total_cost,
       pricePerProject,
+      perProjectRunCost,
       grossMargin,
       minViableMinutes,
     };
@@ -332,7 +332,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          120-minute AI voice interviews, attitude/belief construct, 100-person validation study and 2,000-person commercial deployment at default settings.
+          120-minute AI voice interviews, attitude/belief construct. The library build (2,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
@@ -340,20 +340,28 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
             <div className="landing-kpi-label">Attitude fidelity score</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">${Math.round(baseStats.pilotTotalCost / 1000)}k</div>
-            <div className="landing-kpi-label">Validation study cost</div>
-          </div>
-          <div className="landing-kpi">
-            <div className="landing-kpi-value">${Math.round(baseStats.deploymentTotalCost / 1000)}k</div>
-            <div className="landing-kpi-label">Deployment study cost</div>
-          </div>
-          <div className="landing-kpi">
-            <div className={`landing-kpi-value${baseStats.grossMargin < 0 ? ' landing-kpi-negative' : ''}`}>
-              {(baseStats.grossMargin * 100).toFixed(0)}%
-            </div>
+            <div className="landing-kpi-value">${Math.round(baseStats.libraryBuildCost / 1000)}k</div>
             <div className="landing-kpi-label">
-              Gross margin at scale{' '}
-              <Tooltip content={`(Price − deployment study cost) / price. At default settings: $${Math.round(baseStats.pricePerProject / 1000)}k price vs. $${Math.round(baseStats.deploymentTotalCost / 1000)}k cost for 2,000 participants. Adjust price or study size in the explorer to find a viable combination.`}>
+              Library build cost{' '}
+              <Tooltip content={`One-time cost to interview 2,000 participants, construct their agents, and set up infrastructure. After this investment, projects run against the existing library at much lower marginal cost.`}>
+                <span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </div>
+          </div>
+          <div className="landing-kpi">
+            <div className="landing-kpi-value">${Math.round(baseStats.perProjectRunCost / 1000)}k</div>
+            <div className="landing-kpi-label">
+              Per-project run cost{' '}
+              <Tooltip content="Marginal cost per project sold against the existing library: LLM inference, QA, PM, and data delivery. No new interviews or incentives.">
+                <span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </div>
+          </div>
+          <div className="landing-kpi">
+            <div className="landing-kpi-value">{(baseStats.grossMargin * 100).toFixed(0)}%</div>
+            <div className="landing-kpi-label">
+              Gross margin per project{' '}
+              <Tooltip content={`(Price − per-project run cost) / price. At defaults: $${Math.round(baseStats.pricePerProject / 1000)}k price vs. $${Math.round(baseStats.perProjectRunCost / 1000)}k run cost. Library build cost ($${Math.round(baseStats.libraryBuildCost / 1000)}k) is recovered through the NPV model as upfront investment.`}>
                 <span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </div>

@@ -75,7 +75,12 @@ export function useScenario() {
     const costs = computeCosts(cfg);
     // Deployment costs: used in the Economics tab (commercial-scale study via scaleup mode)
     const deploymentCosts = computeCosts({ ...cfg, mode: 'scaleup' });
-    const finance = computeFinance(cfg, deploymentCosts.total_cost, qualEval.effective_quality_for_market);
+    const finance = computeFinance(
+      cfg,
+      cfg.revenue.per_project_run_cost,
+      qualEval.effective_quality_for_market,
+      deploymentCosts.total_cost,
+    );
     const qualityUncertainty = QUALITY_UNCERTAINTY_BANDS[cfg.quality_profile] ?? 0.08;
 
     let mcResult: MCResult | null = null;

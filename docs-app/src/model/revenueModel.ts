@@ -28,13 +28,14 @@ export interface FinanceResult {
 export function computeFinance(
   cfg: ScenarioConfig,
   cogsPerProject: number,
-  quality: number
+  quality: number,
+  libraryBuildCost: number = 0
 ): FinanceResult {
   const base = cfg.revenue;
   const pwin = winProbability(cfg, base.price_per_project, quality, cfg.competition.turnaround_days);
   const shares = marketShares(cfg, base.price_per_project, quality, cfg.competition.turnaround_days);
   const monthlyD = monthlyDiscount(base.discount_rate);
-  const totalUpfrontInvestment = Math.max(0.0, base.cac + base.other_initial_investment);
+  const totalUpfrontInvestment = Math.max(0.0, base.cac + base.other_initial_investment) + libraryBuildCost;
 
   let monthlyMargin = 0.0;
   let npv = -totalUpfrontInvestment;
@@ -58,7 +59,7 @@ export function computeFinance(
     }
   }
 
-  const grossMargin = Math.max(0.0, 1.0 - cogsPerProject / Math.max(base.price_per_project, 1.0));
+  const grossMargin = 1.0 - cogsPerProject / Math.max(base.price_per_project, 1.0);
   const breakEvenWithinHorizon = breakEvenMonth !== null;
 
   return {
