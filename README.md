@@ -2,6 +2,10 @@
 
 Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
 
+## Live App
+
+**GitHub Pages:** https://arrudafranco.github.io/panel-twin-modeller/
+
 ![Panel Twin Modeller — interactive feasibility explorer showing the Economics tab with the NPV timeline chart, sidebar scenario controls, and financial summary table](screenshot.png)
 
 ## Inspiration and Scope
@@ -29,6 +33,7 @@ Key modeling features:
 ## Interactive Web App
 
 The primary interface is a React app deployed via GitHub Pages. It includes:
+- Live app: https://arrudafranco.github.io/panel-twin-modeller/
 - An executive landing page with static model insights
 - Interactive scenario controls (interview duration, panel size, pricing, memory architecture)
 - Fidelity curves by interview duration with uncertainty bands
