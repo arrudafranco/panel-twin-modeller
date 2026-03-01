@@ -39,8 +39,8 @@ export function ScenarioControls({
           onChange={(e) => update('quality_profile', e.target.value)}
           aria-label="Study type"
         >
-          <option value="mixed_general">Mixed general (attitudes, opinions, behaviors)</option>
-          <option value="behavioral_recall">Behavioral recall (frequency and history items)</option>
+          <option value="mixed_general">Mixed general survey</option>
+          <option value="behavioral_recall">Behavioral recall survey</option>
           <option value="incentivized_behavior">Incentivized / economic experiments</option>
         </select>
       </fieldset>
@@ -48,7 +48,7 @@ export function ScenarioControls({
       <fieldset className="control-group">
         <legend>
           Study design{' '}
-          <Tooltip content="Interview duration affects both quality (logarithmically) and per-participant AI and voice costs. Study sizes set the scale for each phase: pilot (Cost tab) and commercial deployment (Economics tab). All other parameters — response rate, incentives, labor hours — apply at both scales.">
+          <Tooltip content="This tool models three cost stages. Stage 1: a small validation pilot (Cost tab) to check quality and operations before committing. Stage 2: the full library build — AI-conducted interviews with the target number of participants, creating the synthetic twin library (one-time investment in Economics tab). Stage 3: per-project runs against the existing library at marginal cost (Pricing and business section). Interview duration drives quality and per-participant AI costs at all stages.">
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>
@@ -57,25 +57,25 @@ export function ScenarioControls({
           value={cfg.interview_minutes}
           min={30} max={180} step={5}
           onChange={(v) => update('interview_minutes', v)}
-          tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration and directly drives voice and LLM costs."
+          tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration and directly drives voice and LLM costs. Applies to both the pilot and the full library build."
         />
         <Slider
-          label="Pilot study size"
+          label="Stage 1 — Validation pilot size"
           value={cfg.sampling.pilot_n}
           min={50} max={500} step={10}
           onChange={(v) => {
             update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, pilot_n: v } as never);
           }}
-          tooltip="Number of participants in the pilot study. Drives the total cost shown in the Cost tab. Typically 50–200 for an internal feasibility pilot."
+          tooltip="Number of participants in the small validation pilot. Run before committing to the full library build. Drives the total shown in the Cost tab. Typically 50–200 participants."
         />
         <Slider
-          label="Commercial study size"
+          label="Stage 2 — Library build size"
           value={cfg.sampling.scaleup_n}
           min={200} max={5000} step={100}
           onChange={(v) => {
             update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
           }}
-          tooltip="Number of participants per commercial deployment study. Drives the cost-per-project used in the Economics tab NPV and gross margin calculations. A nationally representative U.S. sample typically requires at least 2,000 completed interviews. Set lower for subpopulation or regional studies."
+          tooltip="Number of participants to interview for the full synthetic twin library. This is a one-time investment — once the library is built, subsequent survey projects run against it at marginal cost only (no new interviews). Drives the initial investment line in the Economics tab. A nationally representative U.S. sample typically requires at least 2,000 participants."
         />
       </fieldset>
 
@@ -110,12 +110,12 @@ export function ScenarioControls({
           tooltip="Revenue per project. Covers full-service delivery: data collection, agent construction, representativeness weighting, and a weighted dataset with crosstabs. Does not include custom analysis or reporting."
         />
         <Slider
-          label="Per-project run cost"
+          label="Stage 3 — Per-project run cost"
           value={cfg.revenue.per_project_run_cost}
           min={5000} max={100000} step={1000}
           onChange={(v) => updateRevenue('per_project_run_cost', v)}
           format={money}
-          tooltip="Cost of running one survey project against the existing twin library. Covers LLM inference, per-project QA, PM, and data delivery at loaded labor rates — not new interviews or incentives, which are the one-time library build cost. Typically $20,000–$30,000 per project."
+          tooltip="Marginal cost of running one survey project against the existing twin library (Stage 3 — after the library is built). Covers LLM inference, per-project QA, PM, and data delivery. No new interviews or incentives — those are the one-time Stage 2 library build cost. Typically $20,000–$30,000 per project."
         />
         <Slider
           label="Projects per year"
