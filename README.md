@@ -2,6 +2,8 @@
 
 Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
 
+![Panel Twin Modeller — interactive feasibility explorer showing the Economics tab with the NPV timeline chart, sidebar scenario controls, and financial summary table](screenshot.png)
+
 ## Inspiration and Scope
 
 This project is directly inspired by Stanford HCI's `genagents` project and the paper

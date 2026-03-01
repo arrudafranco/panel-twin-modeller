@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.3
+Version: 0.2.4
 Last updated: 2026-03-01
 Status: active working design record
 
@@ -16,14 +16,52 @@ It is meant to help:
 
 This is not just a feature list. It is a record of the main design choices, the reasons behind them, and the tradeoffs we accepted.
 
+## Contents
+
+- [Goals and Context](#goals-and-context)
+- [External Inspiration and Evidence Boundaries](#external-inspiration-and-evidence-boundaries)
+  - [What We Inherit Conceptually](#what-we-inherit-conceptually)
+  - [What We Add Beyond That Scope](#what-we-add-beyond-that-scope)
+  - [Prompt and Reflection Implications](#prompt-and-reflection-implications)
+  - [How We Label Evidence](#how-we-label-evidence)
+- [Core Design Philosophy](#core-design-philosophy)
+  - [Plain-English First](#plain-english-first)
+  - [Modular, Optional, and Progressive](#modular-optional-and-progressive)
+  - [Decision Support, Not False Precision](#decision-support-not-false-precision)
+- [Architecture Overview](#architecture-overview)
+  - [1. Analytical Core](#1-analytical-core)
+  - [2. Internal Interactive App](#2-internal-interactive-app)
+  - [3. Public Interactive App](#3-public-interactive-app)
+- [Model Design Decisions](#model-design-decisions)
+  - [Configuration Is Explicit](#configuration-is-explicit)
+  - [Cost Model: Detailed but Switchable](#cost-model-detailed-but-switchable)
+  - [Quality Model: Transparent Proxy Instead of Overclaiming](#quality-model-transparent-proxy-instead-of-overclaiming)
+  - [Sampling Model: Move From Simple Weighting to Multi-Margin Raking](#sampling-model-move-from-simple-weighting-to-multi-margin-raking)
+  - [Competition and Revenue: Explicit Scenario Logic](#competition-and-revenue-explicit-scenario-logic)
+  - [Monte Carlo: Uncertainty as a First-Class Output](#monte-carlo-uncertainty-as-a-first-class-output)
+- [App and Frontend Design Decisions](#app-and-frontend-design-decisions)
+  - [Progressive Disclosure Instead of One Giant Control Panel](#progressive-disclosure-instead-of-one-giant-control-panel)
+  - [Subject-Matter Presets, Not Hierarchy Labels](#subject-matter-presets-not-hierarchy-labels)
+  - [Internal and Public Apps Are Aligned but Not Identical](#internal-and-public-apps-are-aligned-but-not-identical)
+  - [Accessibility and Scanability Matter](#accessibility-and-scanability-matter)
+- [Guardrails and Limitations](#guardrails-and-limitations)
+- [Documentation Decisions](#documentation-decisions)
+  - [Why Maintain a Design Record](#why-maintain-a-design-record)
+  - [Why Track Versions Here](#why-track-versions-here)
+- [What This Project Is Good For](#what-this-project-is-good-for)
+- [What This Project Is Not Good For Yet](#what-this-project-is-not-good-for-yet)
+- [Maintenance Rule](#maintenance-rule)
+- [Known Issues and Deferred Work](#known-issues-and-deferred-work)
+- [Version Updates](#version-updates)
+
 ## How To Use This Document
 
-- Read `Goals and Context` first if you are new to the project.
-- Read `Architecture Overview` for the high-level system map.
-- Read `Model Design Decisions` for the core analytical logic.
-- Read `App and Frontend Design Decisions` for interaction and usability choices.
-- Read `Guardrails and Limitations` before treating outputs as forecasts or commitments.
-- Read `Version Updates` to see what changed and why.
+- Read [Goals and Context](#goals-and-context) first if you are new to the project.
+- Read [Architecture Overview](#architecture-overview) for the high-level system map.
+- Read [Model Design Decisions](#model-design-decisions) for the core analytical logic.
+- Read [App and Frontend Design Decisions](#app-and-frontend-design-decisions) for interaction and usability choices.
+- Read [Guardrails and Limitations](#guardrails-and-limitations) before treating outputs as forecasts or commitments.
+- Read [Version Updates](#version-updates) to see what changed and why.
 
 ## Goals and Context
 
@@ -448,6 +486,26 @@ Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `pri
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.4 - 2026-03-01
+
+Cohesion and coherence audit. Terminology standardization, missing caveats, and label clarifications across all tabs.
+
+**Label clarifications**
+- "Risk profile" control renamed to "Client risk profile" to clarify it reflects the buying organization's procurement stance, not the researcher's risk tolerance.
+- "Cumulative contribution" row in the Economics financial summary table renamed to "Total contribution margin" with a tooltip explaining it as the sum of (price − run cost) across all projected projects.
+- "Voice operations" row in the Cost detail table now reads "Voice operations (ASR and TTS)" to make clear what costs are included without requiring the user to cross-reference the intro paragraph.
+
+**Missing caveats added**
+- Headline KPIs section on the landing page now includes: "All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario." Previously the section showed numbers without signaling they were model outputs.
+- "Favorable/Needs work" signal badge on the Overview tab now displays a brief note directly below it explaining the two-part criteria: quality threshold cleared AND NPV positive within the horizon.
+
+**Acronym and terminology standardization**
+- Footer note on landing page expanded from "ASR (speech recognition)" to "ASR (automatic speech recognition), and TTS (text-to-speech)" — both acronyms are now fully expanded since both technologies are referenced in Cost tab.
+- "loaded labor rates" standardized to "fully loaded labor rates" throughout landing page methodology cards to match the label used in the ScenarioControls setup/labor fieldset ("fully loaded (salary, benefits, facilities)").
+
+**Hero screenshot added to README**
+- Playwright screenshot of the Economics tab (NPV timeline, sidebar controls, financial summary table) added as `screenshot.png` and embedded as hero image in README.
 
 ### 0.2.3 - 2026-03-01
 
