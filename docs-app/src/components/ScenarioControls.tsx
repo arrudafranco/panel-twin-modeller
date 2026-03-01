@@ -30,7 +30,7 @@ export function ScenarioControls({
       <fieldset className="control-group">
         <legend>
           What are you measuring?{' '}
-          <Tooltip content="The type of survey construct being studied. Attitudes and beliefs have the strongest quality evidence from the genagents paper (Park et al., 2024). Other constructs carry wider uncertainty.">
+          <Tooltip content="The type of survey construct being studied. Attitudes and beliefs have the strongest paper-anchored evidence (0.85 fidelity, Park et al., 2024). Incentivized and economic behaviors are also anchored in the same paper's economic game experiments (0.66 fidelity) but show lower agent-human agreement. Self-reported behaviors are the most extrapolated of the three.">
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>

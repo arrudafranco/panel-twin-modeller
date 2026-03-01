@@ -436,6 +436,45 @@ If a change only affects wording, styling, or minor implementation detail withou
 
 ## Version Updates
 
+### 0.2.1 - 2026-02-28
+
+Methodological corrections, cost recalibration, and framing refinements.
+
+**Fidelity and validity framing**
+- Renamed "Quality" tab to "Fidelity" throughout the app, and updated all associated labels, chart titles, and narrative copy to use "agent fidelity" rather than "quality."
+- Clarified the key distinction between agent-human fidelity (criterion validity on measured items) and traditional survey reliability. Human test-retest benchmarks serve as normalizing ceilings, not direct comparators.
+- Expanded methods note in the Fidelity tab to explicitly state what fidelity comparisons establish and what they leave open (construct validity, discriminant validity, topical generalizability).
+
+**Evidence base corrections for construct types**
+- Corrected the uncertainty band ordering and methods language. Both attitude_belief (0.85) and incentivized_behavior (0.66) are anchored to Park et al. (2024), from attitude item replication and economic game experiments respectively. Self-reported behaviors (0.75) are the most extrapolated of the three — not incentivized behaviors as previously implied.
+- Updated uncertainty bands to reflect this: attitude_belief ±0.06 (most directly anchored), incentivized_behavior ±0.10 (also anchored but smaller economic game sample), self_report_behavior ±0.12 (least directly tested).
+- Updated the "What are you measuring?" tooltip and Fidelity tab methods note accordingly.
+
+**Citation and benchmark corrections**
+- Removed the HINTS benchmark entry due to inability to verify its published source.
+- Corrected the Park et al. citation from "Nature" to arXiv:2411.10109 (preprint, not peer-reviewed).
+- Removed duplicate BRFSS citation. Corrected GSS citation URL.
+
+**Cost model recalibration**
+- Set cost_per_invite default to $0.00, reflecting the established-panel context where outreach is part of existing panel operations rather than a per-study variable cost.
+- Updated LLM token price defaults to reflect current frontier model pricing (input: $0.003/1k, down from $0.008). Output tokens and TTS costs left at reasonable mid-range defaults.
+- Updated ASR cost default to $0.007/min (down from $0.03) to reflect current speech-to-text API pricing.
+- Added info callout in the Cost tab explaining the established-panel context.
+
+**Competition model recalibration**
+- Lowered the fully synthetic benchmark default price from $130,000 to $50,000, reflecting full-service project pricing at equivalent deliverable scope. Raw data generation from pure-play synthetic vendors is substantially cheaper ($2–30 per profile); the previous default conflated different service scopes.
+- Added comparability scope note to the market benchmarks fieldset and the Economics tab callout. All four prices (Panel Twin and alternatives) now reflect the same scope: data collection or generation, representativeness adjustments, and a weighted dataset. Custom analysis and reporting are not included.
+- Updated slider range for the fully synthetic price to match the corrected scale (min $10,000, max $200,000).
+- Updated tooltips to clarify what "quality" means for fully synthetic data (population-level representational accuracy without person-level anchoring).
+
+**Economics tab framing**
+- Renamed tab heading to "Feasibility and market context" to better reflect its role as investment decision support alongside competitive landscape analysis.
+- Added framing paragraph connecting methodological trade-offs to business outcomes.
+- Updated info callout to explicitly state the price comparability scope.
+
+**Vendor label consistency**
+- Applied consistent generic labels across all public-facing files. Panel-specific and institutional names do not appear in any public repository file.
+
 ### 0.2.0 - 2026-02-27
 
 Major redesign of the public-facing interface and full model port to TypeScript.

@@ -76,20 +76,23 @@ export function QualityTab({ cfg, results }: Props) {
       <div className="methods-note">
         <h3>Methods and limitations</h3>
         <p>
-          The 0.85 anchor is agent-human agreement on GSS attitude items, normalized
-          against human test-retest consistency, from 2-hour GPT-4 interviews
-          (Park et al., 2024, arXiv:2411.10109). It is the only direct published
-          anchor for this specific construction approach. All other estimates
-          extrapolate from it using construct-specific penalties and log-linear
-          duration scaling — modeling assumptions, not empirical measurements.
+          Two of the three construct bases are anchored to Park et al. (2024, arXiv:2411.10109).
+          The 0.85 base for attitudes and beliefs reflects agent-human agreement on GSS attitude
+          items, normalized against human test-retest consistency, from 2-hour GPT-4 interviews
+          with 1,052 participants. The 0.66 base for incentivized behaviors reflects the lower
+          fidelity observed in the same paper's economic game experiments (trust game, ultimatum
+          game), where agents tracked participants less closely than on attitude items. The 0.75
+          base for self-reported behaviors is the most extrapolated of the three — it sits between
+          the two paper-anchored values but is not directly measured in the paper.
         </p>
         <p>
-          Uncertainty bands are ±{QUALITY_UNCERTAINTY_BANDS.attitude_belief.toFixed(2)} for
-          attitudes (paper-anchored),
-          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} for self-reported
-          behaviors (less published evidence), and
-          ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} for incentivized
-          behaviors (least published evidence). These are modeling conventions, not
+          Uncertainty bands reflect this evidence structure. Attitudes carry
+          ±{QUALITY_UNCERTAINTY_BANDS.attitude_belief.toFixed(2)} (large paper-anchored sample).
+          Incentivized behaviors carry
+          ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} (also paper-anchored, but
+          smaller economic game sample and different task structure). Self-reported behaviors carry
+          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} (least directly tested;
+          extrapolated from the two anchored constructs). These are modeling conventions, not
           empirically validated confidence intervals.
         </p>
         <p>

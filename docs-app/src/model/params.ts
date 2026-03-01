@@ -163,9 +163,9 @@ export const DEFAULT_COST: CostParams = {
   base_incentive_phase1: 60.0,
   base_incentive_phase2: 30.0,
   bonus_expected_value: 5.0,
-  asr_cost_per_minute: 0.03,
+  asr_cost_per_minute: 0.007,
   tts_cost_per_minute: 0.02,
-  price_per_1k_input_tokens: 0.008,
+  price_per_1k_input_tokens: 0.003,
   price_per_1k_output_tokens: 0.012,
   avg_scripted_questions: 35,
   avg_followups_per_block: 82,
@@ -304,8 +304,15 @@ export function createDefaultConfig(): ScenarioConfig {
  * The 0.85 base for attitude_belief is paper-anchored (Park et al., 2024).
  * Other constructs have progressively wider bands due to less direct evidence.
  */
+/**
+ * Uncertainty bands by construct type.
+ * attitude_belief: ±0.06 — most directly anchored (large GSS attitude sample, Park et al. 2024)
+ * incentivized_behavior: ±0.10 — also paper-anchored (economic game experiments, Park et al. 2024)
+ *   but smaller sample and different task structure than the attitude items
+ * self_report_behavior: ±0.12 — least directly tested in the paper; base score is extrapolated
+ */
 export const QUALITY_UNCERTAINTY_BANDS: Record<string, number> = {
   attitude_belief: 0.06,
-  self_report_behavior: 0.10,
-  incentivized_behavior: 0.12,
+  incentivized_behavior: 0.10,
+  self_report_behavior: 0.12,
 };

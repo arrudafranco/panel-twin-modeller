@@ -16,7 +16,7 @@ This repository extends beyond that scope into:
 - feasibility and cost modeling
 - sampling and representativeness adjustments
 - pilot calibration
-- commercialization, pricing, NPV, and break-even analysis
+- investment case analysis, pricing, NPV, and break-even modeling
 - an interactive public-facing web app with visualizations and executive narrative
 
 Key modeling features:

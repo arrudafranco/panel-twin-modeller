@@ -20,7 +20,14 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
 
   return (
     <section id="panel-economics" role="tabpanel" aria-labelledby="tab-economics">
-      <h2>Economics and market positioning</h2>
+      <h2>Feasibility and market context</h2>
+      <p>
+        Fidelity and cost do not exist in isolation. They shape whether this approach
+        is viable at scale and how it compares to alternative research methods. This
+        section connects those methodological trade-offs to business outcomes, illustrating
+        what the investment case might look like under different assumptions and how the
+        approach positions relative to alternatives.
+      </p>
 
       {/* Scope clarification */}
       <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
