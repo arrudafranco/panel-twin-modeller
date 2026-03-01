@@ -8,8 +8,8 @@ export function BenchmarksTab() {
         These benchmarks serve a specific and limited role: they characterize how
         self-consistent real human respondents are when re-interviewed on similar
         constructs. That human test-retest consistency becomes the <strong>normalizing
-        ceiling</strong> for agent fidelity comparisons, following the logic of
-        Park et al. (2024).
+        ceiling</strong> for agent fidelity comparisons, following the logic of{' '}
+        <a href="https://arxiv.org/abs/2411.10109" target="_blank" rel="noopener noreferrer">Park et al. (2024)</a>.
       </p>
       <p>
         The comparison works like this. If humans agree with their own earlier

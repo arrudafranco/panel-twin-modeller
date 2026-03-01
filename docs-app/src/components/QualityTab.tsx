@@ -75,58 +75,77 @@ export function QualityTab({ cfg, results }: Props) {
 
       <div className="methods-note">
         <h3>Methods and limitations</h3>
+
+        <h4>What the paper actually measured</h4>
         <p>
-          Two of the three construct bases are anchored to Park et al. (2024, arXiv:2411.10109).
-          The 0.85 base for attitudes and beliefs reflects agent-human agreement on GSS attitude
-          items, normalized against human test-retest consistency, from 2-hour GPT-4 interviews
-          with 1,052 participants. The 0.66 base for incentivized behaviors reflects the lower
-          fidelity observed in the same paper's economic game experiments (trust game, ultimatum
-          game), where agents tracked participants less closely than on attitude items. The 0.75
-          base for self-reported behaviors is the most extrapolated of the three — it sits between
-          the two paper-anchored values but is not directly measured in the paper.
+          Park et al. (2024, arXiv:2411.10109) evaluated agent fidelity against the
+          full <strong>GSS Core</strong> — 177 categorical items spanning attitudes,
+          self-reported behaviors (church attendance, voting, gun ownership, work status,
+          and others), opinions, and demographics. The 0.85 normalized accuracy is an
+          average across all of these, not specifically for attitude items. The paper's
+          empirical distinction is between the GSS Core overall (0.85) and economic game
+          experiments — trust game, ultimatum game — where agents tracked participants
+          less closely (0.66). Attitudes and self-reported behaviors are not separated
+          within the 0.85 figure.
         </p>
+
+        <h4>How the three-way construct split is derived</h4>
         <p>
-          Uncertainty bands reflect this evidence structure. Attitudes carry
-          ±{QUALITY_UNCERTAINTY_BANDS.attitude_belief.toFixed(2)} (large paper-anchored sample).
-          Incentivized behaviors carry
-          ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} (also paper-anchored, but
-          smaller economic game sample and different task structure). Self-reported behaviors carry
-          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} (least directly tested;
-          extrapolated from the two anchored constructs). These are modeling conventions, not
-          empirically validated confidence intervals.
+          This model uses three construct categories for planning purposes, but only
+          two are directly paper-anchored. Attitudes and beliefs at 0.85 (large GSS
+          Core sample, 1,052 participants). Incentivized behaviors at 0.66 (economic
+          game experiments, smaller sample, different task structure). Self-reported
+          behaviors at 0.75 is a modeling convention — interpolated between the two
+          anchors — not a separate empirical measurement. The paper does not report
+          separate accuracy figures for behavioral vs. attitudinal GSS items.
         </p>
+
+        <h4>Uncertainty bands</h4>
         <p>
-          What fidelity comparisons can and cannot establish. This approach captures
-          one dimension of validity: whether agents reproduce their source participants'
-          responses on measured items. It does not establish construct validity (does the
-          instrument measure the intended latent construct?), discriminant validity
-          (do agents correctly differentiate respondents?), or topical generalizability
-          (does fidelity hold for questions outside the interview's domain?). Those
-          remain open empirical questions for a pilot to begin addressing.
+          Bands reflect evidence proximity, not statistical confidence intervals.
+          Attitudes carry ±{QUALITY_UNCERTAINTY_BANDS.attitude_belief.toFixed(2)} (large
+          directly anchored sample). Incentivized behaviors carry
+          ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} (also anchored,
+          but smaller economic game sample). Self-reported behaviors carry
+          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} (widest, because
+          the base is extrapolated rather than measured). These are conventions for
+          scenario planning, not formally derived intervals.
         </p>
+
+        <h4>What fidelity does and does not capture</h4>
         <p>
-          Memory architecture parameters (retrieval k, reflection cadence, importance
-          weighting) affect scores through transparent multipliers. These are
-          theoretically motivated heuristics, not measured effect sizes.
+          Fidelity measures one dimension of validity: whether agents reproduce their
+          source participants' responses on measured items. It does not establish
+          construct validity (does the instrument measure the intended latent
+          construct?), discriminant validity (do agents correctly differentiate
+          respondents?), or topical generalizability (does fidelity hold for questions
+          outside the interview's domain?). Those remain open empirical questions for
+          a pilot to address.
         </p>
+
+        <h4>Agent profile drift and library shelf life</h4>
         <p>
-          Agent profile drift and library useful life. Fidelity estimates in this
-          model describe how well an agent represents its source participant at the
-          time of the interview. They say nothing about how long that representation
-          remains accurate. As real participants' beliefs, circumstances, and attitudes
-          evolve, agent responses diverge from what those participants would currently
-          say. The rate and pattern of this drift has no published estimates for
-          interview-based AI agents. A twin library may be accurate for months or
-          degrade meaningfully within weeks for fast-moving topics. The economics
-          model includes refresh wave revenue but does not model refresh operational
-          costs, because the trigger conditions and scope of a refresh campaign are
-          not yet estimable. Any NPV projection beyond 12–18 months should be read as
-          conditional on library validity — an assumption the model cannot verify.
+          Fidelity estimates describe accuracy at the time of the interview. As real
+          participants' beliefs and circumstances evolve, agent responses diverge from
+          what those participants would currently say. The rate of this drift has no
+          published estimates for interview-based AI agents. A library may remain
+          accurate for months or degrade within weeks for fast-moving topics. The
+          economics model includes refresh wave revenue but not refresh operational
+          costs, because the trigger conditions are not yet estimable. NPV projections
+          beyond 12–18 months should be treated as conditional on library validity.
         </p>
+
+        <h4>Memory architecture parameters</h4>
+        <p>
+          Retrieval k, reflection cadence, and importance weighting affect scores
+          through transparent multipliers. These are theoretically motivated heuristics,
+          not measured effect sizes.
+        </p>
+
         <p style={{ opacity: 0.55, fontSize: '0.82em', marginTop: 12 }}>
-          Model defaults last updated February 2026. The evidence base for digital panel twin
-          approaches is evolving quickly. Anchors, penalties, and uncertainty bands should be
-          revisited as new published results become available.
+          Model defaults last updated February 2026. The evidence base for digital panel
+          twin approaches is evolving quickly. Anchors, penalties, and uncertainty bands
+          should be revisited as new published results become available.
         </p>
       </div>
     </section>

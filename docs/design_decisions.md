@@ -1,7 +1,7 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.0
-Last updated: 2026-02-27
+Version: 0.2.2
+Last updated: 2026-02-28
 Status: active working design record
 
 ## Purpose
@@ -436,6 +436,27 @@ If a change only affects wording, styling, or minor implementation detail withou
 
 ## Version Updates
 
+### 0.2.2 - 2026-02-28
+
+Pricing recalibration, per-project run cost correction, and GSS finding propagation.
+
+**Pricing recalibration**
+- Panel Twin price_per_project default lowered from $180,000 to $55,000. The prior default was in the range of established probability panel benchmarks (AmeriSpeak-class projects), which is the wrong positioning. Panel Twin's value proposition is delivering research-grade quality at a lower price point than traditional probability panels, not matching their pricing.
+- Competitor prices updated to reflect the corrected positioning: probability benchmark $80,000, hybrid benchmark $60,000 (publicly available pricing data for calibrated hybrid panels indicates approximately 25% below the probability benchmark), external synthetic $20,000. These form a logical pricing hierarchy: Synthetic ($20K) < Panel Twin ($55K) < Hybrid ($60K) < Probability ($80K).
+- Price slider range updated accordingly (min $20K, max $300K).
+
+**Per-project run cost correction**
+- Default per_project_run_cost increased from $10,000 to $25,000, reflecting realistic loaded labor rates for QA, PM, and data delivery in an institutional research context. The $10K default understated overhead and staff time relative to how these costs are actually incurred.
+- Slider step updated from $500 to $1,000; tooltip updated to reflect realistic $20K–$30K range.
+- All hardcoded INSIGHTS text updated to reflect the new run cost (gross margin ~55% at $55K price / $25K run cost).
+
+**GSS finding propagation**
+- Confirmed that Park et al. (2024) 0.85 normalized accuracy covers the full GSS Core (177 items including both attitudes and self-reported behaviors), not attitudes only. This finding has been propagated throughout:
+  - QUALITY_UNCERTAINTY_BANDS comment in params.ts corrected from "GSS attitude sample" to "GSS Core sample."
+  - design_decisions.md v0.2.1 entry corrected from "attitude item replication" to "full GSS Core replication."
+  - INSIGHTS[2] in the landing page reframed. The self_report_behavior 0.75 base is now clearly described as a deliberate conservative planning discount — not an empirical finding and not a lower result the paper reports. The prior framing ("methodological risk zone") implied the paper showed lower fidelity for behaviors, which it does not.
+  - QualityTab methods section sub-headings and text already updated in v0.2.1 to correctly describe the GSS Core scope.
+
 ### 0.2.1 - 2026-02-28
 
 Methodological corrections, cost recalibration, and framing refinements.
@@ -446,7 +467,7 @@ Methodological corrections, cost recalibration, and framing refinements.
 - Expanded methods note in the Fidelity tab to explicitly state what fidelity comparisons establish and what they leave open (construct validity, discriminant validity, topical generalizability).
 
 **Evidence base corrections for construct types**
-- Corrected the uncertainty band ordering and methods language. Both attitude_belief (0.85) and incentivized_behavior (0.66) are anchored to Park et al. (2024), from attitude item replication and economic game experiments respectively. Self-reported behaviors (0.75) are the most extrapolated of the three — not incentivized behaviors as previously implied.
+- Corrected the uncertainty band ordering and methods language. attitude_belief (0.85) is anchored to Park et al. (2024) from full GSS Core replication (177 items spanning attitudes, self-reported behaviors, opinions, and demographics — not attitude items only). incentivized_behavior (0.66) is anchored to economic game experiments in the same paper. self_report_behavior (0.75) is a conservative planning discount applied below the 0.85 anchor — not a separately measured result.
 - Updated uncertainty bands to reflect this: attitude_belief ±0.06 (most directly anchored), incentivized_behavior ±0.10 (also anchored but smaller economic game sample), self_report_behavior ±0.12 (least directly tested).
 - Updated the "What are you measuring?" tooltip and Fidelity tab methods note accordingly.
 

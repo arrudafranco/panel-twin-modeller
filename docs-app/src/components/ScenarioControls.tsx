@@ -104,7 +104,7 @@ export function ScenarioControls({
         <Slider
           label="Price per project"
           value={cfg.revenue.price_per_project}
-          min={50000} max={500000} step={5000}
+          min={20000} max={300000} step={5000}
           onChange={(v) => updateRevenue('price_per_project', v)}
           format={money}
           tooltip="Revenue per project. Covers full-service delivery: data collection, agent construction, representativeness weighting, and a weighted dataset with crosstabs. Does not include custom analysis or reporting."
@@ -112,10 +112,10 @@ export function ScenarioControls({
         <Slider
           label="Per-project run cost"
           value={cfg.revenue.per_project_run_cost}
-          min={1000} max={50000} step={500}
+          min={5000} max={100000} step={1000}
           onChange={(v) => updateRevenue('per_project_run_cost', v)}
           format={money}
-          tooltip="Cost of running one survey project against the existing twin library. Covers LLM inference, per-project QA, PM, and data delivery — not new interviews or incentives, which are the one-time library build cost. Typically $5,000–$15,000 per project."
+          tooltip="Cost of running one survey project against the existing twin library. Covers LLM inference, per-project QA, PM, and data delivery at loaded labor rates — not new interviews or incentives, which are the one-time library build cost. Typically $20,000–$30,000 per project."
         />
         <Slider
           label="Projects per year"

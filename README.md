@@ -29,7 +29,7 @@ Key modeling features:
 The primary interface is a React app deployed via GitHub Pages. It includes:
 - An executive landing page with static model insights
 - Interactive scenario controls (interview duration, panel size, pricing, memory architecture)
-- Quality curves by interview duration with uncertainty bands
+- Fidelity curves by interview duration with uncertainty bands
 - Cost breakdown waterfall chart
 - NPV timeline and Monte Carlo simulation (500 iterations, client-side)
 - Market positioning radar chart

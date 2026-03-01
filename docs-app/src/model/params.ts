@@ -245,8 +245,8 @@ export const DEFAULT_PRODUCT: ProductParams = {
 };
 
 export const DEFAULT_REVENUE: RevenueParams = {
-  price_per_project: 180000.0,
-  per_project_run_cost: 10000.0,
+  price_per_project: 55000.0,
+  per_project_run_cost: 25000.0,
   module_addon_price: 25000.0,
   refresh_wave_price: 60000.0,
   projects_per_year: 6,
@@ -272,13 +272,13 @@ export const DEFAULT_COMPETITION: CompetitionParams = {
   federal_risk_penalty: 0.08,
   cross_price_elasticity: 0.20,
   // Fix 3: Generic labels instead of real competitor names
-  probability_benchmark_price: 260000.0,
+  probability_benchmark_price: 80000.0,
   probability_benchmark_quality: 0.90,
   probability_benchmark_turnaround_days: 18.0,
-  hybrid_benchmark_price: 160000.0,
+  hybrid_benchmark_price: 60000.0,
   hybrid_benchmark_quality: 0.80,
   hybrid_benchmark_turnaround_days: 12.0,
-  external_synthetic_price: 50000.0,
+  external_synthetic_price: 20000.0,
   external_synthetic_quality: 0.72,
   external_synthetic_turnaround_days: 7.0,
 };
@@ -308,10 +308,12 @@ export function createDefaultConfig(): ScenarioConfig {
  */
 /**
  * Uncertainty bands by construct type.
- * attitude_belief: ±0.06 — most directly anchored (large GSS attitude sample, Park et al. 2024)
+ * attitude_belief: ±0.06 — most directly anchored (large GSS Core sample, Park et al. 2024;
+ *   177 items including both attitudes and self-reported behaviors)
  * incentivized_behavior: ±0.10 — also paper-anchored (economic game experiments, Park et al. 2024)
- *   but smaller sample and different task structure than the attitude items
- * self_report_behavior: ±0.12 — least directly tested in the paper; base score is extrapolated
+ *   but smaller sample and structurally different task (trust game, ultimatum game)
+ * self_report_behavior: ±0.12 — base score (0.75) is a conservative planning discount below the
+ *   0.85 GSS Core anchor; not a separately measured result. Widest band reflects modeling uncertainty.
  */
 export const QUALITY_UNCERTAINTY_BANDS: Record<string, number> = {
   attitude_belief: 0.06,

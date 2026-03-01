@@ -17,28 +17,28 @@ const INSIGHTS: InsightDef[] = [
     methodology: [
       "Incentive structure: $60 Phase 1 interview + ($30 × 0.8 retest rate) Phase 2 + $5 bonus = $89 per participant. At 2,000 participants: $178,000 — roughly 64% of the total library build cost.",
       "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (ASR + TTS at $0.027/min × 120 min) add $6,480. Setup labor (153 hours at $120/hr) adds $18,360.",
-      "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 2,000 agents costs roughly $300–500. Total run cost including QA and PM is estimated at $5,000–15,000 — about 3–8% of the library build cost.",
+      "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 2,000 agents costs roughly $300–500. At loaded labor rates for QA, PM, and data delivery, total run cost is estimated at $20,000–30,000 — about 7–11% of the library build cost.",
       "Implication: the technology cost curve is not the binding constraint. LLM price changes have minimal impact on the investment case. Response rate and incentive levels have major impact. Scale decisions (how many participants) are primarily a human cost question.",
     ],
   },
   {
     title: "The cost structure transforms from linear to fixed-plus-marginal",
-    summary: "Traditional survey research charges linear costs for every study. Panel Twin separates a one-time library build ($277K for 2,000 participants) from low marginal per-project run costs (~$10K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
+    summary: "Traditional survey research charges per-study fees for every project. Panel Twin separates a one-time library build (~$277K for 2,000 participants) from a lower marginal per-project run cost (~$25K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
     methodology: [
       "Library build cost covers AI-conducted interviews, participant incentives, voice infrastructure, agent construction, setup labor, and overhead. This is a capital investment charged once (or per refresh cycle), not per project.",
-      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $10,000 per project.",
-      "With 94% variable margin per project (at $180K price, $10K run cost), the break-even on the library investment depends on project volume over the library's useful life. At 6 projects/year, rough break-even is within 3–5 projects.",
+      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $25,000 per project at loaded labor rates.",
+      "With ~55% variable margin per project (at $55K price, $25K run cost), the break-even on the library investment depends on project volume over the library's useful life. At 6 projects/year, rough break-even is within 9–11 projects.",
       "The critical open question is library useful life: how many projects can run before agent profiles go stale and re-interviewing is needed. The model cannot answer this — it is an open empirical question. The NPV projections are conditional on the library remaining valid.",
     ],
   },
   {
-    title: "Self-reported behaviors are the methodological risk zone",
-    summary: "Self-reported behaviors are the most common survey use case and the least directly tested construct type. The model places their fidelity at 0.75, but with the widest uncertainty band (±0.12). A result anywhere between 0.63 and 0.87 is defensible.",
+    title: "Self-reported behaviors: the 0.75 base is a deliberate planning discount, not an empirical finding",
+    summary: "The paper's 0.85 accuracy figure covers the full GSS Core, which includes self-reported behaviors alongside attitudes. The model applies a more conservative 0.75 for this construct type as a planning choice — specific behaviors vary in recall accuracy, sensitivity, and verifiability in ways the aggregate may not capture. The ±0.12 band is the widest of the three, reflecting that this discount is a modeling convention rather than a measured result.",
     methodology: [
-      "Two construct types have direct empirical anchors from Park et al. (2024): attitudes and beliefs at 0.85 (1,052 participants, GSS attitude items) and incentivized behaviors at 0.66 (economic game experiments). Self-reported behaviors (0.75) are interpolated between these two anchors — not directly measured in the paper.",
-      "Uncertainty bands: attitudes ±0.06, incentivized behaviors ±0.10, self-reported behaviors ±0.12. The wide band for self-reported behaviors reflects the absence of direct evidence, not higher intrinsic difficulty.",
-      "At default settings, self-reported behaviors often clear the quality threshold (0.75 vs. ~0.75 threshold), but the margin is thin and within the uncertainty band. A reasonable pessimistic scenario has self-reported behaviors below threshold.",
-      "This creates an asymmetric risk: if the primary use case is self-reported behavior studies, you are operating in the least-validated configuration, and feasibility outcomes are most sensitive to which end of the uncertainty band applies. A pilot study specifically targeting self-reported behaviors is more warranted here than for attitudes.",
+      "The paper provides two empirical anchors: the full GSS Core at 0.85 (1,052 participants, 177 items including both attitudes and self-reported behaviors like church attendance, voting, gun ownership, and work status) and economic game experiments at 0.66. Self-reported behaviors do not have a separate anchor — they are within the 0.85 figure. The model's 0.75 base is a deliberate conservative discount, not a separately measured result.",
+      "The rationale for the discount: behaviors tied to specific past events (did you vote? have you bought a gun?) introduce recall and verifiability factors not present in opinion items. Social desirability effects on sensitive behaviors may also differ. These are theoretical reasons, not measured effects — which is why the ±0.12 uncertainty band is wide enough to span from below-threshold to above the paper anchor.",
+      "At default settings, self-reported behaviors often clear the quality threshold at the margin (0.75 vs. ~0.75 threshold). A pessimistic draw from the uncertainty band puts them below threshold; an optimistic draw approaches the empirical 0.85. The pilot phase is the right time to measure which end of the range applies to your specific behavioral items.",
+      "If the primary use case is attitude and opinion measurement, the 0.85 anchor applies more directly and threshold margins are more comfortable. The three-way construct distinction is most useful as a planning signal — not a claim about inherent fidelity differences the paper has established.",
     ],
     citations: [
       "Park et al. (2024). Generative Agent Simulations of 1,000 People. arXiv:2411.10109. https://arxiv.org/abs/2411.10109",
@@ -73,9 +73,9 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "The main uncertainty is now library longevity, not project margin",
-    summary: "With ~94% variable margin per project, the investment case is strong once the library is built. The dominant open question has shifted: how long does a twin library remain valid before agents need re-interviewing? The model tracks NPV but cannot estimate agent shelf life.",
+    summary: "With ~55% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does a twin library remain valid before agents need re-interviewing? The model tracks NPV but cannot estimate agent shelf life.",
     methodology: [
-      "At 94% variable margin, win probability sensitivity has a smaller NPV impact than it would if COGS per project were high. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
+      "At ~55% variable margin, win probability sensitivity has a meaningful but not dominant NPV impact. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
       "Library useful life is the dominant uncertainty. As real participants' views evolve over time, agent responses gradually diverge from what those participants would currently say. The rate of this divergence — and when it crosses a meaningful threshold — has no published estimates for this construction approach.",
       "Refresh wave revenue ($60K default) is included in the model, but per-refresh operational costs are not modeled. The cost of a partial re-interview campaign depends on how many agents need updating and whether source participants remain reachable.",
       "Monte Carlo simulations draw uncertainty from interview duration, response rate, and attrition. Library longevity uncertainty is not included because there is no distributional basis for it yet. This means the MC output understates total uncertainty for projections beyond 12–18 months.",
