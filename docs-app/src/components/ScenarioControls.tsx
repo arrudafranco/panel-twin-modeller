@@ -199,7 +199,7 @@ export function ScenarioControls({
         <fieldset className="control-group">
           <legend>
             Staff and overhead{' '}
-            <Tooltip content="Staff cost and overhead apply to each study run — both the validation pilot (visible in the Cost tab) and the library build (visible in the Economics tab). They are flat per-study costs, not per-participant. Other upfront investment is a separate, truly one-time cost that only enters the NPV model in the Economics tab.">
+            <Tooltip content="Staff cost and overhead apply to each study run — both the validation pilot (visible in the Cost tab) and the library build (visible in the Economics tab). They are flat per-study costs, not per-participant. The two ad-hoc cost fields below are separate catch-all buckets: pilot ad-hoc costs appear only in the Cost tab pilot view; library build ad-hoc costs appear in the Cost tab library view and are also added to the total upfront investment in the Economics tab NPV model.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
@@ -225,15 +225,15 @@ export function ScenarioControls({
             min={0} max={100000} step={1000}
             onChange={(v) => updateCost('other_pilot_cost', v)}
             format={money}
-            tooltip="Any ad-hoc costs specific to the validation pilot that do not fit the other categories — e.g., unexpected IRB fees, software licenses, travel for in-person testing. Shown in the pilot view of the Cost tab."
+            tooltip="Any ad-hoc costs specific to the validation pilot that do not fit the other categories — e.g., unexpected IRB fees, software licenses, travel for in-person testing. Added as a flat total, not per participant. Shown in the Cost tab pilot view (per-unit rows there exclude this item). Not included in the NPV model — the pilot is treated as a pre-decision sunk cost."
           />
           <Slider
-            label="Other one-time costs (library build)"
+            label="Other ad-hoc costs (library build)"
             value={cfg.revenue.other_initial_investment}
             min={0} max={1000000} step={5000}
             onChange={(v) => updateRevenue('other_initial_investment', v)}
             format={money}
-            tooltip="Truly one-time costs tied to the library build phase — e.g., infrastructure build, legal review, partnership setup. Shown in the library build view of the Cost tab and added to total upfront investment in the Economics tab NPV model."
+            tooltip="Any ad-hoc costs specific to the library build phase that do not fit the other categories — e.g., infrastructure setup, legal review, partnership agreements. Shown in the library build view of the Cost tab and added to total upfront investment in the Economics tab NPV model."
           />
         </fieldset>
 
