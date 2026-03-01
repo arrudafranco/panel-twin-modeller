@@ -16,18 +16,18 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
   const data = useMemo(() => {
     const points = [];
     for (let mins = 30; mins <= 180; mins += 5) {
-      const ab = qualityScore(cfg, 'attitude_belief', mins);
-      const sr = qualityScore(cfg, 'self_report_behavior', mins);
+      const mg = qualityScore(cfg, 'mixed_general', mins);
+      const br = qualityScore(cfg, 'behavioral_recall', mins);
       const ib = qualityScore(cfg, 'incentivized_behavior', mins);
       points.push({
         minutes: mins,
-        'Attitudes & beliefs': Number(ab.toFixed(4)),
-        'Self-reported behaviors': Number(sr.toFixed(4)),
-        'Incentivized behaviors': Number(ib.toFixed(4)),
-        ab_upper: Number(Math.min(1, ab + QUALITY_UNCERTAINTY_BANDS.attitude_belief).toFixed(4)),
-        ab_lower: Number(Math.max(0, ab - QUALITY_UNCERTAINTY_BANDS.attitude_belief).toFixed(4)),
-        sr_upper: Number(Math.min(1, sr + QUALITY_UNCERTAINTY_BANDS.self_report_behavior).toFixed(4)),
-        sr_lower: Number(Math.max(0, sr - QUALITY_UNCERTAINTY_BANDS.self_report_behavior).toFixed(4)),
+        'Mixed general': Number(mg.toFixed(4)),
+        'Behavioral recall': Number(br.toFixed(4)),
+        'Incentivized experiments': Number(ib.toFixed(4)),
+        mg_upper: Number(Math.min(1, mg + QUALITY_UNCERTAINTY_BANDS.mixed_general).toFixed(4)),
+        mg_lower: Number(Math.max(0, mg - QUALITY_UNCERTAINTY_BANDS.mixed_general).toFixed(4)),
+        br_upper: Number(Math.min(1, br + QUALITY_UNCERTAINTY_BANDS.behavioral_recall).toFixed(4)),
+        br_lower: Number(Math.max(0, br - QUALITY_UNCERTAINTY_BANDS.behavioral_recall).toFixed(4)),
         ib_upper: Number(Math.min(1, ib + QUALITY_UNCERTAINTY_BANDS.incentivized_behavior).toFixed(4)),
         ib_lower: Number(Math.max(0, ib - QUALITY_UNCERTAINTY_BANDS.incentivized_behavior).toFixed(4)),
       });
@@ -40,8 +40,8 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
       <h3 className="chart-title">Estimated agent fidelity by interview duration</h3>
       <p className="chart-subtitle">
         Shaded regions show uncertainty bands (wider for constructs with less published evidence).
-        The 0.85 attitude anchor reflects agent-human agreement normalized against human
-        test-retest consistency (Park et al., 2024, arXiv:2411.10109).
+        The 0.85 mixed general anchor and 0.66 incentivized experiments anchor both come directly
+        from Park et al. (2024, arXiv:2411.10109). Behavioral recall (0.80) is a planning discount.
       </p>
       <ResponsiveContainer width="100%" height={340}>
         <ComposedChart data={data} margin={{ top: 14, right: 64, bottom: 32, left: 10 }}>
@@ -64,16 +64,16 @@ export function QualityCurveChart({ cfg, threshold }: Props) {
             labelFormatter={(label) => `${label} minutes`}
           />
           {/* Uncertainty bands — legendType="none" hides them from the legend */}
-          <Area type="monotone" dataKey="ab_upper" stroke="none" fill="#E8772233" legendType="none" />
-          <Area type="monotone" dataKey="ab_lower" stroke="none" fill="#ffffff" legendType="none" />
-          <Area type="monotone" dataKey="sr_upper" stroke="none" fill="#3B82F622" legendType="none" />
-          <Area type="monotone" dataKey="sr_lower" stroke="none" fill="#ffffff" legendType="none" />
+          <Area type="monotone" dataKey="mg_upper" stroke="none" fill="#E8772233" legendType="none" />
+          <Area type="monotone" dataKey="mg_lower" stroke="none" fill="#ffffff" legendType="none" />
+          <Area type="monotone" dataKey="br_upper" stroke="none" fill="#3B82F622" legendType="none" />
+          <Area type="monotone" dataKey="br_lower" stroke="none" fill="#ffffff" legendType="none" />
           <Area type="monotone" dataKey="ib_upper" stroke="none" fill="#10B98122" legendType="none" />
           <Area type="monotone" dataKey="ib_lower" stroke="none" fill="#ffffff" legendType="none" />
           {/* Main lines */}
-          <Line type="monotone" dataKey="Attitudes & beliefs" stroke="#E87722" strokeWidth={2.5} dot={false} />
-          <Line type="monotone" dataKey="Self-reported behaviors" stroke="#3B82F6" strokeWidth={2.5} dot={false} />
-          <Line type="monotone" dataKey="Incentivized behaviors" stroke="#10B981" strokeWidth={2.5} dot={false} />
+          <Line type="monotone" dataKey="Mixed general" stroke="#E87722" strokeWidth={2.5} dot={false} />
+          <Line type="monotone" dataKey="Behavioral recall" stroke="#3B82F6" strokeWidth={2.5} dot={false} />
+          <Line type="monotone" dataKey="Incentivized experiments" stroke="#10B981" strokeWidth={2.5} dot={false} />
           {/* Threshold */}
           <ReferenceLine y={threshold} stroke="#991B1B" strokeDasharray="6 4" label={{ value: `Threshold ${threshold.toFixed(2)}`, position: 'insideTopRight', fontSize: 11, fill: '#991B1B' }} />
           {/* Current interview duration */}

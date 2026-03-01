@@ -18,13 +18,13 @@ export function CostTab({ cfg, results }: Props) {
       <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>ℹ</span>
         <span>
-          This model reflects a pilot drawn from an <strong>existing probability
-          panel</strong>. Panel recruitment and ongoing maintenance are fixed
-          infrastructure costs not included here. The costs shown are per-study
-          variable costs: incentives, voice and LLM infrastructure, post-processing
-          labor, and overhead. Set "Cost per invite" to $0 (the default) when
-          sampling from an established panel where outreach is part of panel
-          operations.
+          This model assumes participants are accessed through an existing survey
+          panel or sample source. Standing panel infrastructure (recruitment,
+          maintenance, panel management) is a fixed cost not included here. The
+          costs shown are the variable costs of running the study: incentives,
+          voice and LLM infrastructure, post-processing, staff, and indirect
+          costs. Set "Cost per invite" to $0 (the default) when outreach is
+          handled through ongoing panel operations.
         </span>
       </div>
       <p>
@@ -46,8 +46,8 @@ export function CostTab({ cfg, results }: Props) {
           <tr><th>Voice operations (ASR and TTS)</th><td>{money(costs.voice_ops_cost)}</td></tr>
           <tr><th>LLM token costs</th><td>{money(costs.llm_ops_cost)}</td></tr>
           <tr><th>Post-processing</th><td>{money(costs.postproc_cost)}</td></tr>
-          <tr><th>Professional labor</th><td>{money(costs.labor_cost)}</td></tr>
-          <tr><th>Overhead ({(cfg.cost.overhead_rate * 100).toFixed(0)}%)</th><td>{money(costs.overhead_cost)}</td></tr>
+          <tr><th>Staff cost</th><td>{money(costs.labor_cost)}</td></tr>
+          <tr><th>Indirect / overhead ({(cfg.cost.overhead_rate * 100).toFixed(0)}%, on non-labor)</th><td>{money(costs.overhead_cost)}</td></tr>
           <tr className="total-row"><th>Total pilot cost</th><td><strong>{money(costs.total_cost)}</strong></td></tr>
           <tr><th>Cost per completed interview</th><td>{money(costs.cost_per_completed_interview)}</td></tr>
           <tr><th>Cost per retained agent</th><td>{money(costs.cost_per_retained_agent)}</td></tr>

@@ -13,10 +13,10 @@ function memoryAdjustment(memoryStrategy: string): number {
 }
 
 function constructBase(cfg: ScenarioConfig, constructType: string): number {
-  if (constructType === 'attitude_belief') return 0.85;
-  if (constructType === 'self_report_behavior') return cfg.quality.self_report_behavior_base;
+  if (constructType === 'mixed_general') return 0.85;
+  if (constructType === 'behavioral_recall') return cfg.quality.behavioral_recall_base;
   if (constructType === 'incentivized_behavior') return 0.66;
-  return 0.75;
+  return 0.80;
 }
 
 function memorySystemAdjustment(cfg: ScenarioConfig): number {
@@ -56,8 +56,11 @@ function memorySystemAdjustment(cfg: ScenarioConfig): number {
 
 function constructResponseModeDefaults(constructType: string): Record<string, number> {
   const presets: Record<string, Record<string, number>> = {
-    attitude_belief: { categorical: 0.60, numeric: 0.15, open_ended: 0.25 },
-    self_report_behavior: { categorical: 0.35, numeric: 0.25, open_ended: 0.40 },
+    // Mixed general: mostly closed-ended (opinions + behavioral recall), some open-ended
+    mixed_general: { categorical: 0.55, numeric: 0.20, open_ended: 0.25 },
+    // Behavioral recall: more numeric (frequency/count items), less open-ended
+    behavioral_recall: { categorical: 0.45, numeric: 0.30, open_ended: 0.25 },
+    // Incentivized: dominated by numeric outcomes (amounts, choices)
     incentivized_behavior: { categorical: 0.20, numeric: 0.50, open_ended: 0.30 },
   };
   return presets[constructType] ?? { categorical: 0.45, numeric: 0.20, open_ended: 0.35 };
@@ -140,8 +143,8 @@ export function qualityScore(
 
 export function qualityTiers(cfg: ScenarioConfig): Record<string, number> {
   return {
-    attitude_belief: qualityScore(cfg, 'attitude_belief'),
-    self_report_behavior: qualityScore(cfg, 'self_report_behavior'),
+    mixed_general: qualityScore(cfg, 'mixed_general'),
+    behavioral_recall: qualityScore(cfg, 'behavioral_recall'),
     incentivized_behavior: qualityScore(cfg, 'incentivized_behavior'),
   };
 }

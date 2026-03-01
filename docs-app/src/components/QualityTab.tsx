@@ -9,9 +9,9 @@ interface Props {
 }
 
 const CONSTRUCT_LABELS: Record<string, string> = {
-  attitude_belief: 'Attitudes and beliefs',
-  self_report_behavior: 'Self-reported behaviors',
-  incentivized_behavior: 'Incentivized behaviors',
+  mixed_general: 'Mixed general (attitudes, opinions, behaviors)',
+  behavioral_recall: 'Behavioral recall (frequency and history items)',
+  incentivized_behavior: 'Incentivized / economic experiments',
 };
 
 export function QualityTab({ cfg, results }: Props) {
@@ -43,7 +43,7 @@ export function QualityTab({ cfg, results }: Props) {
 
       <QualityCurveChart cfg={cfg} threshold={threshold} />
 
-      <h3>Estimated fidelity by construct type</h3>
+      <h3>Estimated fidelity by study type</h3>
       <table className="data-table">
         <thead>
           <tr>
@@ -89,27 +89,35 @@ export function QualityTab({ cfg, results }: Props) {
           within the 0.85 figure.
         </p>
 
-        <h4>How the three-way construct split is derived</h4>
+        <h4>How the three study-type categories are derived</h4>
         <p>
-          This model uses three construct categories for planning purposes, but only
-          two are directly paper-anchored. Attitudes and beliefs at 0.85 (large GSS
-          Core sample, 1,052 participants). Incentivized behaviors at 0.66 (economic
-          game experiments, smaller sample, different task structure). Self-reported
-          behaviors at 0.75 is a modeling convention, interpolated between the two
-          anchors, and not a separate empirical measurement. The paper does not report
-          separate accuracy figures for behavioral vs. attitudinal GSS items.
+          Two of the three categories are directly anchored in Park et al. (2024).
+          Mixed general surveys — studies combining attitudes, opinions, and behavioral
+          recall items, like the GSS Core — sit at 0.85 (1,052 participants, 177 items
+          spanning all of those item types). Incentivized experiments — trust games,
+          ultimatum games, and similar revealed-preference tasks — also come directly
+          from the same paper, where agents tracked participants less closely at 0.66
+          (economic game subsample, smaller, structurally different task).
+          Behavioral recall surveys — studies focused primarily on concrete behavioral
+          frequency or recall items (health behaviors, voting history, activity tracking)
+          — sit at 0.80, the only extrapolated category. It is a conservative planning
+          discount below the GSS Core anchor, not a separately measured result. The
+          theoretical rationale is that behavioral recall items lean more heavily on
+          episodic memory retrieval than attitude introspection, a difference that is
+          plausible but untested in the genagents context.
         </p>
 
         <h4>Uncertainty bands</h4>
         <p>
           Bands reflect evidence proximity, not statistical confidence intervals.
-          Attitudes carry ±{QUALITY_UNCERTAINTY_BANDS.attitude_belief.toFixed(2)} (large
-          directly anchored sample). Incentivized behaviors carry
+          Mixed general surveys carry ±{QUALITY_UNCERTAINTY_BANDS.mixed_general.toFixed(2)} (large
+          directly anchored sample). Incentivized experiments carry
           ±{QUALITY_UNCERTAINTY_BANDS.incentivized_behavior.toFixed(2)} (also anchored,
-          but smaller economic game sample). Self-reported behaviors carry
-          ±{QUALITY_UNCERTAINTY_BANDS.self_report_behavior.toFixed(2)} (widest, because
-          the base is extrapolated rather than measured). These are conventions for
-          scenario planning, not formally derived intervals.
+          but smaller economic game sample). Behavioral recall surveys carry
+          ±{QUALITY_UNCERTAINTY_BANDS.behavioral_recall.toFixed(2)} (same as incentivized,
+          because the 0.80 estimate is a modest extrapolation with a plausible theoretical
+          basis, not a pure interpolation). These are conventions for scenario planning,
+          not formally derived intervals.
         </p>
 
         <h4>What fidelity does and does not capture</h4>

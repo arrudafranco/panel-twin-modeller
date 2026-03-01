@@ -30,8 +30,7 @@ This is not just a feature list. It is a record of the main design choices, the 
   - [Decision Support, Not False Precision](#decision-support-not-false-precision)
 - [Architecture Overview](#architecture-overview)
   - [1. Analytical Core](#1-analytical-core)
-  - [2. Internal Interactive App](#2-internal-interactive-app)
-  - [3. Public Interactive App](#3-public-interactive-app)
+  - [2. React Web App](#2-react-web-app)
 - [Model Design Decisions](#model-design-decisions)
   - [Configuration Is Explicit](#configuration-is-explicit)
   - [Cost Model: Detailed but Switchable](#cost-model-detailed-but-switchable)
@@ -42,7 +41,7 @@ This is not just a feature list. It is a record of the main design choices, the 
 - [App and Frontend Design Decisions](#app-and-frontend-design-decisions)
   - [Progressive Disclosure Instead of One Giant Control Panel](#progressive-disclosure-instead-of-one-giant-control-panel)
   - [Subject-Matter Presets, Not Hierarchy Labels](#subject-matter-presets-not-hierarchy-labels)
-  - [Internal and Public Apps Are Aligned but Not Identical](#internal-and-public-apps-are-aligned-but-not-identical)
+  - [The React App Is Now the Actively Maintained Implementation](#the-react-app-is-now-the-actively-maintained-implementation)
   - [Accessibility and Scanability Matter](#accessibility-and-scanability-matter)
 - [Guardrails and Limitations](#guardrails-and-limitations)
 - [Documentation Decisions](#documentation-decisions)
@@ -215,28 +214,17 @@ Key modules:
 
 This layer is the source of truth for the model.
 
-### 2. Internal Interactive App
+### 2. React Web App
 
-The React app in `docs-app/` is the primary public interactive interface, deployed via GitHub Pages.
+The app in `docs-app/` is a React + TypeScript frontend built with Vite and deployed to GitHub Pages. It is the primary interface for exploring the model.
 
 It is designed to:
 - expose core assumptions interactively
 - preserve progressive disclosure
 - support fast scanning and deeper technical review
-- use the same backend logic as the CLI
+- provide plain-language narrative alongside technical outputs
 
-The React app is meant to be the primary interface for stakeholders and external audiences.
-
-### 3. Public Interactive App
-
-The public-facing app in `docs-app/` is a React + TypeScript frontend built with Vite and deployed to GitHub Pages.
-
-It is designed to:
-- provide an accessible and lightweight interactive demonstration
-- mirror the main concepts and controls
-- stay simpler than the full backend model
-
-The public app is intentionally illustrative. The backend remains the authoritative implementation.
+The backend (`twin_econ/`) remains the authoritative model implementation. The React app ports that logic to TypeScript to run entirely client-side.
 
 ## Model Design Decisions
 
@@ -382,18 +370,13 @@ This is intentional:
 - it is more modular
 - it avoids implying that some users should or should not access certain information
 
-### Internal and Public Apps Are Aligned but Not Identical
+### The React App Is Now the Actively Maintained Implementation
 
-The internal app and public app are designed to stay in sync conceptually, but not to be identical in depth.
+The React app (TypeScript) and the Python CLI are conceptually aligned but no longer kept in strict numerical sync.
 
-Why:
-- the internal app should expose the full underlying logic more directly
-- the public app should remain lighter and easier to understand
+The React app is the actively maintained primary interface. Default values, construct type framing, pricing, and model calibrations are updated there first. The Python CLI is preserved as a reference implementation and for one command with no browser equivalent: `calibrate`, which ingests pilot study CSVs and updates model parameters from observed data.
 
-This means:
-- shared concepts and key controls should align
-- the public app may use simplified presentation and lighter interaction patterns
-- the backend remains the authoritative source
+Known divergences between the two implementations are documented in the Known Issues section. Before using the Python CLI for financial projections, check those entries.
 
 ### Accessibility and Scanability Matter
 

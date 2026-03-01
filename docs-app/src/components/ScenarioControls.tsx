@@ -29,19 +29,19 @@ export function ScenarioControls({
 
       <fieldset className="control-group">
         <legend>
-          What are you measuring?{' '}
-          <Tooltip content="The type of survey construct being studied. Attitudes and beliefs have the strongest paper-anchored evidence (0.85 fidelity, Park et al., 2024). Incentivized and economic behaviors are also anchored in the same paper's economic game experiments (0.66 fidelity) but show lower agent-human agreement. Self-reported behaviors are the most extrapolated of the three.">
+          Study type{' '}
+          <Tooltip content="The predominant type of items in your study. Mixed general surveys combine attitudes, opinions, and behavioral recall questions — the most common survey design and the one directly anchored to Park et al. (2024) at 0.85 fidelity. Behavioral recall surveys focus primarily on concrete behavioral frequency or recall items (e.g., health behaviors, voting, activity tracking), estimated at 0.80 as a conservative planning discount. Incentivized / economic experiments include trust games, ultimatum games, or revealed-preference tasks — also paper-anchored at 0.66.">
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>
         <select
           value={cfg.quality_profile}
           onChange={(e) => update('quality_profile', e.target.value)}
-          aria-label="Measurement type"
+          aria-label="Study type"
         >
-          <option value="attitude_belief">Attitudes and beliefs</option>
-          <option value="self_report_behavior">Self-reported behaviors</option>
-          <option value="incentivized_behavior">Incentivized / economic behaviors</option>
+          <option value="mixed_general">Mixed general (attitudes, opinions, behaviors)</option>
+          <option value="behavioral_recall">Behavioral recall (frequency and history items)</option>
+          <option value="incentivized_behavior">Incentivized / economic experiments</option>
         </select>
       </fieldset>
 
@@ -182,67 +182,32 @@ export function ScenarioControls({
             min={0} max={10} step={0.25}
             onChange={(v) => updateCost('cost_per_invite', Number(v.toFixed(2)))}
             format={money}
-            tooltip="Per-invite outreach cost. For an established probability panel this is $0 — invitations are part of ongoing panel operations. Set above $0 only when using external lists or cold outreach."
+            tooltip="Per-invite access cost for sampling from a panel. Set to $0 if your organization operates the panel as shared infrastructure with no per-study chargeback. Set to the chargeback or per-invite rate if the panel department bills studies internally, or if you are purchasing access from an external panel provider."
           />
         </fieldset>
 
         <fieldset className="control-group">
           <legend>
             Setup and labor{' '}
-            <Tooltip content="Fixed setup costs applied once per study at any scale. Hourly rate is fully loaded (salary, benefits, facilities). All five labor categories are used in the cost model.">
+            <Tooltip content="Total staff cost for the study. Enter in dollars — include all applicable roles (PM, protocol design, engineering, QA, IRB compliance) at whatever rate structure your organization uses. Overhead below covers indirect costs on top of non-labor expenses; set it to 0 if your staff figure is already fully loaded.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
           <Slider
-            label="Fully loaded hourly rate"
-            value={cfg.cost.fully_loaded_hourly_rate}
-            min={60} max={300} step={10}
-            onChange={(v) => updateCost('fully_loaded_hourly_rate', v)}
+            label="Total staff cost"
+            value={cfg.cost.total_labor_cost}
+            min={0} max={150000} step={1000}
+            onChange={(v) => updateCost('total_labor_cost', v)}
             format={money}
-            tooltip="Fully loaded cost per staff hour (salary + benefits + facilities). Applied to all labor hour estimates."
+            tooltip="Your total estimated staff cost for the study — include all applicable roles such as PM, protocol design, engineering, QA, and IRB compliance. Enter as a lump dollar amount at your organization's rates."
           />
           <Slider
-            label="Protocol design hours"
-            value={cfg.cost.protocol_design_hours}
-            min={5} max={80} step={5}
-            onChange={(v) => updateCost('protocol_design_hours', v)}
-            tooltip="Hours for designing the interview guide, construct specification, and codebook."
-          />
-          <Slider
-            label="Engineering hours"
-            value={cfg.cost.engineering_hours}
-            min={10} max={200} step={5}
-            onChange={(v) => updateCost('engineering_hours', v)}
-            tooltip="Hours for building the interview platform, agent pipeline, and data infrastructure."
-          />
-          <Slider
-            label="QA hours"
-            value={cfg.cost.qa_hours}
-            min={5} max={100} step={5}
-            onChange={(v) => updateCost('qa_hours', v)}
-            tooltip="Hours for quality assurance, agent output review, and reliability testing."
-          />
-          <Slider
-            label="PM hours"
-            value={cfg.cost.pm_hours}
-            min={5} max={100} step={5}
-            onChange={(v) => updateCost('pm_hours', v)}
-            tooltip="Project management hours covering coordination, client communication, scheduling, and delivery oversight."
-          />
-          <Slider
-            label="IRB compliance hours"
-            value={cfg.cost.irb_compliance_hours}
-            min={5} max={60} step={5}
-            onChange={(v) => updateCost('irb_compliance_hours', v)}
-            tooltip="Hours for IRB submission, consent form preparation, protocol review, and regulatory compliance documentation."
-          />
-          <Slider
-            label="Overhead rate"
+            label="Indirect / overhead rate"
             value={cfg.cost.overhead_rate}
             min={0} max={0.4} step={0.01}
             onChange={(v) => updateCost('overhead_rate', Number(v.toFixed(2)))}
             format={pct}
-            tooltip="Percentage of direct costs added as organizational overhead (facilities, admin, indirect costs)."
+            tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing) to cover facilities, admin, and organizational indirect costs. Set to 0 if your staff cost figure is already fully loaded."
           />
           <Slider
             label="Other upfront investment"

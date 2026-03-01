@@ -110,18 +110,15 @@ export function computeCosts(cfg: ScenarioConfig): CostResult {
       cfg.cost.storage_security_compliance_cost_per_participant
     );
 
-  const labor =
-    cfg.cost.fully_loaded_hourly_rate * (
-      cfg.cost.protocol_design_hours +
-      cfg.cost.engineering_hours +
-      cfg.cost.qa_hours +
-      cfg.cost.pm_hours +
-      cfg.cost.irb_compliance_hours
-    );
+  const labor = cfg.cost.total_labor_cost;
 
   const weighting = cfg.mode === 'scaleup' ? cfg.cost.weighting_raking_cost : 0.0;
-  const direct = recruitment + incentives + reschedulingCost + voiceOps + llmOps + postproc + labor + weighting;
-  const overhead = direct * cfg.cost.overhead_rate;
+  // Overhead applies to non-labor direct costs only. Staff cost is entered as a
+  // lump sum that may already be fully loaded; applying overhead on top would
+  // double-count indirect costs embedded in loaded rates.
+  const nonLaborDirect = recruitment + incentives + reschedulingCost + voiceOps + llmOps + postproc + weighting;
+  const direct = nonLaborDirect + labor;
+  const overhead = nonLaborDirect * cfg.cost.overhead_rate;
   const total = direct + overhead;
 
   const retained = n * (1.0 - cfg.cost.attrition_rate);

@@ -43,11 +43,11 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "60–90 minutes captures most of the quality gain",
-    summary: "Quality improves logarithmically with interview length — the first hour contributes more than the second. For attitude constructs, most gain over a 30-minute baseline is captured by 60–90 minutes. Beyond 120 minutes, incremental quality is small while build cost keeps rising linearly.",
+    summary: "Quality improves logarithmically with interview length — the first hour contributes more than the second. For mixed general and behavioral recall surveys, most gain over a 30-minute baseline is captured by 60–90 minutes. Beyond 120 minutes, incremental quality is small while build cost keeps rising linearly.",
     methodology: [
       "Quality is modeled as base × log-linear adjustment relative to a 120-minute reference point (the genagents interview length). The log functional form reflects diminishing marginal returns on additional interview time. This is a modeling assumption; the actual sensitivity has not been directly measured for this construction approach.",
       "Interview duration drives build cost linearly (voice ops at $0.027/min per participant). At 120 min vs. 90 min: $0.027 × 30 min = $0.81/participant, or $1,620 saved on a 2,000-person library. At 120 vs. 60 min: $3,240 saved. These are modest but real trade-offs.",
-      "Under default attitude/belief settings, the quality threshold is typically cleared well before 90 minutes. The threshold crossover depends on construct type, memory architecture, and benchmark mode. Under federal settings, longer interviews provide more buffer above the stricter threshold.",
+      "Under default settings (mixed general survey), the quality threshold is typically cleared well before 90 minutes. The threshold crossover depends on study type, memory architecture, and benchmark mode. Under federal settings, longer interviews provide more buffer above the stricter threshold.",
       "Extrapolating outside the 60–150 minute range carries higher uncertainty. Very short interviews (30 min) represent a significant departure from the paper anchor and should be treated as speculative.",
     ],
     citations: [
@@ -173,11 +173,11 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
   const baseStats = useMemo(() => {
     const cfg = createDefaultConfig();
     const tiers = qualityTiers(cfg);
-    const threshold = recommendedQualityThreshold(cfg, 'attitude_belief');
+    const threshold = recommendedQualityThreshold(cfg, 'mixed_general');
     const deploymentCosts = computeCosts({ ...cfg, mode: 'scaleup' });
     let minViableMinutes = 0;
     for (let m = 30; m <= 180; m += 5) {
-      if (qualityScore(cfg, 'attitude_belief', m) >= threshold) {
+      if (qualityScore(cfg, 'mixed_general', m) >= threshold) {
         minViableMinutes = m;
         break;
       }
@@ -188,8 +188,8 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     const grossMargin = (pricePerProject - perProjectRunCost) / pricePerProject;
 
     return {
-      attitudeQuality: tiers.attitude_belief,
-      behaviorQuality: tiers.self_report_behavior,
+      attitudeQuality: tiers.mixed_general,
+      behaviorQuality: tiers.behavioral_recall,
       incentivizedQuality: tiers.incentivized_behavior,
       threshold,
       libraryBuildCost: deploymentCosts.total_cost,
@@ -331,12 +331,12 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          120-minute AI voice interviews, attitude/belief construct. The library build (2,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario.
+          120-minute AI voice interviews, mixed general survey (attitudes, opinions, and behavioral recall combined). The library build (2,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
             <div className="landing-kpi-value">{baseStats.attitudeQuality.toFixed(2)}</div>
-            <div className="landing-kpi-label">Attitude fidelity score</div>
+            <div className="landing-kpi-label">Fidelity score (mixed general survey)</div>
           </div>
           <div className="landing-kpi">
             <div className="landing-kpi-value">${Math.round(baseStats.libraryBuildCost / 1000)}k</div>

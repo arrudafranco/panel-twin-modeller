@@ -34,12 +34,7 @@ export interface CostParams {
   transcript_cleaning_cost_per_participant: number;
   summarization_cost: number;
   storage_security_compliance_cost_per_participant: number;
-  protocol_design_hours: number;
-  engineering_hours: number;
-  qa_hours: number;
-  pm_hours: number;
-  irb_compliance_hours: number;
-  fully_loaded_hourly_rate: number;
+  total_labor_cost: number;
   overhead_rate: number;
   retest_reschedule_fraction: number;
   rescheduling_cost_per_event: number;
@@ -66,7 +61,7 @@ export interface QualityParams {
   open_ended_mode_reliability: number;
   quality_threshold: number;
   fatigue_decay_per_contact: number;
-  self_report_behavior_base: number;
+  behavioral_recall_base: number;
   use_benchmark_thresholds: boolean;
   benchmark_min_threshold: number;
   benchmark_max_threshold: number;
@@ -183,12 +178,7 @@ export const DEFAULT_COST: CostParams = {
   transcript_cleaning_cost_per_participant: 5.0,
   summarization_cost: 2.0,
   storage_security_compliance_cost_per_participant: 8.0,
-  protocol_design_hours: 20.0,
-  engineering_hours: 60.0,
-  qa_hours: 30.0,
-  pm_hours: 25.0,
-  irb_compliance_hours: 18.0,
-  fully_loaded_hourly_rate: 120.0,
+  total_labor_cost: 18000,
   overhead_rate: 0.12,
   retest_reschedule_fraction: 0.0,
   rescheduling_cost_per_event: 0.0,
@@ -215,7 +205,7 @@ export const DEFAULT_QUALITY: QualityParams = {
   open_ended_mode_reliability: 0.98,
   quality_threshold: 0.75,
   fatigue_decay_per_contact: 0.03,
-  self_report_behavior_base: 0.75,
+  behavioral_recall_base: 0.80,
   use_benchmark_thresholds: true,
   benchmark_min_threshold: 0.65,
   benchmark_max_threshold: 0.9,
@@ -290,7 +280,7 @@ export function createDefaultConfig(): ScenarioConfig {
     mode: "pilot",
     interview_minutes: 120.0,
     retest_rate: 0.8,
-    quality_profile: "attitude_belief",
+    quality_profile: "mixed_general",
     memory_strategy_prediction: "full_transcript",
     cost: { ...DEFAULT_COST },
     quality: { ...DEFAULT_QUALITY },
@@ -307,16 +297,17 @@ export function createDefaultConfig(): ScenarioConfig {
  * Other constructs have progressively wider bands due to less direct evidence.
  */
 /**
- * Uncertainty bands by construct type.
- * attitude_belief: ±0.06 — most directly anchored (large GSS Core sample, Park et al. 2024;
- *   177 items including both attitudes and self-reported behaviors)
+ * Uncertainty bands by study type.
+ * mixed_general: ±0.06 — most directly anchored (GSS Core, 1,052 participants, 177 items
+ *   spanning attitudes, self-reported behaviors, and demographics; Park et al. 2024)
  * incentivized_behavior: ±0.10 — also paper-anchored (economic game experiments, Park et al. 2024)
  *   but smaller sample and structurally different task (trust game, ultimatum game)
- * self_report_behavior: ±0.12 — base score (0.75) is a conservative planning discount below the
- *   0.85 GSS Core anchor; not a separately measured result. Widest band reflects modeling uncertainty.
+ * behavioral_recall: ±0.10 — base score (0.80) is a conservative planning discount below the
+ *   0.85 GSS Core anchor; not separately measured. Reflects that episodic behavioral recall
+ *   may be less tested in the genagents context than attitude/opinion items.
  */
 export const QUALITY_UNCERTAINTY_BANDS: Record<string, number> = {
-  attitude_belief: 0.06,
+  mixed_general: 0.06,
   incentivized_behavior: 0.10,
-  self_report_behavior: 0.12,
+  behavioral_recall: 0.10,
 };

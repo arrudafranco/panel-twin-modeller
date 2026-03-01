@@ -95,6 +95,10 @@ function constructMatch(benchmarkConstruct: string, targetConstruct: string): bo
   const aliases: Record<string, Set<string>> = {
     self_report_behavior: new Set(['self_report_health_status']),
     self_report_health_status: new Set(['self_report_behavior']),
+    // New study-type keys → old benchmark construct_type keys
+    mixed_general: new Set(['attitude_belief']),
+    behavioral_recall: new Set(['self_report_behavior', 'self_report_health_status']),
+    attitude_belief: new Set(['mixed_general']),
   };
   return aliases[targetConstruct]?.has(benchmarkConstruct) ?? false;
 }

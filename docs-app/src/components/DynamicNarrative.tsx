@@ -7,9 +7,9 @@ interface Props {
 }
 
 const CONSTRUCT_LABELS: Record<string, string> = {
-  attitude_belief: 'attitudes and beliefs',
-  self_report_behavior: 'self-reported behaviors',
-  incentivized_behavior: 'incentivized behaviors',
+  mixed_general: 'mixed general survey items (attitudes and behavioral recall)',
+  behavioral_recall: 'behavioral recall items',
+  incentivized_behavior: 'incentivized / economic experiments',
 };
 
 export function DynamicNarrative({ cfg, results }: Props) {
