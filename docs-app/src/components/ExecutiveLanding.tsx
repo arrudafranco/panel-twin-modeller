@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { createDefaultConfig, qualityScore, qualityTiers, computeCosts, computeFinance, recommendedQualityThreshold, qualityMarketAdjustment } from '../model/index.ts';
+import { createDefaultConfig, qualityScore, qualityTiers, computeCosts, recommendedQualityThreshold } from '../model/index.ts';
+import { Tooltip } from './ui/Tooltip.tsx';
 
 interface InsightDef {
   title: string;
@@ -178,9 +179,6 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     const threshold = recommendedQualityThreshold(cfg, 'attitude_belief');
     const costs = computeCosts(cfg);
     const deploymentCosts = computeCosts({ ...cfg, mode: 'scaleup' });
-    const qualEval = qualityMarketAdjustment(tiers.attitude_belief, threshold);
-    const finance = computeFinance(cfg, deploymentCosts.total_cost, qualEval.effective_quality_for_market);
-
     let minViableMinutes = 0;
     for (let m = 30; m <= 180; m += 5) {
       if (qualityScore(cfg, 'attitude_belief', m) >= threshold) {
@@ -189,6 +187,9 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       }
     }
 
+    const pricePerProject = cfg.revenue.price_per_project;
+    const grossMargin = (pricePerProject - deploymentCosts.total_cost) / pricePerProject;
+
     return {
       attitudeQuality: tiers.attitude_belief,
       behaviorQuality: tiers.self_report_behavior,
@@ -196,7 +197,8 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       threshold,
       pilotTotalCost: costs.total_cost,
       deploymentTotalCost: deploymentCosts.total_cost,
-      winProb: finance.win_probability,
+      pricePerProject,
+      grossMargin,
       minViableMinutes,
     };
   }, []);
@@ -330,7 +332,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          120-minute AI voice interviews, attitude/belief construct. Pilot study: 100 participants for validation. Deployment study: {(2000).toLocaleString()} participants at commercial scale.
+          120-minute AI voice interviews, attitude/belief construct, 100-person validation study and 2,000-person commercial deployment at default settings.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
@@ -339,15 +341,22 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           </div>
           <div className="landing-kpi">
             <div className="landing-kpi-value">${Math.round(baseStats.pilotTotalCost / 1000)}k</div>
-            <div className="landing-kpi-label">Pilot study cost</div>
+            <div className="landing-kpi-label">Validation study cost</div>
           </div>
           <div className="landing-kpi">
             <div className="landing-kpi-value">${Math.round(baseStats.deploymentTotalCost / 1000)}k</div>
             <div className="landing-kpi-label">Deployment study cost</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">{(baseStats.winProb * 100).toFixed(1)}%</div>
-            <div className="landing-kpi-label">Win probability</div>
+            <div className={`landing-kpi-value${baseStats.grossMargin < 0 ? ' landing-kpi-negative' : ''}`}>
+              {(baseStats.grossMargin * 100).toFixed(0)}%
+            </div>
+            <div className="landing-kpi-label">
+              Gross margin at scale{' '}
+              <Tooltip content={`(Price − deployment study cost) / price. At default settings: $${Math.round(baseStats.pricePerProject / 1000)}k price vs. $${Math.round(baseStats.deploymentTotalCost / 1000)}k cost for 2,000 participants. Adjust price or study size in the explorer to find a viable combination.`}>
+                <span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </section>

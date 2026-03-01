@@ -46,30 +46,48 @@ export function ScenarioControls({
       </fieldset>
 
       <fieldset className="control-group">
-        <legend>Interview and panel</legend>
+        <legend>
+          Study design{' '}
+          <Tooltip content="Interview duration affects both quality (logarithmically) and per-participant AI and voice costs. Study sizes set the scale for each phase: validation (Cost tab) and commercial deployment (Economics tab). All other parameters — response rate, incentives, labor hours — apply at both scales.">
+            <span className="info-icon" aria-hidden="true">i</span>
+          </Tooltip>
+        </legend>
         <Slider
           label="Interview duration (minutes)"
           value={cfg.interview_minutes}
           min={30} max={180} step={5}
           onChange={(v) => update('interview_minutes', v)}
-          tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration."
+          tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration and directly drives voice and LLM costs."
         />
         <Slider
-          label="Pilot sample size"
+          label="Validation study size"
           value={cfg.sampling.pilot_n}
           min={50} max={500} step={10}
           onChange={(v) => {
             update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, pilot_n: v } as never);
           }}
-          tooltip="Number of participants per study. Drives the total study cost shown in the Cost tab, which in turn is used as cost-per-project in the Economics tab. Increase this to model the economics of larger commercial deployments."
+          tooltip="Number of participants in the initial validation study. Drives the total cost shown in the Cost tab. Typically 50–200 for an internal feasibility pilot."
         />
+        <Slider
+          label="Commercial study size"
+          value={cfg.sampling.scaleup_n}
+          min={200} max={5000} step={100}
+          onChange={(v) => {
+            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
+          }}
+          tooltip="Number of participants per commercial deployment study. Drives the cost-per-project used in the Economics tab NPV and gross margin calculations. A nationally representative U.S. sample typically requires at least 2,000 completed interviews. Set lower for subpopulation or regional studies."
+        />
+      </fieldset>
+
+      <fieldset className="control-group">
+        <legend>Field operations</legend>
         <Slider
           label="Response rate"
           value={cfg.cost.response_rate}
           min={0.05} max={0.9} step={0.01}
           onChange={(v) => updateCost('response_rate', Number(v.toFixed(2)))}
           format={pct}
-          tooltip="Fraction of invited panel members who complete the interview. For a 2-hour AI voice study via an established probability panel, 15–30% is a reasonable range. Determines how many panel slots to reserve, but does not drive per-invite outreach cost when sampling from an established panel."
+          tooltip="Fraction of invited panel members who complete the interview. For a 2-hour AI voice study via an established probability panel, 15–30% is a reasonable range. Determines how many panel slots to reserve."
         />
         <Slider
           label="Retest attrition"
@@ -77,7 +95,7 @@ export function ScenarioControls({
           min={0} max={0.6} step={0.01}
           onChange={(v) => updateCost('attrition_rate', Number(v.toFixed(2)))}
           format={pct}
-          tooltip="Fraction of completed participants lost before the retest wave. High attrition weakens the quality estimate grounding."
+          tooltip="Fraction of completed participants lost before the retest wave. High attrition weakens the quality estimate grounding and reduces the number of retained agents."
         />
       </fieldset>
 
@@ -89,30 +107,21 @@ export function ScenarioControls({
           min={50000} max={500000} step={5000}
           onChange={(v) => updateRevenue('price_per_project', v)}
           format={money}
-          tooltip="Revenue per project. Represents the full-service price for data collection, agent construction, and basic deliverables (weighted dataset and crosstabs). Does not include custom analysis or reporting. Combined with cost per project this determines the gross margin."
-        />
-        <Slider
-          label="Deployment study size"
-          value={cfg.sampling.scaleup_n}
-          min={200} max={5000} step={100}
-          onChange={(v) => {
-            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
-          }}
-          tooltip="Number of participants per commercial deployment study. This drives the cost-per-project used in the Feasibility tab NPV and break-even calculations. Keep the pilot sample size small for validation; set this to your expected commercial scale (typically 500–2,000)."
+          tooltip="Revenue per project. Covers full-service delivery: data collection, agent construction, representativeness weighting, and a weighted dataset with crosstabs. Does not include custom analysis or reporting. Combined with commercial study cost this determines gross margin."
         />
         <Slider
           label="Projects per year"
           value={cfg.revenue.projects_per_year}
           min={1} max={30} step={1}
           onChange={(v) => updateRevenue('projects_per_year', v)}
-          tooltip="Expected number of projects per year. Drives the total revenue projection in the NPV model."
+          tooltip="Expected number of projects per year. Drives total revenue in the NPV model."
         />
         <Slider
           label="Time horizon (months)"
           value={cfg.revenue.horizon_months}
           min={6} max={120} step={3}
           onChange={(v) => updateRevenue('horizon_months', v)}
-          tooltip="How far forward the commercial deployment NPV model projects. Longer horizons increase uncertainty. 36 months is the default."
+          tooltip="How far forward the NPV model projects. 36 months is the default. Longer horizons increase uncertainty."
         />
         <div className="control-group-row">
           <label className="select-field">
@@ -139,7 +148,7 @@ export function ScenarioControls({
         <fieldset className="control-group">
           <legend>
             Participant costs{' '}
-            <Tooltip content="Direct per-participant cost parameters. These have a large impact on the total pilot cost.">
+            <Tooltip content="This model assumes the panel provides participant access at no per-invite cost, while incentives are paid directly by the project operator. This is the correct structure for non-standard protocols (2-hour AI voice interviews) where probability panels do not bundle incentives into a flat per-complete rate, unlike standard omnibus surveys.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
@@ -157,7 +166,7 @@ export function ScenarioControls({
             min={5} max={100} step={5}
             onChange={(v) => updateCost('base_incentive_phase2', v)}
             format={money}
-            tooltip="Incentive for the retest wave. Usually lower than phase 1 since the session is shorter."
+            tooltip="Incentive for the retest wave. Usually lower than Phase 1 since the session is shorter."
           />
           <Slider
             label="Cost per invite"
@@ -165,14 +174,14 @@ export function ScenarioControls({
             min={0} max={10} step={0.25}
             onChange={(v) => updateCost('cost_per_invite', Number(v.toFixed(2)))}
             format={money}
-            tooltip="Per-invite outreach cost. For an established probability panel, this is $0 — panel members are already recruited and survey invitations are part of ongoing panel operations. Only non-zero if using external recruitment lists or cold outreach."
+            tooltip="Per-invite outreach cost. For an established probability panel this is $0 — invitations are part of ongoing panel operations. Set above $0 only when using external lists or cold outreach."
           />
         </fieldset>
 
         <fieldset className="control-group">
           <legend>
-            Labor and overhead{' '}
-            <Tooltip content="Protocol design, engineering, QA, PM, and IRB compliance hours are one-time setup costs for the pilot. The hourly rate is fully loaded (benefits, facilities).">
+            Setup and labor{' '}
+            <Tooltip content="Fixed setup costs applied once per study at any scale. Hourly rate is fully loaded (salary, benefits, facilities). All five labor categories are used in the cost model.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
@@ -183,6 +192,13 @@ export function ScenarioControls({
             onChange={(v) => updateCost('fully_loaded_hourly_rate', v)}
             format={money}
             tooltip="Fully loaded cost per staff hour (salary + benefits + facilities). Applied to all labor hour estimates."
+          />
+          <Slider
+            label="Protocol design hours"
+            value={cfg.cost.protocol_design_hours}
+            min={5} max={80} step={5}
+            onChange={(v) => updateCost('protocol_design_hours', v)}
+            tooltip="Hours for designing the interview guide, construct specification, and codebook."
           />
           <Slider
             label="Engineering hours"
@@ -199,11 +215,18 @@ export function ScenarioControls({
             tooltip="Hours for quality assurance, agent output review, and reliability testing."
           />
           <Slider
-            label="Protocol design hours"
-            value={cfg.cost.protocol_design_hours}
-            min={5} max={80} step={5}
-            onChange={(v) => updateCost('protocol_design_hours', v)}
-            tooltip="Hours for designing the interview guide, construct specification, and codebook."
+            label="PM hours"
+            value={cfg.cost.pm_hours}
+            min={5} max={100} step={5}
+            onChange={(v) => updateCost('pm_hours', v)}
+            tooltip="Project management hours covering coordination, client communication, scheduling, and delivery oversight."
+          />
+          <Slider
+            label="IRB compliance hours"
+            value={cfg.cost.irb_compliance_hours}
+            min={5} max={60} step={5}
+            onChange={(v) => updateCost('irb_compliance_hours', v)}
+            tooltip="Hours for IRB submission, consent form preparation, protocol review, and regulatory compliance documentation."
           />
           <Slider
             label="Overhead rate"
@@ -212,6 +235,14 @@ export function ScenarioControls({
             onChange={(v) => updateCost('overhead_rate', Number(v.toFixed(2)))}
             format={pct}
             tooltip="Percentage of direct costs added as organizational overhead (facilities, admin, indirect costs)."
+          />
+          <Slider
+            label="Other upfront investment"
+            value={cfg.revenue.other_initial_investment}
+            min={0} max={1000000} step={5000}
+            onChange={(v) => updateRevenue('other_initial_investment', v)}
+            format={money}
+            tooltip="Additional upfront costs beyond per-study setup (e.g., infrastructure build, legal review, partnership setup). Added to the total investment in NPV and break-even calculations."
           />
         </fieldset>
 
@@ -222,7 +253,7 @@ export function ScenarioControls({
             value={cfg.quality.memory_retrieval_k}
             min={1} max={20} step={1}
             onChange={(v) => updateQuality('memory_retrieval_k', v)}
-            tooltip="Number of memory items the agent retrieves per query. More items provide richer context but may increase token costs."
+            tooltip="Number of memory items the agent retrieves per query. More items provide richer context but increase token costs."
           />
           <Slider
             label="Recency weight"
@@ -283,32 +314,6 @@ export function ScenarioControls({
         </fieldset>
 
         <fieldset className="control-group">
-          <legend>Operations</legend>
-          <Slider
-            label="Contact attempts"
-            value={cfg.cost.contact_attempts}
-            min={1} max={6} step={1}
-            onChange={(v) => updateCost('contact_attempts', v)}
-            tooltip="Number of contact attempts per invitee (initial invitation plus reminders). For an established probability panel, 1–2 is typical (one invitation plus one reminder). Affects response rate modeling but not cost when per-invite cost is $0."
-          />
-          <Slider
-            label="Other upfront investment"
-            value={cfg.revenue.other_initial_investment}
-            min={0} max={1000000} step={5000}
-            onChange={(v) => updateRevenue('other_initial_investment', v)}
-            format={money}
-            tooltip="Additional upfront costs beyond CAC (e.g., infrastructure, legal, partnerships). Added to the break-even denominator."
-          />
-          <Slider
-            label="Cross-price elasticity"
-            value={cfg.competition.cross_price_elasticity}
-            min={0} max={1} step={0.01}
-            onChange={(v) => updateCompetition('cross_price_elasticity', Number(v.toFixed(2)))}
-            tooltip="How much demand shifts between competitors when prices change. Higher = more price-sensitive market."
-          />
-        </fieldset>
-
-        <fieldset className="control-group">
           <legend>
             Market benchmarks{' '}
             <Tooltip content="Stylized defaults for alternative-approach pricing, quality, and turnaround. All prices represent full-service project scope at equivalent deliverables: data collection or generation, representativeness adjustments, and a weighted dataset. Custom analysis and reporting are not included in any of the four prices. Adjust to reflect your actual landscape.">
@@ -359,6 +364,13 @@ export function ScenarioControls({
             min={0.4} max={1.0} step={0.01}
             onChange={(v) => updateCompetition('external_synthetic_quality', Number(v.toFixed(2)))}
             tooltip="Estimated representational quality for fully synthetic data (profiles generated from aggregate sources without individual human interviews). Default 0.72 reflects reasonable population-level accuracy but no person-level anchoring — unlike Panel Twin, fully synthetic agents cannot be validated against their source participants."
+          />
+          <Slider
+            label="Cross-price elasticity"
+            value={cfg.competition.cross_price_elasticity}
+            min={0} max={1} step={0.01}
+            onChange={(v) => updateCompetition('cross_price_elasticity', Number(v.toFixed(2)))}
+            tooltip="How much demand shifts between alternatives when prices change. Higher values indicate a more price-sensitive market. Used in the market share model alongside quality and brand utility."
           />
         </fieldset>
       </details>
