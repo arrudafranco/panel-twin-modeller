@@ -16,6 +16,8 @@ export function CostTab({ cfg, results }: Props) {
   const [view, setView] = useState<CostView>('pilot');
   const costs = view === 'pilot' ? results.costs : results.deploymentCosts;
   const isLibrary = view === 'library';
+  const otherUpfront = isLibrary ? cfg.revenue.other_initial_investment : 0;
+  const grandTotal = costs.total_cost + otherUpfront;
 
   const toggleStyle = (active: boolean): React.CSSProperties => ({
     padding: '5px 14px',
@@ -50,7 +52,7 @@ export function CostTab({ cfg, results }: Props) {
       </div>
       <p>
         {isLibrary
-          ? `Cost estimates cover the one-time library build: AI-conducted interviews with all ${results.deploymentCosts.n_target} participants who make up the synthetic twin library. Staff and overhead costs are the same as the pilot since they represent per-project coordination.`
+          ? `Cost estimates cover the full one-time library build: AI-conducted interviews with all ${results.deploymentCosts.n_target} participants, plus any other upfront investment (infrastructure, legal, partnership setup) set in Advanced. This is the total you need to recover before breaking even.`
           : `Cost estimates cover the per-study variable costs of the validation pilot: participant incentives, AI voice infrastructure (ASR/TTS), LLM token costs, post-processing, professional labor, and organizational overhead.`
         }
       </p>
@@ -78,9 +80,10 @@ export function CostTab({ cfg, results }: Props) {
 
       <CostWaterfallChart
         costs={costs}
+        otherUpfront={otherUpfront > 0 ? otherUpfront : undefined}
         subtitle={
           isLibrary
-            ? 'Library build cost components (one-time investment). Adjust participant costs and build costs in Advanced settings.'
+            ? 'Library build cost components (one-time total investment). Adjust participant costs and other upfront investment in Advanced settings.'
             : 'Pilot cost components. Adjust incentives, labor rate, and overhead in the Advanced settings sidebar.'
         }
       />
@@ -98,9 +101,12 @@ export function CostTab({ cfg, results }: Props) {
           <tr><th>Post-processing</th><td>{money(costs.postproc_cost)}</td></tr>
           <tr><th>Staff cost</th><td>{money(costs.labor_cost)}</td></tr>
           <tr><th>Indirect / overhead ({(cfg.cost.overhead_rate * 100).toFixed(0)}%, on non-labor)</th><td>{money(costs.overhead_cost)}</td></tr>
+          {isLibrary && otherUpfront > 0 && (
+            <tr><th>Other upfront investment</th><td>{money(otherUpfront)}</td></tr>
+          )}
           <tr className="total-row">
             <th>{isLibrary ? 'Total library build cost' : 'Total pilot cost'}</th>
-            <td><strong>{money(costs.total_cost)}</strong></td>
+            <td><strong>{money(grandTotal)}</strong></td>
           </tr>
           <tr><th>Cost per completed interview</th><td>{money(costs.cost_per_completed_interview)}</td></tr>
           <tr><th>Cost per retained agent</th><td>{money(costs.cost_per_retained_agent)}</td></tr>
