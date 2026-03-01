@@ -21,7 +21,7 @@ export function QualityTab({ cfg, results }: Props) {
     <section id="panel-quality" role="tabpanel" aria-labelledby="tab-quality">
       <h2>Agent fidelity estimates</h2>
       <p>
-        These scores estimate <strong>agent-human response fidelity</strong> — how
+        These scores estimate <strong>agent-human response fidelity</strong>, meaning how
         consistently an AI agent's answers match what the source participant would
         actually say. This is meaningfully different from survey reliability in the
         traditional sense. Reliability describes how consistently a human answers
@@ -37,8 +37,8 @@ export function QualityTab({ cfg, results }: Props) {
         consistent with themselves, expecting perfect agent-human agreement is an
         unfair standard. The right question is whether agents track their source
         participants about as well as those participants track themselves. At 0.85,
-        the Park et al. agents cleared that bar for GSS attitude items with
-        2-hour GPT-4 interviews.
+        the Park et al. agents cleared that bar across the full GSS Core (177 items
+        spanning attitudes, self-reported behaviors, and demographics) with 2-hour GPT-4 interviews.
       </p>
 
       <QualityCurveChart cfg={cfg} threshold={threshold} />
@@ -79,7 +79,7 @@ export function QualityTab({ cfg, results }: Props) {
         <h4>What the paper actually measured</h4>
         <p>
           Park et al. (2024, arXiv:2411.10109) evaluated agent fidelity against the
-          full <strong>GSS Core</strong> — 177 categorical items spanning attitudes,
+          full <strong>GSS Core</strong>, covering 177 categorical items spanning attitudes,
           self-reported behaviors (church attendance, voting, gun ownership, work status,
           and others), opinions, and demographics. The 0.85 normalized accuracy is an
           average across all of these, not specifically for attitude items. The paper's
@@ -95,8 +95,8 @@ export function QualityTab({ cfg, results }: Props) {
           two are directly paper-anchored. Attitudes and beliefs at 0.85 (large GSS
           Core sample, 1,052 participants). Incentivized behaviors at 0.66 (economic
           game experiments, smaller sample, different task structure). Self-reported
-          behaviors at 0.75 is a modeling convention — interpolated between the two
-          anchors — not a separate empirical measurement. The paper does not report
+          behaviors at 0.75 is a modeling convention, interpolated between the two
+          anchors, and not a separate empirical measurement. The paper does not report
           separate accuracy figures for behavioral vs. attitudinal GSS items.
         </p>
 
@@ -143,7 +143,7 @@ export function QualityTab({ cfg, results }: Props) {
         </p>
 
         <p style={{ opacity: 0.55, fontSize: '0.82em', marginTop: 12 }}>
-          Model defaults last updated February 2026. The evidence base for digital panel
+          Model defaults last updated March 2026. The evidence base for digital panel
           twin approaches is evolving quickly. Anchors, penalties, and uncertainty bands
           should be revisited as new published results become available.
         </p>

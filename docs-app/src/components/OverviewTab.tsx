@@ -24,12 +24,12 @@ export function OverviewTab({ cfg, results }: Props) {
           label="Fidelity score"
           value={quality.toFixed(3)}
           status={qualityEval.quality_pass ? 'positive' : 'negative'}
-          detail={`Threshold: ${threshold.toFixed(3)}`}
+          detail={`Agent-participant match rate. Threshold: ${threshold.toFixed(3)}`}
         />
         <Kpi
           label="Cost per interview"
           value={money(costs.cost_per_completed_interview)}
-          detail={`Total: ${money(costs.total_cost)}`}
+          detail={`Total pilot build: ${money(costs.total_cost)}`}
         />
         <Kpi
           label="Win probability"

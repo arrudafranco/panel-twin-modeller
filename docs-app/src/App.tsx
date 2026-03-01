@@ -33,8 +33,14 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="app-header-inner">
-          <h1 className="app-title" onClick={() => setView('landing')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setView('landing')}>
-            Panel Twin Modeller
+          <h1 className="app-title">
+            <button
+              className="app-title-btn"
+              onClick={() => setView('landing')}
+              aria-label="Return to landing page"
+            >
+              Panel Twin Modeller
+            </button>
           </h1>
           <span className="app-subtitle">Interactive feasibility explorer</span>
         </div>

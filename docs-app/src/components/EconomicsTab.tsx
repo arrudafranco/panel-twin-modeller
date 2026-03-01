@@ -42,7 +42,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
           <span className="info-icon" aria-hidden="true">i</span>
         </Tooltip>
         {' '}illustrative scenario coefficients — treat them as directional planning signals.{' '}
-        <span style={{ opacity: 0.55, fontSize: '0.88em' }}>Defaults: February 2026.</span>
+        <span style={{ opacity: 0.55, fontSize: '0.88em' }}>Defaults: March 2026.</span>
       </p>
 
       <NpvTimelineChart finance={finance} />

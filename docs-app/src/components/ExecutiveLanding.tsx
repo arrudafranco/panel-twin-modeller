@@ -16,7 +16,7 @@ const INSIGHTS: InsightDef[] = [
     summary: "At 2,000 participants, incentives alone total $178K out of a ~$277K library build. LLM inference for those same 2,000 interviews costs roughly $220. The binding constraint is human compensation, not technology.",
     methodology: [
       "Incentive structure: $60 Phase 1 interview + ($30 × 0.8 retest rate) Phase 2 + $5 bonus = $89 per participant. At 2,000 participants: $178,000 — roughly 64% of the total library build cost.",
-      "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (ASR + TTS at $0.027/min × 120 min) add $6,480. Setup labor (153 hours at $120/hr) adds $18,360.",
+      "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (automatic speech recognition and text-to-speech, at $0.027/min × 120 min) add $6,480. Setup labor (153 hours at $120/hr) adds $18,360.",
       "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 2,000 agents costs roughly $300–500. At loaded labor rates for QA, PM, and data delivery, total run cost is estimated at $20,000–30,000 — about 7–11% of the library build cost.",
       "Implication: the technology cost curve is not the binding constraint. LLM price changes have minimal impact on the investment case. Response rate and incentive levels have major impact. Scale decisions (how many participants) are primarily a human cost question.",
     ],
@@ -396,8 +396,8 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           Adjust parameters and see how quality, cost, and economics respond in real time.
         </p>
         <p className="cta-note" style={{ marginTop: 12, opacity: 0.6, fontSize: 11 }}>
-          Model defaults last updated February 2026. LLM pricing, ASR rates, and market conditions
-          change rapidly. Review Advanced settings against current figures before drawing conclusions.
+          Model defaults last updated March 2026. LLM (large language model) and ASR (speech recognition)
+          pricing change rapidly, as do market conditions. Review Advanced settings against current figures before drawing conclusions.
         </p>
       </section>
     </div>
