@@ -125,7 +125,7 @@ export function ScenarioControls({
           min={5000} max={100000} step={1000}
           onChange={(v) => updateRevenue('per_project_run_cost', v)}
           format={money}
-          tooltip="Marginal cost of running one survey project against the existing library. Covers LLM inference, per-project QA, PM, and data delivery. No new interviews or participant incentives — those are part of the library build. Typically $20,000–$30,000 per project."
+          tooltip="Marginal cost of running one survey project against the existing library. Covers LLM inference, per-project QA, PM, and data delivery. No new interviews or participant incentives — those are part of the library build."
         />
         <Slider
           label="Projects per year"
@@ -140,6 +140,14 @@ export function ScenarioControls({
           min={6} max={120} step={3}
           onChange={(v) => updateRevenue('horizon_months', v)}
           tooltip="How far forward the NPV model projects. 36 months is the default. Longer horizons increase uncertainty."
+        />
+        <Slider
+          label="Customer acquisition cost"
+          value={cfg.revenue.cac}
+          min={0} max={100000} step={1000}
+          onChange={(v) => updateRevenue('cac', v)}
+          format={money}
+          tooltip="One-time cost to acquire the initial client base before the library is operational — marketing, sales, partnership setup, and business development. Added to the library build cost in the total upfront investment used for NPV and break-even calculations."
         />
         <div className="control-group-row">
           <label className="select-field">
@@ -166,10 +174,18 @@ export function ScenarioControls({
         <fieldset className="control-group">
           <legend>
             Per-interview costs{' '}
-            <Tooltip content="Costs incurred per participant interviewed. These apply at both the validation pilot and the library build — the total scales with the number of participants in each. For non-standard 2-hour AI voice protocols, probability panels typically do not bundle incentives into a flat per-complete rate, so incentives are paid separately by the project operator.">
+            <Tooltip content="Costs incurred per participant interviewed. These apply at both the validation pilot and the library build — the total scales with the number of participants in each. For non-standard 2-hour AI voice protocols, probability panels typically do not bundle incentives into a flat per-complete rate, so incentives are paid separately by the project operator. Other fixed per-participant assumptions not shown here: $5 bonus expected value, $5 transcript cleaning, $2 summarization, $8 storage and compliance — totaling $20 per participant in addition to incentives.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
+          <Slider
+            label="Retest rate"
+            value={cfg.retest_rate}
+            min={0} max={1} step={0.05}
+            onChange={(v) => update('retest_rate', Number(v.toFixed(2)))}
+            format={pct}
+            tooltip="Fraction of initial interview participants who complete the retest wave. The retest validates agent fidelity by re-administering survey items to human participants and comparing their responses to the agents. At 80% (default), 800 of 1,000 library build participants complete the retest, each receiving the retest incentive. Lower retest rates reduce cost but weaken fidelity validation."
+          />
           <Slider
             label="Interview incentive"
             value={cfg.cost.base_incentive_phase1}
@@ -199,17 +215,25 @@ export function ScenarioControls({
         <fieldset className="control-group">
           <legend>
             Staff and overhead{' '}
-            <Tooltip content="Staff cost and overhead apply to each study run — both the validation pilot (visible in the Cost tab) and the library build (visible in the Economics tab). They are flat per-study costs, not per-participant. The two ad-hoc cost fields below are separate catch-all buckets: pilot ad-hoc costs appear only in the Cost tab pilot view; library build ad-hoc costs appear in the Cost tab library view and are also added to the total upfront investment in the Economics tab NPV model.">
+            <Tooltip content="Staff costs are set separately for the validation pilot and the library build, since each represents a different scope of work. Both are flat lump-sum amounts, not per-participant. The overhead rate applies to non-labor direct costs in both phases. The two ad-hoc cost fields below are separate catch-all buckets: pilot ad-hoc costs appear only in the Cost tab pilot view; library build ad-hoc costs appear in the Cost tab library view and are added to total upfront investment in the Economics tab NPV model.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
           <Slider
-            label="Total staff cost"
-            value={cfg.cost.total_labor_cost}
-            min={0} max={150000} step={1000}
-            onChange={(v) => updateCost('total_labor_cost', v)}
+            label="Staff cost (pilot)"
+            value={cfg.cost.pilot_labor_cost}
+            min={0} max={80000} step={500}
+            onChange={(v) => updateCost('pilot_labor_cost', v)}
             format={money}
-            tooltip="Your total estimated staff cost for the study — PM, protocol design, engineering, QA, and IRB compliance combined. Applied per study run (both pilot and library build). Enter as a lump dollar amount at your organization's rates."
+            tooltip="Your total estimated staff cost for the validation pilot — PM, protocol design, engineering, QA, and any ethics or compliance review. Covers the small validation run only, not the full library build. A flat lump sum at your organization's blended rates."
+          />
+          <Slider
+            label="Staff cost (library build)"
+            value={cfg.cost.library_labor_cost}
+            min={0} max={200000} step={1000}
+            onChange={(v) => updateCost('library_labor_cost', v)}
+            format={money}
+            tooltip="Your total estimated staff cost for the full library build — typically 3–4× the pilot figure, reflecting a larger participant count plus additional engineering, data pipeline, and compliance work for production deployment. A flat lump sum at your organization's blended rates."
           />
           <Slider
             label="Indirect / overhead rate"
@@ -234,6 +258,39 @@ export function ScenarioControls({
             onChange={(v) => updateRevenue('other_initial_investment', v)}
             format={money}
             tooltip="Any ad-hoc costs specific to the library build phase that do not fit the other categories — e.g., infrastructure setup, legal review, partnership agreements. Shown in the library build view of the Cost tab and added to total upfront investment in the Economics tab NPV model."
+          />
+        </fieldset>
+
+        <fieldset className="control-group">
+          <legend>
+            Financial assumptions{' '}
+            <Tooltip content="These parameters control the NPV model's financial structure. Discount rate sets the hurdle — future cash flows are worth less than today's dollars at this rate, so a higher rate reduces NPV for the same projected cash flows. Growth and churn set compound annual demand trends: at defaults (8% growth, 5% churn) they roughly offset each other, keeping projected demand approximately flat. Adjust them to model optimistic or pessimistic demand trajectories.">
+              <span className="info-icon" aria-hidden="true">i</span>
+            </Tooltip>
+          </legend>
+          <Slider
+            label="Discount rate (hurdle rate)"
+            value={cfg.revenue.discount_rate}
+            min={0.04} max={0.30} step={0.01}
+            onChange={(v) => updateRevenue('discount_rate', Number(v.toFixed(2)))}
+            format={pct}
+            tooltip="Annual discount rate applied to future cash flows in the NPV calculation. Represents your cost of capital or required return threshold. At 12% (default), a dollar earned 36 months from now is worth roughly $0.70 today. Higher rates penalize longer payback periods more heavily."
+          />
+          <Slider
+            label="Annual revenue growth"
+            value={cfg.revenue.growth_rate}
+            min={0} max={0.5} step={0.01}
+            onChange={(v) => updateRevenue('growth_rate', Number(v.toFixed(2)))}
+            format={pct}
+            tooltip="Compound annual growth applied to project demand in the NPV model. At 8% (default), year-3 demand is roughly 26% higher than year-1 before churn is applied. Represents market expansion or increasing project volume over time."
+          />
+          <Slider
+            label="Annual client churn"
+            value={cfg.revenue.churn_rate}
+            min={0} max={0.4} step={0.01}
+            onChange={(v) => updateRevenue('churn_rate', Number(v.toFixed(2)))}
+            format={pct}
+            tooltip="Compound annual decay applied to project demand in the NPV model. At 5% (default), year-3 demand is roughly 14% lower than year-1 before growth is applied. At default settings, growth and churn roughly cancel, keeping demand approximately flat across the 36-month horizon."
           />
         </fieldset>
 
@@ -306,11 +363,26 @@ export function ScenarioControls({
 
         <fieldset className="control-group">
           <legend>
-            Market benchmarks{' '}
-            <Tooltip content="Stylized defaults for alternative-approach pricing, quality, and turnaround. All prices represent full-service project scope at equivalent deliverables: data collection or generation, representativeness adjustments, and a weighted dataset. Custom analysis and reporting are not included in any of the four prices. Adjust to reflect your actual landscape.">
+            Market context{' '}
+            <Tooltip content="Competitive positioning assumptions for Panel Twin and stylized defaults for alternative approaches. All benchmark prices represent full-service project scope: data collection or generation, representativeness adjustments, and a weighted dataset — custom analysis and reporting excluded. Adjust all figures to reflect your actual landscape. Fixed defaults not shown: Panel Twin turnaround 10 days, probability benchmark 18 days, hybrid 12 days, non-prob panel 3 days; market tailwind 10%.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
+          <Slider
+            label="Brand trust"
+            value={cfg.competition.brand_trust}
+            min={0} max={1} step={0.01}
+            onChange={(v) => updateCompetition('brand_trust', Number(v.toFixed(2)))}
+            tooltip="Your organization's perceived credibility on a 0–1 scale, used as a positive term in Panel Twin's utility calculation. Higher trust increases win probability. Competitors have no brand term — their prices and quality carry their full positioning. Reflect your honest assessment of how established your brand is in the research market."
+          />
+          <Slider
+            label="Cannibalization rate"
+            value={cfg.competition.cannibalization_rate}
+            min={0} max={1} step={0.01}
+            onChange={(v) => updateCompetition('cannibalization_rate', Number(v.toFixed(2)))}
+            format={pct}
+            tooltip="Fraction of Panel Twin revenue that displaces existing revenue rather than creating net-new revenue. At 30% (default), 30 cents of every dollar earned replaces existing business. The NPV model scales monthly margin by (1 − cannibalization rate). Set higher if your organization currently runs traditional panels that Panel Twin would partially replace."
+          />
           <Slider
             label="Probability benchmark price"
             value={cfg.competition.probability_benchmark_price}

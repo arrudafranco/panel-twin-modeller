@@ -34,7 +34,8 @@ export interface CostParams {
   transcript_cleaning_cost_per_participant: number;
   summarization_cost: number;
   storage_security_compliance_cost_per_participant: number;
-  total_labor_cost: number;
+  pilot_labor_cost: number;
+  library_labor_cost: number;
   overhead_rate: number;
   other_pilot_cost: number;
   retest_reschedule_fraction: number;
@@ -177,7 +178,8 @@ export const DEFAULT_COST: CostParams = {
   transcript_cleaning_cost_per_participant: 5.0,
   summarization_cost: 2.0,
   storage_security_compliance_cost_per_participant: 8.0,
-  total_labor_cost: 18000,
+  pilot_labor_cost: 15000,
+  library_labor_cost: 45000,
   overhead_rate: 0.12,
   other_pilot_cost: 0,
   retest_reschedule_fraction: 0.0,
@@ -220,7 +222,7 @@ export const DEFAULT_QUALITY: QualityParams = {
 export const DEFAULT_SAMPLING: SamplingParams = {
   recruitment_mode: "pilot",
   pilot_n: 100,
-  scaleup_n: 2000,
+  scaleup_n: 1000,
   target_strata: ["age", "gender", "race", "region", "education"],
   response_rate_by_stratum: { default: 0.22 },
   representativeness_penalty_max: 0.10,
@@ -236,11 +238,11 @@ export const DEFAULT_PRODUCT: ProductParams = {
 
 export const DEFAULT_REVENUE: RevenueParams = {
   price_per_project: 55000.0,
-  per_project_run_cost: 25000.0,
+  per_project_run_cost: 18000.0,
   projects_per_year: 15,
   growth_rate: 0.08,
   churn_rate: 0.05,
-  cac: 20000.0,
+  cac: 12000.0,
   other_initial_investment: 0.0,
   discount_rate: 0.12,
   horizon_months: 36,

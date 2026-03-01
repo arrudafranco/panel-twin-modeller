@@ -110,7 +110,7 @@ export function computeCosts(cfg: ScenarioConfig): CostResult {
       cfg.cost.storage_security_compliance_cost_per_participant
     );
 
-  const labor = cfg.cost.total_labor_cost;
+  const labor = cfg.mode === 'pilot' ? cfg.cost.pilot_labor_cost : cfg.cost.library_labor_cost;
 
   const weighting = cfg.mode === 'scaleup' ? cfg.cost.weighting_raking_cost : 0.0;
   // Overhead applies to non-labor direct costs only. Staff cost is entered as a

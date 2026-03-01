@@ -123,7 +123,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
       </table>
 
       <p style={{ opacity: 0.65, fontSize: '0.88em', marginTop: 16 }}>
-        The NPV uses a {(cfg.revenue.discount_rate * 100).toFixed(0)}% annual discount rate (fixed assumption, not configurable here).
+        Discount rate, revenue growth, and churn rate are configurable in Advanced settings.
         The useful life of an agent library before re-interviewing is needed is unknown. See the Fidelity tab for discussion of agent profile drift.
       </p>
 

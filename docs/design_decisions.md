@@ -367,7 +367,7 @@ The revenue model runs a month-by-month NPV loop over `horizon_months` (default 
 - Demand scales with `projects_per_year`, `growth_rate` (0.08/year), and `churn_rate` (0.05/year)
 - Projects sold = demand × win_probability × net_new_fraction
 - Revenue per project = `price_per_project` (base price only; removed attachment rates in v0.2.8)
-- Total upfront investment = `cac` ($20K) + `other_initial_investment` ($0 default) + library build cost
+- Total upfront investment = `cac` ($12K default) + `other_initial_investment` ($0 default) + library build cost
 - NPV uses a 12% annual discount rate (`discount_rate`)
 
 These are scenario coefficients intended to make the investment case plannable. Actual win rates depend on client relationships, proposal quality, contracting factors, and market dynamics not captured in this model.
@@ -530,12 +530,46 @@ If a change only affects wording, styling, or minor implementation detail withou
 Items that are acknowledged, not urgent, and should not be forgotten.
 
 **Python config pricing divergence (low priority)**
-Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `price_per_project: 180000` — the pre-recalibration default. The React app defaults were updated to $55,000 in v0.2.2 to reflect a realistic pricing position below traditional probability panel benchmarks. The Python configs were not updated at that time because the Python model is treated as a reference implementation and the configs are not actively used in the public-facing flow. Before relying on the Python CLI for financial projections, these values should be updated to match the React app defaults ($55,000 price, $25,000 per-project run cost, $80,000/$60,000/$5,000 competitor prices).
+Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `price_per_project: 180000` — the pre-recalibration default. The React app defaults were updated to $55,000 in v0.2.2 to reflect a realistic pricing position below traditional probability panel benchmarks. The Python configs were not updated at that time because the Python model is treated as a reference implementation and the configs are not actively used in the public-facing flow. Before relying on the Python CLI for financial projections, these values should be updated to match the React app defaults ($55,000 price, $18,000 per-project run cost, $80,000/$60,000/$5,000 competitor prices).
 
 **Federal risk penalty has no effect on win probability (acknowledged, not a bug)**
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.9 - 2026-03-01
+
+Parameter defaults recalibrated, hidden parameters exposed as sliders, tooltip accuracy fixes, and stale landing page copy corrected.
+
+**Default parameter updates**
+- `scaleup_n` default: 2,000 → 1,000. The 2,000 figure was aspirational rather than a planning baseline; 1,000 is a more defensible starting point for an initial library build.
+- `per_project_run_cost` default: $25,000 → $18,000. The $25K figure overstated loaded run costs when labor is already captured in the library build phase; $18K better reflects per-project LLM inference, QA, PM, and data delivery.
+- `cac` default: $20,000 → $12,000. Lowered to a more conservative customer acquisition estimate consistent with a commercial research services context with prior relationships.
+- Split `total_labor_cost` (single field) into `pilot_labor_cost` ($15,000 default) and `library_labor_cost` ($45,000 default). `computeCosts()` now selects between the two based on `cfg.mode`. This prevents the library build from using the pilot's labor cost — previously, both cost views used the same lump sum, which understated library build labor by approximately 3×.
+
+**Hidden parameters exposed as sliders**
+Seven parameters that materially affect NPV, break-even, or win probability were previously hidden at fixed defaults with no UI access. All seven now have sliders:
+- `cac` (Customer acquisition cost) — added to Per-project economics section
+- `retest_rate` (Fraction of participants completing the retest wave) — added to Per-interview costs (Advanced)
+- `discount_rate` (Annual hurdle rate for NPV discounting)
+- `growth_rate` (Annual compound growth in project demand)
+- `churn_rate` (Annual compound decay in project demand)
+- `brand_trust` (Panel Twin's perceived credibility, 0–1 scale)
+- `cannibalization_rate` (Fraction of Panel Twin revenue displacing existing revenue rather than net-new)
+
+The last three appear in a new "Financial assumptions" fieldset and the "Market context" section (renamed from "Market benchmarks") within Advanced settings. Fixed defaults that were intentionally not exposed — `market_tailwind`, `turnaround_days`, competitor turnaround days — are now documented in the Market context fieldset tooltip instead.
+
+**Tooltip accuracy fixes**
+- Staff cost (pilot) tooltip: removed incorrect "IRB compliance combined" label; softened to "ethics or compliance review." Removed "Enter as a lump dollar amount" instruction (redundant with slider mechanics).
+- Staff cost (library build) tooltip: removed misleading "scaled for the larger participant count" language (the field is NOT auto-scaled; users must set it independently). Added typical range note ("typically 3–4× the pilot figure").
+- Per-interview costs fieldset tooltip: added disclosure of the $20/participant in fixed costs not surfaced as sliders ($5 bonus, $5 transcript cleaning, $2 summarization, $8 storage/compliance).
+- Run cost per project tooltip: removed stale "$20,000–$30,000 range" guidance (now an exposed slider, range is visible from the control itself).
+- EconomicsTab note: replaced "fixed assumption, not configurable here" with "configurable in Advanced settings" for discount rate, growth rate, and churn rate.
+- Market context fieldset tooltip: added documentation of the turnaround-day and market-tailwind defaults not exposed as sliders.
+
+**Landing page stale copy corrected**
+- Insight 4 methodology: "2,000-person library" → "1,000-person library"; savings figures corrected ($1,620/$3,240 → $810/$1,620) to match the updated `scaleup_n` default.
+- Insight 6 methodology: "~55% variable margin" → "~67% variable margin" to match the updated `per_project_run_cost` default ($18K instead of $25K at $55K price).
 
 ### 0.2.8 - 2026-03-01
 

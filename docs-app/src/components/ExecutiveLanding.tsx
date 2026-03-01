@@ -13,31 +13,31 @@ interface InsightDef {
 const INSIGHTS: InsightDef[] = [
   {
     title: "Participant incentives dominate build cost — compute is nearly free",
-    summary: "At 2,000 participants, incentives alone total $178K out of a ~$275K library build. LLM inference for those same 2,000 interviews costs roughly $220. The binding constraint is human compensation, not technology.",
+    summary: "At 1,000 participants, incentives alone total $89K out of a ~$174K library build. LLM inference for those same 1,000 interviews costs roughly $111. The binding constraint is human compensation, not technology.",
     methodology: [
-      "Incentive structure: $60 Phase 1 interview + ($30 × 0.8 retest rate) Phase 2 + $5 bonus = $89 per participant. At 2,000 participants: $178,000 — roughly 64% of the total library build cost.",
-      "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (automatic speech recognition and text-to-speech, at $0.027/min × 120 min) add $6,480. Staff cost (lump sum, $18,000 default) adds a flat amount per study run — adjust in Advanced settings.",
-      "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 2,000 agents costs roughly $300–500. At loaded labor rates for QA, PM, and data delivery, total run cost is estimated at $20,000–30,000 — about 7–11% of the library build cost.",
+      "Incentive structure: $60 Phase 1 interview + ($30 × 0.8 retest rate) Phase 2 + $5 bonus = $89 per participant. At 1,000 participants: $89,000 — roughly 51% of the total library build cost.",
+      "LLM inference for 1,000 interviews at 117 turns each: roughly $111 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (ASR and TTS, at $0.027/min × 120 min) add $3,240. Staff cost for the library build ($45,000 default) and overhead together add ~$59K flat — adjust in Advanced settings.",
+      "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 1,000 agents costs roughly $150–250. At loaded labor rates for QA, PM, and data delivery, total run cost is estimated at $18,000 (default) — about 10% of the library build cost.",
       "Implication: the technology cost curve is not the binding constraint. LLM price changes have minimal impact on the investment case. Response rate and incentive levels have major impact. Scale decisions (how many participants) are primarily a human cost question.",
     ],
   },
   {
     title: "The cost structure transforms from linear to fixed-plus-marginal",
-    summary: "Traditional survey research charges per-study fees for every project. Panel Twin separates a one-time library build (~$275K for 2,000 participants) from a lower marginal per-project run cost (~$25K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
+    summary: "Traditional survey research charges per-study fees for every project. Panel Twin separates a one-time library build (~$174K for 1,000 participants) from a lower marginal per-project run cost (~$18K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
     methodology: [
       "Library build cost covers AI-conducted interviews, participant incentives, voice infrastructure, agent construction, setup labor, and overhead. This is a capital investment charged once (or per refresh cycle), not per project.",
-      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $25,000 per project at fully loaded labor rates.",
-      "With ~55% variable margin per project (at $55K price, $25K run cost), the break-even on the library investment depends on project volume over the library's useful life. At 6 projects/year, rough break-even is within 9–11 projects.",
+      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $18,000 per project at fully loaded labor rates.",
+      "With ~67% variable margin per project (at $55K price, $18K run cost), the break-even on the library investment depends on project volume over the library's useful life. At default volume (15 projects/year), the investment recovers after roughly 5 projects won — about 17 months.",
       "The critical open question is library useful life: how many projects can run before agent profiles go stale and re-interviewing is needed. The model cannot answer this — it is an open empirical question. The NPV projections are conditional on the library remaining valid.",
     ],
   },
   {
     title: "Project volume is the primary NPV lever — not per-project margin",
-    summary: "Gross margin per project is decent (~55%), but win probability in a four-way market is only ~37%. At 15 projects pursued per year (the default), the investment breaks even around month 30. Cut that in half and break-even moves outside the 36-month horizon — volume matters more than what you charge per project.",
+    summary: "Gross margin per project is ~67%, but win probability in a four-way market is only ~36%. At 15 projects pursued per year (the default), the investment breaks even around month 17. Reduce to fewer than 7 projects/year and break-even moves outside the 36-month horizon — volume matters more than what you charge per project.",
     methodology: [
-      "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $30,000 ($55K price minus $25K run cost). At 15 projects pursued per year, expected monthly margin is roughly $9,700 before discounting. Over 36 months cumulative margin approaches $350,000 against ~$295,000 upfront, with break-even around month 30.",
-      "A non-probability panel at $5K captures ~39% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
-      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Reducing to 8–10 projects per year moves break-even outside the 36-month horizon. Use the explorer to find the volume and pricing combination that makes the investment case work for your scenario.",
+      "Win probability ~36% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $37,000 ($55K price minus $18K run cost). At 15 projects pursued per year, expected monthly margin is roughly $11,500 before discounting. Over 36 months cumulative margin approaches $425,000 against ~$186,000 upfront, with break-even around month 17.",
+      "A non-probability panel at $5K captures ~40% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
+      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Reducing to fewer than 7 projects per year moves break-even outside the 36-month horizon. Use the explorer to find the volume and pricing combination that makes the investment case work for your scenario.",
       "These projections use stylized market utility coefficients, not historical win/loss data. Actual win rates depend on client relationships, proposal quality, pricing negotiations, and factors not captured in a logit model. Treat NPV as a directional planning signal, not a forecast.",
     ],
   },
@@ -46,7 +46,7 @@ const INSIGHTS: InsightDef[] = [
     summary: "Quality improves logarithmically with interview length — the first hour contributes more than the second. For mixed general and behavioral recall surveys, most gain over a 30-minute baseline is captured by 60–90 minutes. Beyond 120 minutes, incremental quality is small while build cost keeps rising linearly.",
     methodology: [
       "Quality is modeled as base × log-linear adjustment relative to a 120-minute reference point (the genagents interview length). The log functional form reflects diminishing marginal returns on additional interview time. This is a modeling assumption; the actual sensitivity has not been directly measured for this construction approach.",
-      "Interview duration drives build cost linearly (voice ops at $0.027/min per participant). At 120 min vs. 90 min: $0.027 × 30 min = $0.81/participant, or $1,620 saved on a 2,000-person library. At 120 vs. 60 min: $3,240 saved. These are modest but real trade-offs.",
+      "Interview duration drives build cost linearly (voice ops at $0.027/min per participant). At 120 min vs. 90 min: $0.027 × 30 min = $0.81/participant, or $810 saved on a 1,000-person library. At 120 vs. 60 min: $1,620 saved. These are modest but real trade-offs.",
       "Under default settings (mixed general survey), the quality threshold is typically cleared well before 90 minutes. The threshold crossover depends on study type, memory architecture, and benchmark mode. Under federal settings, longer interviews provide more buffer above the stricter threshold.",
       "Extrapolating outside the 60–150 minute range carries higher uncertainty. Very short interviews (30 min) represent a significant departure from the paper anchor and should be treated as speculative.",
     ],
@@ -70,9 +70,9 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "The main uncertainty is now library longevity, not project margin",
-    summary: "With ~55% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does an agent library remain valid before agents need re-interviewing? The model tracks net present value (NPV) but cannot estimate agent shelf life.",
+    summary: "With ~67% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does an agent library remain valid before agents need re-interviewing? The model tracks net present value (NPV) but cannot estimate agent shelf life.",
     methodology: [
-      "At ~55% variable margin, win probability sensitivity has a meaningful but not dominant NPV impact. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
+      "At ~67% variable margin, win probability sensitivity has a meaningful but not dominant NPV impact. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
       "Library useful life is the dominant uncertainty. As real participants' views evolve over time, agent responses gradually diverge from what those participants would currently say. The rate of this divergence — and when it crosses a meaningful threshold — has no published estimates for this construction approach.",
       "The current model does not include refresh wave revenue or operational costs, because the trigger conditions for re-interviewing are not yet estimable. The cost of a partial re-interview campaign depends on how many agents need updating and whether source participants remain reachable.",
       "Monte Carlo simulations draw uncertainty from interview duration, response rate, and attrition. Library longevity uncertainty is not included because there is no distributional basis for it yet. This means the MC output understates total uncertainty for projections beyond 12–18 months.",
@@ -337,7 +337,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          120-minute AI voice interviews, mixed general survey (attitudes, opinions, and behavioral recall combined). The library build (2,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario.
+          120-minute AI voice interviews, mixed general survey (attitudes, opinions, and behavioral recall combined). The library build (1,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
@@ -348,7 +348,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
             <div className="landing-kpi-value">${Math.round(baseStats.libraryBuildCost / 1000)}k</div>
             <div className="landing-kpi-label">
               Library build cost{' '}
-              <Tooltip content={`One-time cost to interview 2,000 participants, construct their agents, and set up infrastructure. After this investment, projects run against the existing library at much lower marginal cost.`}>
+              <Tooltip content={`One-time cost to interview 1,000 participants, construct their agents, and set up infrastructure. After this investment, projects run against the existing library at much lower marginal cost.`}>
                 <span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </div>
