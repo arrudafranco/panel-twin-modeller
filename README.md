@@ -73,6 +73,14 @@ pytest -q
 
 39 of 39 tests pass.
 
+## AI Assistance
+
+This project was developed with substantial assistance from Claude Code (Anthropic). AI contributions included code generation, refactoring, documentation drafting, test writing, and iterative debugging across the React app, TypeScript model, and Python backend.
+
+The intellectual direction of the project is the author's own. This includes the research framing, the decision to model pilot-first feasibility, the three-phase cost structure, the construct-type quality anchors and their uncertainty bands, the study-type reframing rationale, parameter calibration choices, and all design decisions documented in [docs/design_decisions.md](docs/design_decisions.md). All AI-generated code and text was reviewed and approved by the author before being committed.
+
+The underlying model draws on Park et al. (2024), *Generative Agent Simulations of 1,000 People* (Stanford HCI), and on AAPOR and federal retest reliability benchmarks. Those external sources are documented in [docs/external_reference_defaults.md](docs/external_reference_defaults.md).
+
 ## Notes
 
 - Config files are real YAML and loaded with `PyYAML`.
