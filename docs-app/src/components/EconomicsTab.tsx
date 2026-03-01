@@ -67,7 +67,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
           <tr>
             <th>
               Library build cost
-              <Tooltip content={`One-time cost to conduct AI voice interviews with ${cfg.sampling.scaleup_n.toLocaleString()} participants, construct their agents, and set up the infrastructure. Included in total upfront investment; not charged per project.`}>
+              <Tooltip content={`Variable cost to conduct AI voice interviews with ${cfg.sampling.scaleup_n.toLocaleString()} participants and construct their agents (incentives, voice ops, LLM, post-processing, staff, overhead). Any other ad-hoc costs for the library build phase (Advanced settings) are added separately in the Total upfront investment row below.`}>
                 {' '}<span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </th>

@@ -24,7 +24,7 @@ export function CostWaterfallChart({ costs, otherUpfront, subtitle }: Props) {
     ];
     const total = costs.total_cost + (otherUpfront ?? 0);
     if (otherUpfront && otherUpfront > 0) {
-      rows.push({ name: 'Other upfront', value: otherUpfront, fill: '#059669' });
+      rows.push({ name: 'Ad-hoc costs', value: otherUpfront, fill: '#059669' });
     }
     rows.push({ name: 'Total', value: total, fill: '#1F2937' });
     return rows;

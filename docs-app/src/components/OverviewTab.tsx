@@ -29,7 +29,7 @@ export function OverviewTab({ cfg, results }: Props) {
         <Kpi
           label="Cost per interview"
           value={money(costs.cost_per_completed_interview)}
-          detail={`Total pilot build: ${money(costs.total_cost)}`}
+          detail={`Total pilot build: ${money(costs.total_cost + cfg.cost.other_pilot_cost)}`}
         />
         <Kpi
           label="Win probability"

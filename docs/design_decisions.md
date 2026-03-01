@@ -470,6 +470,27 @@ In the competition model, `federal_risk_penalty` is subtracted from all utility 
 
 ## Version Updates
 
+### 0.2.6 - 2026-03-01
+
+Sidebar reorganization, Cost tab pilot/library toggle, and ad-hoc cost fields.
+
+**Sidebar reorganization**
+- Replaced the ad-hoc "Study design + Field operations + Pricing and business" grouping with four semantically coherent sections organized by cost destination: Interview design (shared per-participant parameters), Study scale (pilot size → Cost tab; library build size → Economics tab), Per-project economics (post-library revenue and cost inputs), and Advanced settings.
+- Rationale: the previous layout organized controls by parameter type. The new layout mirrors how a user thinks about the three spending events: per-participant costs at both scales, the validation pilot, the library build, and per-project runs. Each section tooltip explicitly names which output tab the parameters drive.
+- Advanced section renamed: "Build and setup costs" → "Staff and overhead". This name is more accurate because staff cost and overhead apply to every study run (both pilot and library build), whereas "build costs" implied one-time application.
+
+**Cost tab pilot/library toggle**
+- The Cost tab now has a two-button toggle switching the cost breakdown chart and detail table between the validation pilot view and the library build view. Both are computed simultaneously in `useScenario` (`costs` for pilot, `deploymentCosts` for library build) and the toggle simply selects which `CostResult` to display.
+- Previously only the pilot costs were visible in the Cost tab; the library build cost only appeared in the Economics tab as the initial investment figure.
+
+**Ad-hoc cost fields**
+- Added `other_pilot_cost` (default $0, in `CostParams`) as a free-form ad-hoc cost bucket for the validation pilot — for costs that do not fit any existing category (unexpected IRB fees, software licenses, travel). Handled entirely in the UI: `CostTab` adds it to the displayed total and the `CostWaterfallChart`; it does not enter `computeCosts()` or the NPV model.
+- `other_initial_investment` (already existed in `RevenueParams`) now also appears in the Cost tab library build view as "Ad-hoc costs (library build)". Previously it was invisible in the Cost tab and only appeared in the Economics tab NPV model. The Cost tab now correctly shows the full picture of what the library build will cost.
+- Design note on asymmetry: `other_pilot_cost` is UI-only (not in `computeCosts()`), while `other_initial_investment` is in the revenue model AND shown in the UI. This asymmetry is intentional — pilot ad-hoc costs are not included in the NPV model's total upfront investment (the pilot is treated as a pre-decision sunk cost). If a future version includes pilot costs in the NPV model, both fields should be in the finance calculation.
+
+**Per-unit cost labels**
+- "Cost per completed interview" and "Cost per retained agent" rows in the Cost detail table append "(base, excl. ad-hoc)" when ad-hoc costs are present, to clarify that these per-unit figures divide `computeCosts()` total by n and do not include the flat ad-hoc cost items (which are not per-participant and should not be allocated to individual interviews).
+
 ### 0.2.5 - 2026-03-01
 
 Study-type reframe, labor model simplification, overhead fix, and cost tab wording.
