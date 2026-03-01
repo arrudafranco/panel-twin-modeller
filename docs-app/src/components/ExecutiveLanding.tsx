@@ -194,10 +194,8 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       behaviorQuality: tiers.self_report_behavior,
       incentivizedQuality: tiers.incentivized_behavior,
       threshold,
-      costPerInterview: costs.cost_per_completed_interview,
-      totalCost: costs.total_cost,
-      npv: finance.npv,
-      breakEvenMonth: finance.time_to_break_even_months,
+      pilotTotalCost: costs.total_cost,
+      deploymentTotalCost: deploymentCosts.total_cost,
       winProb: finance.win_probability,
       minViableMinutes,
     };
@@ -332,7 +330,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          Using the base pilot scenario (100 participants, 120-minute AI voice interviews, attitude/belief construct).
+          120-minute AI voice interviews, attitude/belief construct. Pilot study: 100 participants for validation. Deployment study: {(2000).toLocaleString()} participants at commercial scale.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
@@ -340,18 +338,16 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
             <div className="landing-kpi-label">Attitude fidelity score</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">${Math.round(baseStats.costPerInterview).toLocaleString()}</div>
-            <div className="landing-kpi-label">Cost per interview</div>
+            <div className="landing-kpi-value">${Math.round(baseStats.pilotTotalCost / 1000)}k</div>
+            <div className="landing-kpi-label">Pilot study cost</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">${(baseStats.npv / 1000).toFixed(0)}k</div>
-            <div className="landing-kpi-label">Projected NPV (commercial)</div>
+            <div className="landing-kpi-value">${Math.round(baseStats.deploymentTotalCost / 1000)}k</div>
+            <div className="landing-kpi-label">Deployment study cost</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">
-              {baseStats.breakEvenMonth ? `${baseStats.breakEvenMonth} mo` : 'N/A'}
-            </div>
-            <div className="landing-kpi-label">Break-even (commercial)</div>
+            <div className="landing-kpi-value">{(baseStats.winProb * 100).toFixed(1)}%</div>
+            <div className="landing-kpi-label">Win probability</div>
           </div>
         </div>
       </section>
