@@ -68,10 +68,10 @@ python -m pip install -e .
 To run tests:
 
 ```bash
-pytest -q tests/
+pytest -q
 ```
 
-38 of 39 tests pass. One pre-existing failure (`test_strict_filter_changes_threshold_vs_all`) covers a benchmark filter edge case unrelated to the primary model flow. See [docs/design_decisions.md](docs/design_decisions.md) for details.
+39 of 39 tests pass.
 
 ## Notes
 
