@@ -2,11 +2,27 @@
 
 Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
 
-## Live App
+## Interactive Web App
 
 **GitHub Pages:** https://arrudafranco.github.io/panel-twin-modeller/
 
 ![Panel Twin Modeller — interactive feasibility explorer showing the Economics tab with the NPV timeline chart, sidebar scenario controls, and financial summary table](screenshot.png)
+
+The primary interface is a React app deployed via GitHub Pages. It includes:
+- An executive landing page with static model insights
+- Interactive scenario controls (e.g., interview duration, panel size, pricing, memory architecture)
+- Fidelity curves by interview duration with uncertainty bands
+- Cost breakdown waterfall chart
+- NPV timeline and Monte Carlo simulation (500 iterations, client-side)
+- Federal benchmark comparison
+
+To run locally:
+
+```bash
+cd docs-app
+npm install
+npm run dev
+```
 
 ## Inspiration and Scope
 
@@ -29,27 +45,6 @@ Key modeling features:
 - Study-type presets (mixed general survey, behavioral recall, incentivized behavior) set quality expectations and uncertainty bands
 - Memory architecture is configurable (full transcript, summary memory, hybrid) and affects both quality estimates and token costs
 - Pilot calibration via the `calibrate` CLI command can update model parameters from observed field data
-
-## Interactive Web App
-
-The primary interface is a React app deployed via GitHub Pages. It includes:
-- Live app: https://arrudafranco.github.io/panel-twin-modeller/
-- An executive landing page with static model insights
-- Interactive scenario controls (interview duration, panel size, pricing, memory architecture)
-- Fidelity curves by interview duration with uncertainty bands
-- Cost breakdown waterfall chart
-- NPV timeline and Monte Carlo simulation (500 iterations, client-side)
-- Market positioning radar chart
-- Federal benchmark comparison
-- Dynamic plain-language narrative that adapts to parameters
-
-To run locally:
-
-```bash
-cd docs-app
-npm install
-npm run dev
-```
 
 ## Python CLI (reference implementation)
 
