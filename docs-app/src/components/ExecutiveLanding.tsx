@@ -341,35 +341,40 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
+            <div className="landing-kpi-info-anchor">
+              <Tooltip content="How closely AI agents replicate real participants' survey responses, expressed as a fraction of human test-retest reliability. A score of 0.83 means agents reproduce answers at 83% of the rate real people reproduce their own answers on re-survey. Mixed general survey covers attitudes, opinions, and behavioral recall -- the question types most common in commercial research. Calibrated from Park et al. (2024), who achieved 0.85 on the full GSS Core at 120-minute interview depth.">
+                <span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </div>
             <div className="landing-kpi-value">{baseStats.attitudeQuality.toFixed(2)}</div>
             <div className="landing-kpi-label">Fidelity score (mixed general survey)</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">${Math.round(baseStats.libraryBuildCost / 1000)}k</div>
-            <div className="landing-kpi-label">
-              Library build cost{' '}
-              <Tooltip content={`One-time cost to interview 1,000 participants, construct their agents, and set up infrastructure. After this investment, projects run against the existing library at much lower marginal cost.`}>
+            <div className="landing-kpi-info-anchor">
+              <Tooltip content="One-time cost to interview 1,000 participants, construct their agents, and set up infrastructure. After this investment, projects run against the existing library at much lower marginal cost.">
                 <span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </div>
+            <div className="landing-kpi-value">${Math.round(baseStats.libraryBuildCost / 1000)}k</div>
+            <div className="landing-kpi-label">Library build cost</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">${Math.round(baseStats.perProjectRunCost / 1000)}k</div>
-            <div className="landing-kpi-label">
-              Per-project run cost{' '}
+            <div className="landing-kpi-info-anchor">
               <Tooltip content="Marginal cost per project sold against the existing library: LLM inference, QA, PM, and data delivery. No new interviews or incentives.">
                 <span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </div>
+            <div className="landing-kpi-value">${Math.round(baseStats.perProjectRunCost / 1000)}k</div>
+            <div className="landing-kpi-label">Per-project run cost</div>
           </div>
           <div className="landing-kpi">
-            <div className="landing-kpi-value">{(baseStats.grossMargin * 100).toFixed(0)}%</div>
-            <div className="landing-kpi-label">
-              Gross margin per project{' '}
-              <Tooltip content={`(Price − per-project run cost) / price. At defaults: $${Math.round(baseStats.pricePerProject / 1000)}k price vs. $${Math.round(baseStats.perProjectRunCost / 1000)}k run cost. Library build cost ($${Math.round(baseStats.libraryBuildCost / 1000)}k) is recovered through the NPV model as upfront investment.`}>
+            <div className="landing-kpi-info-anchor">
+              <Tooltip content={`(Price - per-project run cost) / price. At defaults: $${Math.round(baseStats.pricePerProject / 1000)}k price vs. $${Math.round(baseStats.perProjectRunCost / 1000)}k run cost. Library build cost ($${Math.round(baseStats.libraryBuildCost / 1000)}k) is recovered through the NPV model as upfront investment.`}>
                 <span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </div>
+            <div className="landing-kpi-value">{(baseStats.grossMargin * 100).toFixed(0)}%</div>
+            <div className="landing-kpi-label">Gross margin per project</div>
           </div>
         </div>
       </section>
