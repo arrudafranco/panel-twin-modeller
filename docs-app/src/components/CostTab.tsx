@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CostWaterfallChart } from './charts/CostWaterfallChart.tsx';
+import { Tooltip } from './ui/Tooltip.tsx';
 import type { ScenarioConfig } from '../model/params.ts';
 import type { ComputedResults } from '../hooks/useScenario.ts';
 
@@ -77,6 +78,10 @@ export function CostTab({ cfg, results }: Props) {
           onClick={() => setView('library')}
         >
           Library build ({results.deploymentCosts.n_target} participants)
+          {' '}
+          <Tooltip content="The library build is the full one-time investment: AI-conducted interviews with the target number of participants, creating a reusable collection of AI agents. Once built, subsequent survey projects run against this agent library at much lower marginal cost — no new interviews needed.">
+            <span className="info-icon" aria-hidden="true">i</span>
+          </Tooltip>
         </button>
       </div>
 

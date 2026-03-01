@@ -94,8 +94,6 @@ export interface ProductParams {
 export interface RevenueParams {
   price_per_project: number;
   per_project_run_cost: number;
-  module_addon_price: number;
-  refresh_wave_price: number;
   projects_per_year: number;
   growth_rate: number;
   churn_rate: number;
@@ -239,9 +237,7 @@ export const DEFAULT_PRODUCT: ProductParams = {
 export const DEFAULT_REVENUE: RevenueParams = {
   price_per_project: 55000.0,
   per_project_run_cost: 25000.0,
-  module_addon_price: 25000.0,
-  refresh_wave_price: 60000.0,
-  projects_per_year: 10,
+  projects_per_year: 15,
   growth_rate: 0.08,
   churn_rate: 0.05,
   cac: 20000.0,

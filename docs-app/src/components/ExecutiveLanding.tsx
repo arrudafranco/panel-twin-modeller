@@ -33,11 +33,11 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "Project volume is the primary NPV lever — not per-project margin",
-    summary: "Gross margin per project is decent (~55%), but win probability in a four-way market is only ~37%. The investment closes at 10 projects per year — cut that in half and NPV stays negative. Volume matters more than what you charge per project.",
+    summary: "Gross margin per project is decent (~55%), but win probability in a four-way market is only ~37%. At 15 projects pursued per year (the default), the investment breaks even around month 30. Cut that in half and break-even moves outside the 36-month horizon — volume matters more than what you charge per project.",
     methodology: [
-      "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $52,000 (including module and refresh add-ons). At 10 projects pursued per year, expected monthly margin is roughly $11,200. Over 36 months cumulative margin approaches $415,000 (before discounting) against ~$295,000 upfront.",
+      "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $30,000 ($55K price minus $25K run cost). At 15 projects pursued per year, expected monthly margin is roughly $9,700 before discounting. Over 36 months cumulative margin approaches $350,000 against ~$295,000 upfront, with break-even around month 30.",
       "A non-probability panel at $5K captures ~39% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
-      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Doubling volume roughly doubles cumulative margin while upfront investment stays at ~$297K. This means a modest increase in the pipeline has a disproportionate NPV effect.",
+      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Reducing to 8–10 projects per year moves break-even outside the 36-month horizon. Use the explorer to find the volume and pricing combination that makes the investment case work for your scenario.",
       "These projections use stylized market utility coefficients, not historical win/loss data. Actual win rates depend on client relationships, proposal quality, pricing negotiations, and factors not captured in a logit model. Treat NPV as a directional planning signal, not a forecast.",
     ],
   },

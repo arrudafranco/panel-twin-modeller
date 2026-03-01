@@ -364,12 +364,34 @@ If you want either parameter to affect win probability, it would need to be appl
 **NPV and revenue model**
 
 The revenue model runs a month-by-month NPV loop over `horizon_months` (default 36). Each month:
-- Demand scales with `projects_per_year`, `growth_rate` (0.05), and `churn_rate` (0.05)
+- Demand scales with `projects_per_year`, `growth_rate` (0.08/year), and `churn_rate` (0.05/year)
 - Projects sold = demand × win_probability × net_new_fraction
 - Revenue per project = price + 0.4 × module_addon_price ($25K) + 0.2 × refresh_wave_price ($60K)
 - Total upfront investment = `cac` ($20K) + `other_initial_investment` ($0 default) + library build cost
+- NPV uses a 12% annual discount rate (`discount_rate`)
 
 These are scenario coefficients intended to make the investment case plannable. Actual win rates depend on client relationships, proposal quality, contracting factors, and market dynamics not captured in this model.
+
+**Monte Carlo perturbation distributions**
+
+The MC model draws from the following distributions per iteration. Standard deviations are hardcoded in `mcModel.ts`, not configurable through the UI.
+
+| Variable | Distribution | Std dev | Rationale |
+|---|---|---|---|
+| `interview_minutes` | Normal, clipped ≥20 | 12.0 min | Reflects scheduling uncertainty and interview length variation |
+| `attrition_rate` | Normal, clipped [0.02, 0.50] | 0.05 | Typical field variation in 2-wave completion |
+| `response_rate` | Normal, clipped [0.05, 0.80] | 0.04 | Typical sampling frame variation |
+| Quality score (additive noise) | Normal, mean=0 | qualityUncertainty / 2 | Construct-specific extrapolation uncertainty |
+
+**Quality uncertainty bands (used in MC and quality charts)**
+
+| Construct | Uncertainty band | Basis |
+|---|---|---|
+| `mixed_general` | ±0.06 | Directly paper-anchored (Park et al., GSS Core, GPT-4, 2-hr interviews) |
+| `incentivized_behavior` | ±0.10 | Anchored at 0.66 from Park et al. economic games; narrower anchoring |
+| `behavioral_recall` | ±0.10 | Extrapolated from 0.85 GSS Core base; not separately measured |
+
+The band for `mixed_general` is narrower because the 0.85 anchor is directly from the paper. Bands for other constructs are wider to reflect greater extrapolation uncertainty. In MC, quality noise is drawn from Normal(0, band/2), meaning ~68% of draws fall within ±(band/2) of the base quality estimate.
 
 ### Monte Carlo: Uncertainty as a First-Class Output
 
@@ -514,6 +536,23 @@ Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `pri
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.8 - 2026-03-01
+
+Revenue model simplification, default projects per year raised to 15, and CostTab library definition tooltip.
+
+**Module add-on and refresh wave attachment rates removed**
+- The revenue model previously included hardcoded attachment rates (0.4 × module_addon_price and 0.2 × refresh_wave_price) that inflated expected revenue per project from $55K base to ~$77K effective. These rates were never exposed in the sidebar or prominently disclosed, creating a hidden assumption that made the default NPV projections more optimistic than a base-price model would justify.
+- Removed: revenue formula simplified to `sold × price_per_project`. The `module_addon_price` and `refresh_wave_price` fields were removed from `RevenueParams` and defaults since they no longer affect any calculation.
+- Users who want to model add-on revenue should set `price_per_project` to their expected blended rate.
+- Impact: per-project margin drops from $52K (with add-ons) to $30K (base price only). Break-even analysis is now more conservative and transparent.
+
+**Default projects_per_year raised from 10 to 15**
+- At $30K base-price margin and ~37% win probability, 10 projects/year did not break even within the 36-month horizon. Raising to 15 places the break-even at approximately month 31 on an undiscounted basis, which is more illustrative for the default scenario while still requiring users to engage the controls to understand sensitivity.
+- Rationale: the default scenario should be directionally useful, not pessimistic. 15 projects/year is still conservative for a commercial research services context with an established brand.
+
+**CostTab library definition tooltip**
+- Added an info tooltip on the "Library build" toggle button in the Cost tab explaining what an agent library is, for users who access the explorer without reading the landing page.
 
 ### 0.2.7 - 2026-03-01
 

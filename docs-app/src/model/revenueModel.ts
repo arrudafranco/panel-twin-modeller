@@ -48,7 +48,7 @@ export function computeFinance(
     const year = Math.floor((m - 1) / 12);
     const demand = projects * Math.pow(1 + base.growth_rate, year) * Math.pow(1 - base.churn_rate, year);
     const sold = (demand / 12.0) * pwin * netNew;
-    const revenue = sold * (base.price_per_project + 0.4 * base.module_addon_price + 0.2 * base.refresh_wave_price);
+    const revenue = sold * base.price_per_project;
     const cogs = sold * cogsPerProject;
     const margin = revenue - cogs;
     monthlyMargin += margin;
