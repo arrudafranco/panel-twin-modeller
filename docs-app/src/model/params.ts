@@ -36,6 +36,7 @@ export interface CostParams {
   storage_security_compliance_cost_per_participant: number;
   total_labor_cost: number;
   overhead_rate: number;
+  other_pilot_cost: number;
   retest_reschedule_fraction: number;
   rescheduling_cost_per_event: number;
   panel_fatigue_function: string;
@@ -180,6 +181,7 @@ export const DEFAULT_COST: CostParams = {
   storage_security_compliance_cost_per_participant: 8.0,
   total_labor_cost: 18000,
   overhead_rate: 0.12,
+  other_pilot_cost: 0,
   retest_reschedule_fraction: 0.0,
   rescheduling_cost_per_event: 0.0,
   panel_fatigue_function: "exponential",

@@ -220,12 +220,20 @@ export function ScenarioControls({
             tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing) for each study run — both pilot and library build. Set to 0 if your staff cost figure is already fully loaded with overhead."
           />
           <Slider
-            label="Other upfront investment"
+            label="Other ad-hoc costs (pilot)"
+            value={cfg.cost.other_pilot_cost}
+            min={0} max={100000} step={1000}
+            onChange={(v) => updateCost('other_pilot_cost', v)}
+            format={money}
+            tooltip="Any ad-hoc costs specific to the validation pilot that do not fit the other categories — e.g., unexpected IRB fees, software licenses, travel for in-person testing. Shown in the pilot view of the Cost tab."
+          />
+          <Slider
+            label="Other one-time costs (library build)"
             value={cfg.revenue.other_initial_investment}
             min={0} max={1000000} step={5000}
             onChange={(v) => updateRevenue('other_initial_investment', v)}
             format={money}
-            tooltip="Truly one-time costs not tied to running either study (e.g., infrastructure build, legal review, partnership setup). Not included in the Cost tab. Added to total upfront investment in the Economics tab NPV model."
+            tooltip="Truly one-time costs tied to the library build phase — e.g., infrastructure build, legal review, partnership setup. Shown in the library build view of the Cost tab and added to total upfront investment in the Economics tab NPV model."
           />
         </fieldset>
 

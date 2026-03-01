@@ -16,7 +16,9 @@ export function CostTab({ cfg, results }: Props) {
   const [view, setView] = useState<CostView>('pilot');
   const costs = view === 'pilot' ? results.costs : results.deploymentCosts;
   const isLibrary = view === 'library';
-  const otherUpfront = isLibrary ? cfg.revenue.other_initial_investment : 0;
+  const otherUpfront = isLibrary
+    ? cfg.revenue.other_initial_investment
+    : cfg.cost.other_pilot_cost;
   const grandTotal = costs.total_cost + otherUpfront;
 
   const toggleStyle = (active: boolean): React.CSSProperties => ({
@@ -52,8 +54,8 @@ export function CostTab({ cfg, results }: Props) {
       </div>
       <p>
         {isLibrary
-          ? `Cost estimates cover the full one-time library build: AI-conducted interviews with all ${results.deploymentCosts.n_target} participants, plus any other upfront investment (infrastructure, legal, partnership setup) set in Advanced. This is the total you need to recover before breaking even.`
-          : `Cost estimates cover the per-study variable costs of the validation pilot: participant incentives, AI voice infrastructure (ASR/TTS), LLM token costs, post-processing, professional labor, and organizational overhead.`
+          ? `Cost estimates cover the full one-time library build: AI-conducted interviews with all ${results.deploymentCosts.n_target} participants, plus any other one-time costs (infrastructure, legal, partnership setup) set in Advanced. This is the total you need to recover before breaking even.`
+          : `Cost estimates cover the per-study variable costs of the validation pilot: participant incentives, AI voice infrastructure (ASR/TTS), LLM token costs, post-processing, professional labor, and organizational overhead. Any ad-hoc pilot costs set in Advanced are included in the total.`
         }
       </p>
 
@@ -101,8 +103,11 @@ export function CostTab({ cfg, results }: Props) {
           <tr><th>Post-processing</th><td>{money(costs.postproc_cost)}</td></tr>
           <tr><th>Staff cost</th><td>{money(costs.labor_cost)}</td></tr>
           <tr><th>Indirect / overhead ({(cfg.cost.overhead_rate * 100).toFixed(0)}%, on non-labor)</th><td>{money(costs.overhead_cost)}</td></tr>
-          {isLibrary && otherUpfront > 0 && (
-            <tr><th>Other upfront investment</th><td>{money(otherUpfront)}</td></tr>
+          {otherUpfront > 0 && (
+            <tr>
+              <th>{isLibrary ? 'Other one-time costs' : 'Other ad-hoc costs'}</th>
+              <td>{money(otherUpfront)}</td>
+            </tr>
           )}
           <tr className="total-row">
             <th>{isLibrary ? 'Total library build cost' : 'Total pilot cost'}</th>
