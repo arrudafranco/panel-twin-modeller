@@ -61,7 +61,6 @@ def write_limitations_brief(
         [
             "",
             "## External Reference Notes",
-            "- Discount-rate policy context often uses 3% and 7% sensitivity anchors in federal analysis guidance.",
             "- Telephone survey response-rate trends can be low in modern practice; weighting and design remain critical.",
             "- English tokenization rule-of-thumb often approximates ~1 token per ~4 characters.",
             "",
