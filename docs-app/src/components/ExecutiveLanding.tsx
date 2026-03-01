@@ -26,7 +26,7 @@ const INSIGHTS: InsightDef[] = [
     summary: "Traditional survey research charges per-study fees for every project. Panel Twin separates a one-time library build (~$277K for 2,000 participants) from a lower marginal per-project run cost (~$25K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
     methodology: [
       "Library build cost covers AI-conducted interviews, participant incentives, voice infrastructure, agent construction, setup labor, and overhead. This is a capital investment charged once (or per refresh cycle), not per project.",
-      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $25,000 per project at loaded labor rates.",
+      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $25,000 per project at fully loaded labor rates.",
       "With ~55% variable margin per project (at $55K price, $25K run cost), the break-even on the library investment depends on project volume over the library's useful life. At 6 projects/year, rough break-even is within 9–11 projects.",
       "The critical open question is library useful life: how many projects can run before agent profiles go stale and re-interviewing is needed. The model cannot answer this — it is an open empirical question. The NPV projections are conditional on the library remaining valid.",
     ],
@@ -331,7 +331,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          120-minute AI voice interviews, attitude/belief construct. The library build (2,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists.
+          120-minute AI voice interviews, attitude/belief construct. The library build (2,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
@@ -396,7 +396,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           Adjust parameters and see how quality, cost, and economics respond in real time.
         </p>
         <p className="cta-note" style={{ marginTop: 12, opacity: 0.6, fontSize: 11 }}>
-          Model defaults last updated March 2026. LLM (large language model) and ASR (speech recognition)
+          Model defaults last updated March 2026. LLM (large language model), ASR (automatic speech recognition), and TTS (text-to-speech)
           pricing change rapidly, as do market conditions. Review Advanced settings against current figures before drawing conclusions.
         </p>
       </section>

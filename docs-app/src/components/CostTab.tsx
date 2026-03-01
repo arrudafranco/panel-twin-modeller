@@ -43,7 +43,7 @@ export function CostTab({ cfg, results }: Props) {
           <tr><th>Invites per complete</th><td>{costs.invites_per_complete.toFixed(1)}</td></tr>
           <tr><th>Recruitment</th><td>{money(costs.recruitment_cost)}</td></tr>
           <tr><th>Incentives</th><td>{money(costs.incentives_cost)}</td></tr>
-          <tr><th>Voice operations</th><td>{money(costs.voice_ops_cost)}</td></tr>
+          <tr><th>Voice operations (ASR and TTS)</th><td>{money(costs.voice_ops_cost)}</td></tr>
           <tr><th>LLM token costs</th><td>{money(costs.llm_ops_cost)}</td></tr>
           <tr><th>Post-processing</th><td>{money(costs.postproc_cost)}</td></tr>
           <tr><th>Professional labor</th><td>{money(costs.labor_cost)}</td></tr>

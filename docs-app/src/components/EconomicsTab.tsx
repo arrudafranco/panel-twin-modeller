@@ -100,7 +100,15 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
             </th>
             <td>{money(finance.total_upfront_investment)}</td>
           </tr>
-          <tr><th>Cumulative contribution</th><td>{money(finance.contribution_margin_total)}</td></tr>
+          <tr>
+            <th>
+              Total contribution margin
+              <Tooltip content="Sum of (price − per-project run cost) across all expected projects over the horizon. This is what accumulates to recover the upfront investment and generate NPV.">
+                {' '}<span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </th>
+            <td>{money(finance.contribution_margin_total)}</td>
+          </tr>
           <tr><th>Projected net present value (NPV)</th><td><strong>{money(finance.npv)}</strong></td></tr>
           <tr><th>Break-even</th><td>{finance.time_to_break_even_months ? `${finance.time_to_break_even_months} months` : `Not within ${cfg.revenue.horizon_months} months`}</td></tr>
         </tbody>

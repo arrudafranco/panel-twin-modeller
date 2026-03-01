@@ -980,6 +980,12 @@ details.advanced-controls[open] summary::before {
   color: var(--negative);
 }
 
+.signal-badge-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 4px 0 0 2px;
+}
+
 /* ----------------------------------------------------------------
    Dynamic narrative
    ---------------------------------------------------------------- */

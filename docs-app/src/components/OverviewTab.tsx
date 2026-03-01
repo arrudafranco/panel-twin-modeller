@@ -52,6 +52,11 @@ export function OverviewTab({ cfg, results }: Props) {
       <div className={`signal-badge ${favorable ? 'signal-favorable' : 'signal-caution'}`}>
         {favorable ? 'Favorable' : 'Needs work'}
       </div>
+      <p className="signal-badge-note">
+        {favorable
+          ? 'Quality threshold cleared and NPV positive within the horizon.'
+          : 'One or both conditions unmet: quality threshold and positive NPV within the horizon.'}
+      </p>
 
       {warnings.length > 0 && (
         <div className="guardrails-box" role="alert">

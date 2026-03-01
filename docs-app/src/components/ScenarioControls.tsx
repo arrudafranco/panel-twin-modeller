@@ -134,8 +134,8 @@ export function ScenarioControls({
         <div className="control-group-row">
           <label className="select-field">
             <span>
-              Risk profile{' '}
-              <Tooltip content="Federal/high-risk settings apply a stricter quality threshold (+0.05 uplift) and a market utility penalty (−0.08), reflecting risk-averse federal procurement behavior.">
+              Client risk profile{' '}
+              <Tooltip content="The buying organization's risk tolerance. Federal/high-risk settings apply a stricter quality threshold (+0.05 uplift) and a market utility penalty (−0.08), reflecting risk-averse federal procurement behavior.">
                 <span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </span>
