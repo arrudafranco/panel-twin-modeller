@@ -33,7 +33,7 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "Project volume is the primary NPV lever — not per-project margin",
-    summary: "At $55K price and $25K run cost, gross margin is ~55% per project. But win probability in a four-way market (including a $5K non-probability panel) is only ~37%, and 30% of wins cannibalize existing work. With 10 projects pursued per year, the model projects positive NPV with break-even around month 27 of a 36-month horizon. Cut project volume in half and the investment doesn't recover. The primary driver is not margin per project — it is how many projects you actually pursue.",
+    summary: "Gross margin per project is decent (~55%), but win probability in a four-way market is only ~37%. The investment closes at 10 projects per year — cut that in half and NPV stays negative. Volume matters more than what you charge per project.",
     methodology: [
       "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $52,000 (including module and refresh add-ons). At 10 projects pursued per year, expected monthly margin is roughly $11,200. Over 36 months cumulative margin approaches $415,000 (before discounting) against ~$297,000 upfront.",
       "A non-probability panel at $5K captures ~39% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
@@ -56,7 +56,7 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "Federal clients are a harder sell than the quality numbers alone would suggest",
-    summary: "Switching to federal settings applies a +0.05 uplift to the quality threshold, derived from NSDUH, BRFSS, and GSS reliability benchmarks. A configuration that comfortably clears the commercial threshold may fall short in federal mode with the same interview design. The economic model also applies a risk penalty (−0.08 utility) to represent client conservatism, though because this applies across all options it is most meaningful as a signal of overall market difficulty rather than a change in relative win rates.",
+    summary: "Federal settings raise the quality threshold by 0.05 — a configuration that passes commercially may fall short in federal mode with the same interview design. The model also applies a conservatism penalty reflecting documented federal risk aversion toward novel research methods.",
     methodology: [
       "Federal quality threshold: the benchmark-derived threshold increases by 0.05 in federal mode. This reflects the stricter evidence standards associated with federal research procurement, derived from published NSDUH, BRFSS, and GSS reliability benchmarks. The uplift is a modeling convention, not a formally measured procurement standard.",
       "Federal risk penalty: the competition model applies a −0.08 utility reduction across all options in federal mode. Since this applies equally to all competitors, it does not change relative win probabilities within the four-way market. Its effect is better understood as a signal: the federal market is overall less favorable for novel methods, and that context should temper NPV projections rather than shift specific win probability estimates.",
