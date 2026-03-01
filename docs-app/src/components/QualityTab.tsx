@@ -109,6 +109,20 @@ export function QualityTab({ cfg, results }: Props) {
           weighting) affect scores through transparent multipliers. These are
           theoretically motivated heuristics, not measured effect sizes.
         </p>
+        <p>
+          Agent profile drift and library useful life. Fidelity estimates in this
+          model describe how well an agent represents its source participant at the
+          time of the interview. They say nothing about how long that representation
+          remains accurate. As real participants' beliefs, circumstances, and attitudes
+          evolve, agent responses diverge from what those participants would currently
+          say. The rate and pattern of this drift has no published estimates for
+          interview-based AI agents. A twin library may be accurate for months or
+          degrade meaningfully within weeks for fast-moving topics. The economics
+          model includes refresh wave revenue but does not model refresh operational
+          costs, because the trigger conditions and scope of a refresh campaign are
+          not yet estimable. Any NPV projection beyond 12–18 months should be read as
+          conditional on library validity — an assumption the model cannot verify.
+        </p>
         <p style={{ opacity: 0.55, fontSize: '0.82em', marginTop: 12 }}>
           Model defaults last updated February 2026. The evidence base for digital panel twin
           approaches is evolving quickly. Anchors, penalties, and uncertainty bands should be

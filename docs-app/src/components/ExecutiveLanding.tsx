@@ -12,73 +12,73 @@ interface InsightDef {
 
 const INSIGHTS: InsightDef[] = [
   {
-    title: "Quality varies sharply by construct",
-    summary: "Attitudes and beliefs are the strongest candidates for digital twins. Self-reported behaviors are borderline. Incentivized and economic behaviors fall below threshold with current evidence.",
+    title: "Participant incentives dominate build cost — compute is nearly free",
+    summary: "At 2,000 participants, incentives alone total $178K out of a ~$277K library build. LLM inference for those same 2,000 interviews costs roughly $220. The binding constraint is human compensation, not technology.",
     methodology: [
-      "The 0.85 base accuracy estimate is anchored to Park et al. (2024) genagents, where GPT-4 agents built from ~2-hour interviews on GSS attitude items matched human test-retest reliability at 85%. This is the only direct published anchor for this approach.",
-      "Two bases are paper-anchored: attitudes and beliefs at 0.85 (GSS attitude items, 1,052 participants) and incentivized/economic behaviors at 0.66 (economic game experiments in the same paper, showing lower agent-human agreement). Self-reported behaviors (0.75) are the most extrapolated of the three — interpolated between the two anchors, not directly measured.",
-      "Uncertainty bands reflect this evidence structure: ±0.06 for attitudes (most directly anchored), ±0.10 for incentivized behaviors (also anchored but smaller economic game sample), ±0.12 for self-reported behaviors (least directly tested). These are modeling conventions, not empirically validated confidence intervals.",
-      "Extrapolation to constructs or LLMs not studied in the original paper should be treated with caution. The uncertainty bands are a modeling convention, not empirically validated confidence intervals.",
+      "Incentive structure: $60 Phase 1 interview + ($30 × 0.8 retest rate) Phase 2 + $5 bonus = $89 per participant. At 2,000 participants: $178,000 — roughly 64% of the total library build cost.",
+      "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (ASR + TTS at $0.027/min × 120 min) add $6,480. Setup labor (153 hours at $120/hr) adds $18,360.",
+      "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 2,000 agents costs roughly $300–500. Total run cost including QA and PM is estimated at $5,000–15,000 — about 3–8% of the library build cost.",
+      "Implication: the technology cost curve is not the binding constraint. LLM price changes have minimal impact on the investment case. Response rate and incentive levels have major impact. Scale decisions (how many participants) are primarily a human cost question.",
+    ],
+  },
+  {
+    title: "The cost structure transforms from linear to fixed-plus-marginal",
+    summary: "Traditional survey research charges linear costs for every study. Panel Twin separates a one-time library build ($277K for 2,000 participants) from low marginal per-project run costs (~$10K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
+    methodology: [
+      "Library build cost covers AI-conducted interviews, participant incentives, voice infrastructure, agent construction, setup labor, and overhead. This is a capital investment charged once (or per refresh cycle), not per project.",
+      "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $10,000 per project.",
+      "With 94% variable margin per project (at $180K price, $10K run cost), the break-even on the library investment depends on project volume over the library's useful life. At 6 projects/year, rough break-even is within 3–5 projects.",
+      "The critical open question is library useful life: how many projects can run before agent profiles go stale and re-interviewing is needed. The model cannot answer this — it is an open empirical question. The NPV projections are conditional on the library remaining valid.",
+    ],
+  },
+  {
+    title: "Self-reported behaviors are the methodological risk zone",
+    summary: "Self-reported behaviors are the most common survey use case and the least directly tested construct type. The model places their fidelity at 0.75, but with the widest uncertainty band (±0.12). A result anywhere between 0.63 and 0.87 is defensible.",
+    methodology: [
+      "Two construct types have direct empirical anchors from Park et al. (2024): attitudes and beliefs at 0.85 (1,052 participants, GSS attitude items) and incentivized behaviors at 0.66 (economic game experiments). Self-reported behaviors (0.75) are interpolated between these two anchors — not directly measured in the paper.",
+      "Uncertainty bands: attitudes ±0.06, incentivized behaviors ±0.10, self-reported behaviors ±0.12. The wide band for self-reported behaviors reflects the absence of direct evidence, not higher intrinsic difficulty.",
+      "At default settings, self-reported behaviors often clear the quality threshold (0.75 vs. ~0.75 threshold), but the margin is thin and within the uncertainty band. A reasonable pessimistic scenario has self-reported behaviors below threshold.",
+      "This creates an asymmetric risk: if the primary use case is self-reported behavior studies, you are operating in the least-validated configuration, and feasibility outcomes are most sensitive to which end of the uncertainty band applies. A pilot study specifically targeting self-reported behaviors is more warranted here than for attitudes.",
     ],
     citations: [
       "Park et al. (2024). Generative Agent Simulations of 1,000 People. arXiv:2411.10109. https://arxiv.org/abs/2411.10109",
     ],
   },
   {
-    title: "Interview duration has diminishing returns",
-    summary: "Quality improves logarithmically with interview length. Moving from 30 to 90 minutes produces the largest gains. Beyond ~120 minutes, additional time yields marginal improvement.",
+    title: "60–90 minutes captures most of the quality gain",
+    summary: "Quality improves logarithmically with interview length — the first hour contributes more than the second. For attitude constructs, most gain over a 30-minute baseline is captured by 60–90 minutes. Beyond 120 minutes, incremental quality is small while build cost keeps rising linearly.",
     methodology: [
-      "Quality is modeled as base × log-linear penalty/bonus relative to a 120-minute reference point (the genagents interview length). The log functional form reflects the intuition that each additional hour adds less marginal information than the previous one.",
-      "This functional form is a modeling assumption. The actual sensitivity of agent quality to interview length has not been directly measured and published for this construction approach. Extrapolating outside the 60–150 minute range carries higher uncertainty.",
-      "The threshold crossover point (minimum interview length to clear the quality benchmark) depends on construct type, memory architecture, and the benchmark filter mode. Under default settings, attitude/belief constructs typically clear the threshold well before 60 minutes.",
+      "Quality is modeled as base × log-linear adjustment relative to a 120-minute reference point (the genagents interview length). The log functional form reflects diminishing marginal returns on additional interview time. This is a modeling assumption; the actual sensitivity has not been directly measured for this construction approach.",
+      "Interview duration drives build cost linearly (voice ops at $0.027/min per participant). At 120 min vs. 90 min: $0.027 × 30 min = $0.81/participant, or $1,620 saved on a 2,000-person library. At 120 vs. 60 min: $3,240 saved. These are modest but real trade-offs.",
+      "Under default attitude/belief settings, the quality threshold is typically cleared well before 90 minutes. The threshold crossover depends on construct type, memory architecture, and benchmark mode. Under federal settings, longer interviews provide more buffer above the stricter threshold.",
+      "Extrapolating outside the 60–150 minute range carries higher uncertainty. Very short interviews (30 min) represent a significant departure from the paper anchor and should be treated as speculative.",
     ],
     citations: [
       "Park et al. (2024). Generative Agent Simulations of 1,000 People. arXiv:2411.10109. https://arxiv.org/abs/2411.10109",
     ],
   },
   {
-    title: "Recruitment and onboarding are the primary cost drivers",
-    summary: "At current token prices, LLM inference is a small fraction of total pilot cost. The largest cost drivers are recruitment, participant incentives, and labor for protocol design, engineering, and compliance setup.",
+    title: "Federal viability applies two independent filters, not one",
+    summary: "The model applies a quality threshold uplift (0.05) and a separate market utility penalty (−0.08) for federal settings. These are independent. A configuration can clear the quality bar and still face market headwinds — and the interaction narrows the viable space substantially.",
     methodology: [
-      "Recruitment cost: cost per invite ÷ response rate. At 25% response rate with $1 per invite and 100 participants, this implies 400 contacts. Incentives ($60 phase 1 + $30 phase 2) are the second largest per-participant cost.",
-      "Labor costs cover one-time pilot setup: protocol design (20 hrs), engineering (60 hrs), QA (30 hrs), PM (25 hrs), IRB compliance (18 hrs) at $120/hr fully loaded. These are not ongoing operational staff costs.",
-      "LLM token costs are modest at current pricing ($0.003/1K input, $0.012/1K output) but will scale with panel size and interview length at national deployment.",
-      "Voice infrastructure: $0.007/min ASR (transcription) + $0.02/min TTS (AI interviewer voice). These are representative AI voice API rates as of early 2026; pricing changes frequently.",
-      "These estimates do not include the cost of training on a nationally representative panel (which would require a probability sample like an RDD or address-based sample), or periodic refresh costs.",
-    ],
-  },
-  {
-    title: "Economics are sensitive to win probability",
-    summary: "The business case depends heavily on competitive positioning. Small changes in quality, pricing, or brand trust can shift win probability enough to change the NPV sign.",
-    methodology: [
-      "Win probability is derived from a multinomial logit competition model. Each competitor's utility is computed as: U = quality×3.2 + brand×1.1 + tailwind×0.8 − price×0.000012 − turnaround×0.03. These coefficients are illustrative scenario planning defaults, not estimated from historical win/loss data.",
-      "Market share is the softmax probability across all competitors' utilities. Panel Twin's win probability is its softmax share × net new demand fraction.",
-      "Brand trust defaults: Panel Twin=0.70 (emerging product), Probability benchmark=0.92 (established), Hybrid benchmark=0.75, Fully synthetic=0.55. These can be adjusted in Advanced settings.",
-      "A 10% change in the quality utility coefficient (3.2 → 2.9 or 3.5) can shift NPV by 15–30% under typical default settings. Treat NPV as a directional planning signal.",
-    ],
-  },
-  {
-    title: "Uncertainty is asymmetric",
-    summary: "Quality uncertainty is wider for less-studied constructs. The Monte Carlo simulation captures this asymmetry and typically shows a wider NPV distribution when studying incentivized behaviors.",
-    methodology: [
-      "Uncertainty bands (±0.06, ±0.10, ±0.12 by construct) represent the range of plausible quality scores given the available evidence, not formal statistical confidence intervals.",
-      "The Monte Carlo simulation draws 500 iterations from normal distributions centered at point estimates for interview duration, response rate, and attrition. A quality noise term proportional to the construct's uncertainty band is also added.",
-      "P(NPV > 0) and break-even probability are reported from the empirical distribution of MC outcomes. Results are seeded for reproducibility.",
-      "The asymmetric distribution of NPV outcomes reflects the fact that unfavorable scenarios (low quality, high attrition, low win rate) compound each other, while favorable scenarios are bounded above by market capacity.",
-    ],
-  },
-  {
-    title: "Federal applications face a higher bar",
-    summary: "Federal and high-risk settings apply a quality threshold uplift and a market utility penalty, meaningfully narrowing the window of viable configurations.",
-    methodology: [
-      "Federal/high-risk quality threshold: benchmark quality + 0.05 uplift. This reflects stricter evidence requirements for federal research procurement, consistent with standards applied to longitudinal federal surveys like the NSDUH and BRFSS.",
-      "Federal utility penalty: −0.08 applied to the market win probability. This reflects conservative federal buying behavior and risk-aversion in adopting novel research methods.",
-      "Together, these adjustments mean that only configurations with near-attitude-level quality, strong brand trust, and competitive pricing are viable for federal contracts under current parameter assumptions.",
-      "These are modeling conventions intended to distinguish commercial exploratory from federal high-stakes use cases. Actual federal procurement behavior varies substantially by agency, program, and contracting officer.",
+      "Federal quality threshold: benchmark quality + 0.05 uplift applied to the recommended threshold derived from NSDUH, BRFSS, and GSS reliability benchmarks. This reflects stricter evidence requirements for federal research procurement.",
+      "Federal market utility penalty: −0.08 applied in the competition model, capturing the well-documented risk-aversion of federal procurement toward novel research methods, regardless of demonstrated quality.",
+      "The two adjustments are multiplicative in effect: a configuration that just barely passes quality thresholds in commercial settings typically fails in federal settings, and even configurations with sufficient quality face a harder market win probability path.",
+      "These are modeling conventions intended to make the federal/commercial distinction plannable, not predictions about any specific procurement. Actual federal buying behavior varies substantially by agency, program, and contracting officer.",
     ],
     citations: [
       "NSDUH Reliability Study (SAMHSA). https://www.ncbi.nlm.nih.gov/books/NBK519788/",
       "BRFSS HRQOL Reliability (CDC). https://pubmed.ncbi.nlm.nih.gov/12700216/",
+    ],
+  },
+  {
+    title: "The main uncertainty is now library longevity, not project margin",
+    summary: "With ~94% variable margin per project, the investment case is strong once the library is built. The dominant open question has shifted: how long does a twin library remain valid before agents need re-interviewing? The model tracks NPV but cannot estimate agent shelf life.",
+    methodology: [
+      "At 94% variable margin, win probability sensitivity has a smaller NPV impact than it would if COGS per project were high. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
+      "Library useful life is the dominant uncertainty. As real participants' views evolve over time, agent responses gradually diverge from what those participants would currently say. The rate of this divergence — and when it crosses a meaningful threshold — has no published estimates for this construction approach.",
+      "Refresh wave revenue ($60K default) is included in the model, but per-refresh operational costs are not modeled. The cost of a partial re-interview campaign depends on how many agents need updating and whether source participants remain reachable.",
+      "Monte Carlo simulations draw uncertainty from interview duration, response rate, and attrition. Library longevity uncertainty is not included because there is no distributional basis for it yet. This means the MC output understates total uncertainty for projections beyond 12–18 months.",
     ],
   },
 ];
@@ -267,10 +267,11 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           </div>
           <div className="landing-card">
             <div className="landing-card-icon" aria-hidden="true">$</div>
-            <h3>Projects pilot costs</h3>
+            <h3>Maps the investment case</h3>
             <p>
-              What does it cost to build and test these agents? Covers recruitment,
-              incentives, AI voice infrastructure, LLM tokens, labor, and overhead.
+              Separates the one-time library build cost (interviews, incentives, setup)
+              from the low marginal cost of running each subsequent project against
+              the existing agent library.
             </p>
           </div>
           <div className="landing-card">
@@ -294,11 +295,12 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
 
       {/* Static Model Insights — clickable */}
       <section className="landing-section">
-        <h2>What the model tells us</h2>
+        <h2>What the model accounts for — and what it reveals</h2>
         <p className="landing-section-intro">
-          Even before adjusting parameters, the model's structure reveals several
-          important patterns about the feasibility landscape. Click any card to read
-          the model logic and assumptions behind each finding.
+          Some of these cards describe established knowledge the model explicitly
+          encodes: evidence hierarchies, cost structure assumptions, federal procurement
+          adjustments. Others are patterns that emerge only when running the full model
+          across configurations. Click any card to read the methodology behind it.
         </p>
         <div className="insight-grid">
           {INSIGHTS.map((ins, i) => (

@@ -48,7 +48,7 @@ export function ScenarioControls({
       <fieldset className="control-group">
         <legend>
           Study design{' '}
-          <Tooltip content="Interview duration affects both quality (logarithmically) and per-participant AI and voice costs. Study sizes set the scale for each phase: validation (Cost tab) and commercial deployment (Economics tab). All other parameters — response rate, incentives, labor hours — apply at both scales.">
+          <Tooltip content="Interview duration affects both quality (logarithmically) and per-participant AI and voice costs. Study sizes set the scale for each phase: pilot (Cost tab) and commercial deployment (Economics tab). All other parameters — response rate, incentives, labor hours — apply at both scales.">
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>
@@ -60,13 +60,13 @@ export function ScenarioControls({
           tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration and directly drives voice and LLM costs."
         />
         <Slider
-          label="Validation study size"
+          label="Pilot study size"
           value={cfg.sampling.pilot_n}
           min={50} max={500} step={10}
           onChange={(v) => {
             update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, pilot_n: v } as never);
           }}
-          tooltip="Number of participants in the initial validation study. Drives the total cost shown in the Cost tab. Typically 50–200 for an internal feasibility pilot."
+          tooltip="Number of participants in the pilot study. Drives the total cost shown in the Cost tab. Typically 50–200 for an internal feasibility pilot."
         />
         <Slider
           label="Commercial study size"
