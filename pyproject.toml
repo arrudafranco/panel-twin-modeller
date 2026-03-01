@@ -21,3 +21,6 @@ twin-econ = "twin_econ.cli:main"
 
 [tool.setuptools]
 packages = ["twin_econ"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
