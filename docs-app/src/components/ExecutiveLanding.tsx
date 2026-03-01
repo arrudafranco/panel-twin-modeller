@@ -13,17 +13,17 @@ interface InsightDef {
 const INSIGHTS: InsightDef[] = [
   {
     title: "Participant incentives dominate build cost — compute is nearly free",
-    summary: "At 2,000 participants, incentives alone total $178K out of a ~$277K library build. LLM inference for those same 2,000 interviews costs roughly $220. The binding constraint is human compensation, not technology.",
+    summary: "At 2,000 participants, incentives alone total $178K out of a ~$275K library build. LLM inference for those same 2,000 interviews costs roughly $220. The binding constraint is human compensation, not technology.",
     methodology: [
       "Incentive structure: $60 Phase 1 interview + ($30 × 0.8 retest rate) Phase 2 + $5 bonus = $89 per participant. At 2,000 participants: $178,000 — roughly 64% of the total library build cost.",
-      "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (automatic speech recognition and text-to-speech, at $0.027/min × 120 min) add $6,480. Setup labor (153 hours at $120/hr) adds $18,360.",
+      "LLM inference for 2,000 interviews at 117 turns each: roughly $222 total at $0.003/1K input, $0.012/1K output tokens. Voice ops (automatic speech recognition and text-to-speech, at $0.027/min × 120 min) add $6,480. Staff cost (lump sum, $18,000 default) adds a flat amount per study run — adjust in Advanced settings.",
       "Per-project run cost once the library exists: LLM inference to run a 50-item survey through 2,000 agents costs roughly $300–500. At loaded labor rates for QA, PM, and data delivery, total run cost is estimated at $20,000–30,000 — about 7–11% of the library build cost.",
       "Implication: the technology cost curve is not the binding constraint. LLM price changes have minimal impact on the investment case. Response rate and incentive levels have major impact. Scale decisions (how many participants) are primarily a human cost question.",
     ],
   },
   {
     title: "The cost structure transforms from linear to fixed-plus-marginal",
-    summary: "Traditional survey research charges per-study fees for every project. Panel Twin separates a one-time library build (~$277K for 2,000 participants) from a lower marginal per-project run cost (~$25K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
+    summary: "Traditional survey research charges per-study fees for every project. Panel Twin separates a one-time library build (~$275K for 2,000 participants) from a lower marginal per-project run cost (~$25K). This is the same cost-structure shift that distinguishes SaaS from consulting.",
     methodology: [
       "Library build cost covers AI-conducted interviews, participant incentives, voice infrastructure, agent construction, setup labor, and overhead. This is a capital investment charged once (or per refresh cycle), not per project.",
       "Per-project run cost covers LLM inference, per-project QA, PM, and data delivery against the existing agent library. No new interviews or incentives. Default estimate: $25,000 per project at fully loaded labor rates.",
@@ -35,7 +35,7 @@ const INSIGHTS: InsightDef[] = [
     title: "Project volume is the primary NPV lever — not per-project margin",
     summary: "Gross margin per project is decent (~55%), but win probability in a four-way market is only ~37%. The investment closes at 10 projects per year — cut that in half and NPV stays negative. Volume matters more than what you charge per project.",
     methodology: [
-      "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $52,000 (including module and refresh add-ons). At 10 projects pursued per year, expected monthly margin is roughly $11,200. Over 36 months cumulative margin approaches $415,000 (before discounting) against ~$297,000 upfront.",
+      "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $52,000 (including module and refresh add-ons). At 10 projects pursued per year, expected monthly margin is roughly $11,200. Over 36 months cumulative margin approaches $415,000 (before discounting) against ~$295,000 upfront.",
       "A non-probability panel at $5K captures ~39% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
       "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Doubling volume roughly doubles cumulative margin while upfront investment stays at ~$297K. This means a modest increase in the pipeline has a disproportionate NPV effect.",
       "These projections use stylized market utility coefficients, not historical win/loss data. Actual win rates depend on client relationships, proposal quality, pricing negotiations, and factors not captured in a logit model. Treat NPV as a directional planning signal, not a forecast.",
@@ -70,7 +70,7 @@ const INSIGHTS: InsightDef[] = [
   },
   {
     title: "The main uncertainty is now library longevity, not project margin",
-    summary: "With ~55% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does a twin library remain valid before agents need re-interviewing? The model tracks net present value (NPV) but cannot estimate agent shelf life.",
+    summary: "With ~55% variable margin per project, the investment case is meaningful once the library is built. The dominant open question has shifted: how long does an agent library remain valid before agents need re-interviewing? The model tracks net present value (NPV) but cannot estimate agent shelf life.",
     methodology: [
       "At ~55% variable margin, win probability sensitivity has a meaningful but not dominant NPV impact. Small changes in win rate shift the timeline to break-even but do not change the direction of the investment case under reasonable assumptions.",
       "Library useful life is the dominant uncertainty. As real participants' views evolve over time, agent responses gradually diverge from what those participants would currently say. The rate of this divergence — and when it crosses a meaningful threshold — has no published estimates for this construction approach.",
@@ -225,8 +225,14 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           (Park et al., 2024). In that study, agents built from ~2-hour qualitative interviews
           replicated participants' GSS survey responses with 85% of human test-retest reliability.
           A key innovation here is conducting those interviews using an AI voice agent rather than a
-          human interviewer — enabling scale while maintaining semi-structured depth.
+          human interviewer, enabling scale while maintaining semi-structured depth.
           Our model explores the feasibility of operationalizing this approach commercially.
+        </p>
+        <p>
+          When agents are built from a representative sample of participants, the resulting
+          collection is called an <strong>agent library</strong>. Once built, the library can
+          answer new survey questions on demand without re-interviewing participants, transforming
+          the cost structure from per-study to fixed-plus-marginal.
         </p>
         {/* CSS-based diagram */}
         <div className="twin-diagram" aria-label="Diagram showing the AI interview-based approach: from an AI voice interview to a digital agent to survey responses">

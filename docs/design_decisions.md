@@ -305,23 +305,71 @@ This balances realism with implementation practicality.
 
 ### Competition and Revenue: Explicit Scenario Logic
 
-The competition and revenue logic are designed to be explicit rather than opaque.
+The competition and revenue logic are designed to be explicit rather than opaque. They model win probability, market substitution, cannibalization, and NPV in a four-way logit choice framework. All coefficients are illustrative scenario assumptions, not fitted to historical win/loss data. This section documents the full parameter set so readers do not need to trace the source code.
 
-They include:
-- outside options
-- substitution pressure
-- cannibalization
-- market tailwind
-- horizon-based NPV
-- explicit break-even timing
+**Utility function (multinomial logit)**
 
-This is useful because it lets stakeholders inspect:
-- which business assumptions matter
-- how sensitive the model is to pricing or substitution assumptions
+Each option gets a utility score. Win probability (market share) is softmax over those scores.
 
-At the same time, these are still scenario coefficients, not market estimates fitted to historical internal data.
+```
+u = quality_weight × quality
+  + brand_weight × brand_trust     (Panel Twin only; competitors get brand=0)
+  + tailwind_weight × market_tailwind
+  − price_weight × price
+  − turnaround_weight × turnaround_days
+  + cross_price_elasticity × log(ownPrice / competitorPrice)  (for competitors only)
+  − federal_risk_penalty            (applied equally to all when federal_high_risk)
+```
 
-That limitation is intentional and documented.
+**Utility coefficients (stylized, not fitted)**
+
+| Coefficient | Value | Rationale |
+|---|---|---|
+| `utility_quality_weight` | 3.2 | Quality has the highest weight; reflects quality as primary differentiator |
+| `utility_brand_weight` | 1.1 | Applied only to Panel Twin via `brand_trust`; represents new-entrant credibility |
+| `utility_tailwind_weight` | 0.8 | See note below |
+| `utility_price_weight` | 0.000012 | Very small; price has modest weight at these dollar magnitudes |
+| `utility_turnaround_weight` | 0.03 | One day faster is worth about 0.03 utility units |
+| `cross_price_elasticity` | 0.20 | Competitor utility includes a term for how much more expensive Panel Twin is |
+
+**Panel Twin defaults**
+
+| Parameter | Default | Note |
+|---|---|---|
+| `price_per_project` | $55,000 | Below traditional probability panel benchmarks |
+| `turnaround_days` | 10 | Between probability (18 days) and non-prob (3 days) |
+| `brand_trust` | 0.70 | Panel Twin's brand credibility as a new entrant (0–1 scale) |
+| `market_tailwind` | 0.10 | See note below |
+
+**Competitor defaults (generic labels in this public repo)**
+
+| Competitor | Price | Quality | Turnaround |
+|---|---|---|---|
+| Probability benchmark | $80,000 | 0.90 | 18 days |
+| Hybrid benchmark | $60,000 | 0.80 | 12 days |
+| Non-probability panel | $5,000 | 0.70 | 3 days |
+
+**Cannibalization and substitution**
+
+- `cannibalization_rate`: 0.30. 30% of Panel Twin wins are assumed to displace existing internal work rather than generating truly incremental revenue. Net-new fraction = 1 − 0.30 = 0.70.
+
+**Note on market_tailwind and federal_risk_penalty (both shift-invariant)**
+
+The `market_tailwind` (0.10) is added to all utilities equally via the `tailwind_weight × tailwind` term. Because softmax is shift-invariant (adding a constant to all utilities does not change relative shares), this parameter has no effect on win probability. It was included as a future hook for cases where the tailwind benefit applies differentially, but in the current implementation it cancels out.
+
+The same is true of `federal_risk_penalty` (0.08 in federal mode): it is subtracted equally from all utilities and therefore does not change relative win probabilities. Its practical interpretation is as a market-level headwind signal, not a competitor-specific disadvantage.
+
+If you want either parameter to affect win probability, it would need to be applied asymmetrically (only to Panel Twin or only to competitors).
+
+**NPV and revenue model**
+
+The revenue model runs a month-by-month NPV loop over `horizon_months` (default 36). Each month:
+- Demand scales with `projects_per_year`, `growth_rate` (0.05), and `churn_rate` (0.05)
+- Projects sold = demand × win_probability × net_new_fraction
+- Revenue per project = price + 0.4 × module_addon_price ($25K) + 0.2 × refresh_wave_price ($60K)
+- Total upfront investment = `cac` ($20K) + `other_initial_investment` ($0 default) + library build cost
+
+These are scenario coefficients intended to make the investment case plannable. Actual win rates depend on client relationships, proposal quality, contracting factors, and market dynamics not captured in this model.
 
 ### Monte Carlo: Uncertainty as a First-Class Output
 
@@ -466,6 +514,22 @@ Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `pri
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.7 - 2026-03-01
+
+Landing page audit, terminology consistency, and competition model documentation.
+
+**Landing page accuracy fixes**
+- Updated hardcoded dollar figures in INSIGHTS prose to match current TS model defaults: "~$277K library build" corrected to "~$275K" in two places (INSIGHTS[0] summary and INSIGHTS[1] summary); "~$297,000 upfront" corrected to "~$295,000" in INSIGHTS[2] methodology. The live KPI section below already computed these accurately from the model; the prose was using figures from an earlier calibration.
+- Corrected INSIGHTS[0] labor description: "Setup labor (153 hours at $120/hr) adds $18,360" was stale. The TS model uses a single `total_labor_cost` lump sum (default $18,000), not an hours × rate breakdown. Updated to "Staff cost (lump sum, $18,000 default)."
+
+**Agent library definition added**
+- The term "agent library" (the collection of AI agents built from participant interviews) was used in several places throughout the app without a first-use definition on the landing page. Added a brief explanatory paragraph to the "What is a digital panel twin?" section introducing the term.
+- Replaced the one occurrence of "twin library" in INSIGHTS[5] summary with "agent library" for consistency.
+
+**Competition model documentation**
+- Expanded the "Competition and Revenue" section in this document with a full parameter reference: utility coefficients, Panel Twin defaults, competitor defaults (prices, quality, turnaround), cannibalization rate, and NPV model structure.
+- Documented the shift-invariance note for `market_tailwind` and `federal_risk_penalty`: both are applied equally to all options in the current model and therefore have no effect on relative win probabilities. Noted where asymmetric application would be needed to achieve a real effect.
 
 ### 0.2.6 - 2026-03-01
 
