@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { CostWaterfallChart } from './charts/CostWaterfallChart.tsx';
 import type { ScenarioConfig } from '../model/params.ts';
 import type { ComputedResults } from '../hooks/useScenario.ts';
@@ -9,8 +10,28 @@ interface Props {
 
 const money = (v: number) => `$${Math.round(v).toLocaleString()}`;
 
+type CostView = 'pilot' | 'library';
+
 export function CostTab({ cfg, results }: Props) {
-  const { costs } = results;
+  const [view, setView] = useState<CostView>('pilot');
+  const costs = view === 'pilot' ? results.costs : results.deploymentCosts;
+  const isLibrary = view === 'library';
+
+  const toggleStyle = (active: boolean): React.CSSProperties => ({
+    padding: '5px 14px',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.6px',
+    textTransform: 'uppercase',
+    border: '1.5px solid',
+    borderColor: active ? 'var(--brand-orange)' : 'var(--border)',
+    background: active ? 'var(--brand-orange)' : 'transparent',
+    color: active ? '#fff' : 'var(--text-muted)',
+    cursor: active ? 'default' : 'pointer',
+    borderRadius: 3,
+    fontFamily: 'var(--font-body)',
+    transition: 'all 0.15s',
+  });
 
   return (
     <section id="panel-cost" role="tabpanel" aria-labelledby="tab-cost">
@@ -28,12 +49,41 @@ export function CostTab({ cfg, results }: Props) {
         </span>
       </div>
       <p>
-        Cost estimates cover the per-study variable costs of the pilot: participant
-        incentives, AI voice infrastructure (ASR/TTS), LLM token costs,
-        post-processing, professional labor, and organizational overhead.
+        {isLibrary
+          ? `Cost estimates cover the one-time library build: AI-conducted interviews with all ${results.deploymentCosts.n_target} participants who make up the synthetic twin library. Staff and overhead costs are the same as the pilot since they represent per-project coordination.`
+          : `Cost estimates cover the per-study variable costs of the validation pilot: participant incentives, AI voice infrastructure (ASR/TTS), LLM token costs, post-processing, professional labor, and organizational overhead.`
+        }
       </p>
 
-      <CostWaterfallChart costs={costs} />
+      <div
+        role="group"
+        aria-label="Cost view"
+        style={{ display: 'flex', gap: 6, marginBottom: 16 }}
+      >
+        <button
+          style={toggleStyle(view === 'pilot')}
+          aria-pressed={view === 'pilot'}
+          onClick={() => setView('pilot')}
+        >
+          Validation pilot ({results.costs.n_target} participants)
+        </button>
+        <button
+          style={toggleStyle(view === 'library')}
+          aria-pressed={view === 'library'}
+          onClick={() => setView('library')}
+        >
+          Library build ({results.deploymentCosts.n_target} participants)
+        </button>
+      </div>
+
+      <CostWaterfallChart
+        costs={costs}
+        subtitle={
+          isLibrary
+            ? 'Library build cost components (one-time investment). Adjust participant costs and build costs in Advanced settings.'
+            : 'Pilot cost components. Adjust incentives, labor rate, and overhead in the Advanced settings sidebar.'
+        }
+      />
 
       <h3>Cost detail</h3>
       <table className="data-table">
@@ -48,7 +98,10 @@ export function CostTab({ cfg, results }: Props) {
           <tr><th>Post-processing</th><td>{money(costs.postproc_cost)}</td></tr>
           <tr><th>Staff cost</th><td>{money(costs.labor_cost)}</td></tr>
           <tr><th>Indirect / overhead ({(cfg.cost.overhead_rate * 100).toFixed(0)}%, on non-labor)</th><td>{money(costs.overhead_cost)}</td></tr>
-          <tr className="total-row"><th>Total pilot cost</th><td><strong>{money(costs.total_cost)}</strong></td></tr>
+          <tr className="total-row">
+            <th>{isLibrary ? 'Total library build cost' : 'Total pilot cost'}</th>
+            <td><strong>{money(costs.total_cost)}</strong></td>
+          </tr>
           <tr><th>Cost per completed interview</th><td>{money(costs.cost_per_completed_interview)}</td></tr>
           <tr><th>Cost per retained agent</th><td>{money(costs.cost_per_retained_agent)}</td></tr>
         </tbody>

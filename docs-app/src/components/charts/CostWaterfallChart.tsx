@@ -4,12 +4,13 @@ import type { CostResult } from '../../model/costModel.ts';
 
 interface Props {
   costs: CostResult;
+  subtitle?: string;
 }
 
 const money = (v: number) => `$${Math.round(v).toLocaleString()}`;
 const shortMoney = (v: number) => v > 1000 ? `$${(v / 1000).toFixed(1)}k` : money(v);
 
-export function CostWaterfallChart({ costs }: Props) {
+export function CostWaterfallChart({ costs, subtitle }: Props) {
   const data = useMemo(() => [
     { name: 'Recruitment', value: costs.recruitment_cost, fill: '#E87722' },
     { name: 'Incentives', value: costs.incentives_cost, fill: '#F59E0B' },
@@ -25,7 +26,7 @@ export function CostWaterfallChart({ costs }: Props) {
     <div className="chart-container" role="img" aria-label={`Cost breakdown. Total cost is ${money(costs.total_cost)}.`}>
       <h3 className="chart-title">Cost breakdown</h3>
       <p className="chart-subtitle">
-        Pilot cost components. Adjust incentives, labor rate, and overhead in the Advanced settings sidebar.
+        {subtitle ?? 'Pilot cost components. Adjust incentives, labor rate, and overhead in the Advanced settings sidebar.'}
       </p>
       <ResponsiveContainer width="100%" height={310}>
         <BarChart

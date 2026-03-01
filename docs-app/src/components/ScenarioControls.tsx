@@ -198,8 +198,8 @@ export function ScenarioControls({
 
         <fieldset className="control-group">
           <legend>
-            Build and setup costs{' '}
-            <Tooltip content="Fixed costs incurred once per study phase — not per participant. Staff cost covers all roles involved in designing, building, and running the study (PM, protocol design, engineering, QA, IRB compliance). Overhead applies to non-labor direct costs only; set to 0 if your staff figure is already fully loaded. Other upfront investment covers any additional one-time costs such as infrastructure, legal review, or partnership setup.">
+            Staff and overhead{' '}
+            <Tooltip content="Staff cost and overhead apply to each study run — both the validation pilot (visible in the Cost tab) and the library build (visible in the Economics tab). They are flat per-study costs, not per-participant. Other upfront investment is a separate, truly one-time cost that only enters the NPV model in the Economics tab.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
@@ -209,7 +209,7 @@ export function ScenarioControls({
             min={0} max={150000} step={1000}
             onChange={(v) => updateCost('total_labor_cost', v)}
             format={money}
-            tooltip="Your total estimated staff cost for the study — PM, protocol design, engineering, QA, and IRB compliance combined. Enter as a lump dollar amount at your organization's rates."
+            tooltip="Your total estimated staff cost for the study — PM, protocol design, engineering, QA, and IRB compliance combined. Applied per study run (both pilot and library build). Enter as a lump dollar amount at your organization's rates."
           />
           <Slider
             label="Indirect / overhead rate"
@@ -217,7 +217,7 @@ export function ScenarioControls({
             min={0} max={0.4} step={0.01}
             onChange={(v) => updateCost('overhead_rate', Number(v.toFixed(2)))}
             format={pct}
-            tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing). Set to 0 if your staff cost figure is already fully loaded with overhead."
+            tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing) for each study run — both pilot and library build. Set to 0 if your staff cost figure is already fully loaded with overhead."
           />
           <Slider
             label="Other upfront investment"
@@ -225,7 +225,7 @@ export function ScenarioControls({
             min={0} max={1000000} step={5000}
             onChange={(v) => updateRevenue('other_initial_investment', v)}
             format={money}
-            tooltip="Additional one-time costs beyond the per-study setup (e.g., infrastructure build, legal review, partnership agreements). Added to the total investment in NPV and break-even calculations."
+            tooltip="Truly one-time costs not tied to running either study (e.g., infrastructure build, legal review, partnership setup). Not included in the Cost tab. Added to total upfront investment in the Economics tab NPV model."
           />
         </fieldset>
 
