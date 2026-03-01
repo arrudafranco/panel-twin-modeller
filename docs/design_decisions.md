@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.4
+Version: 0.2.5
 Last updated: 2026-03-01
 Status: active working design record
 
@@ -212,11 +212,11 @@ Key modules:
 - `reporting.py`: writes artifacts and visualizations
 - `cli.py`: turns model logic into usable commands
 
-This layer is the source of truth for the model.
+This layer is preserved as a reference implementation. The `calibrate` command, which ingests pilot study CSVs and updates model parameters from observed data, is the one command with no browser equivalent and the primary reason to use the Python CLI directly.
 
 ### 2. React Web App
 
-The app in `docs-app/` is a React + TypeScript frontend built with Vite and deployed to GitHub Pages. It is the primary interface for exploring the model.
+The app in `docs-app/` is a React + TypeScript frontend built with Vite and deployed to GitHub Pages. It is the primary interface for exploring the model and the actively maintained implementation.
 
 It is designed to:
 - expose core assumptions interactively
@@ -224,7 +224,7 @@ It is designed to:
 - support fast scanning and deeper technical review
 - provide plain-language narrative alongside technical outputs
 
-The backend (`twin_econ/`) remains the authoritative model implementation. The React app ports that logic to TypeScript to run entirely client-side.
+The React app ports the core model logic to TypeScript to run entirely client-side. Default values, construct framing, and model calibrations are updated there first. Known divergences from the Python reference implementation are documented in the Known Issues section.
 
 ## Model Design Decisions
 
@@ -272,10 +272,10 @@ This was a deliberate design choice:
 
 The quality model is intentionally a transparent proxy model.
 
-It separates:
-- attitude/belief constructs
-- self-report behavior
-- incentivized behavior
+It separates three study types:
+- mixed general surveys (attitudes, opinions, and behavioral recall combined)
+- behavioral recall surveys (frequency and history items)
+- incentivized / economic experiments
 
 It uses configurable functional forms and memory assumptions rather than pretending to be a final empirically validated psychometric engine.
 
@@ -469,6 +469,29 @@ Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `pri
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.5 - 2026-03-01
+
+Study-type reframe, labor model simplification, overhead fix, and cost tab wording.
+
+**Study-type reframe**
+- Renamed the three study-type categories from construct-type framing to study-type framing: `attitude_belief` (0.85) → `mixed_general` (0.85), `self_report_behavior` (0.75) → `behavioral_recall` (0.80 — raised from 0.75 to better reflect the planning discount position), `incentivized_behavior` remains (0.66).
+- Rationale: the original framing implied a construct-type decision (what latent variable are you measuring?). In practice, researchers choose by study design (what kind of study is this?). Mixed general surveys combine attitudes, opinions, and behavioral recall — the most common design and the one directly paper-anchored via the GSS Core. Behavioral recall surveys focus on frequency or history items and are the only extrapolated category. Incentivized experiments remain paper-anchored at 0.66.
+- Labels updated across the dropdown ("Mixed general (attitudes, opinions, behaviors)", "Behavioral recall (frequency and history items)"), CONSTRUCT_LABELS maps, chart series names, tooltips, and quality tab methods text.
+- `constructMatch()` in `benchmarkModel.ts` was missing aliases for the new keys, causing benchmark thresholds to silently fall back to the manual default for both `mixed_general` and `behavioral_recall`. Fixed by adding bidirectional aliases mapping new keys to the old benchmark `construct_type` values.
+
+**Labor model simplification**
+- Collapsed six sidebar sliders (fully loaded hourly rate + protocol design / engineering / QA / PM / IRB compliance hours) into a single "Total staff cost" lump-sum input ($18,000 default, equal to the previous calculated total of 153 hours × $120/hr).
+- Rationale: individual hour breakdowns are error-prone since labor rates and role structures vary widely by organization. A lump-sum input correctly places the estimation burden on the user, who knows their own staffing, rather than on stylized defaults that no organization will actually match.
+
+**Overhead double-counting fix**
+- `overhead_rate` previously applied to all direct costs including labor. Since the "fully loaded hourly rate" was described as already including overhead (salary + benefits + facilities), applying overhead on top constituted double-counting on the labor line.
+- Fixed: overhead now applies only to non-labor direct costs (recruitment, incentives, voice ops, LLM, post-processing). The "Total staff cost" lump sum is not marked up further. Tooltip updated to clarify: set overhead to 0 if the staff figure is already fully loaded.
+- Sidebar label renamed from "Overhead rate" to "Indirect / overhead rate" for clarity.
+
+**Cost tab panel wording**
+- Removed bold "existing probability panel" phrasing from the Cost tab info callout. Reworded to "existing survey panel or sample source" — generic language that does not imply a specific named panel or proprietary relationship.
+- `cost_per_invite` tooltip updated to explicitly distinguish three cases: no chargeback ($0), internal departmental chargeback (set to the rate), and external vendor per-invite rate.
 
 ### 0.2.4 - 2026-03-01
 
