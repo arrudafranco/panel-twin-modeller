@@ -109,16 +109,22 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
             </th>
             <td>{money(finance.contribution_margin_total)}</td>
           </tr>
-          <tr><th>Projected net present value (NPV)</th><td><strong>{money(finance.npv)}</strong></td></tr>
+          <tr>
+            <th>
+              Projected net present value (NPV)
+              <Tooltip content={`Discounted sum of monthly margins over the ${cfg.revenue.horizon_months}-month horizon, minus the total upfront investment. Uses a ${(cfg.revenue.discount_rate * 100).toFixed(0)}% annual discount rate (the hurdle rate assumption — future cash flows are worth less than today's dollars at this rate). A positive NPV means the investment recovers its cost and earns above the hurdle rate; negative means it does not, even if the undiscounted cash-flow break-even is within the horizon.`}>
+                {' '}<span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </th>
+            <td><strong>{money(finance.npv)}</strong></td>
+          </tr>
           <tr><th>Break-even</th><td>{finance.time_to_break_even_months ? `${finance.time_to_break_even_months} months` : `Not within ${cfg.revenue.horizon_months} months`}</td></tr>
         </tbody>
       </table>
 
       <p style={{ opacity: 0.65, fontSize: '0.88em', marginTop: 16 }}>
-        Refresh wave revenue is included in the model but refresh operational costs are not
-        modeled on the cost side. The useful life of a twin library before agents need
-        re-interviewing is unknown. For discussion of topical generalizability limits and
-        agent profile drift over time, see the Fidelity tab.
+        The NPV uses a {(cfg.revenue.discount_rate * 100).toFixed(0)}% annual discount rate (fixed assumption, not configurable here).
+        The useful life of an agent library before re-interviewing is needed is unknown. See the Fidelity tab for discussion of agent profile drift.
       </p>
 
       <div className="mc-section">
