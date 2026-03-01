@@ -85,7 +85,7 @@
     "price_per_project": 180000,
     "module_addon_price": 25000,
     "refresh_wave_price": 60000,
-    "projects_per_year": 6,
+    "projects_per_year": 10,
     "growth_rate": 0.08,
     "churn_rate": 0.05,
     "cac": 20000,

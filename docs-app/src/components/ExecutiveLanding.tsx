@@ -32,13 +32,13 @@ const INSIGHTS: InsightDef[] = [
     ],
   },
   {
-    title: "At default settings, NPV is negative — the model shows where the gaps are",
-    summary: "Six projects per year at $55K price and $25K run cost generates roughly $6,700/month in margin. Over 36 months that is about $248K cumulative — against a ~$297K upfront investment. NPV is negative. The investment case requires more project volume, higher price, or a longer amortization window. The interactive explorer shows exactly where the tipping points are.",
+    title: "Project volume is the primary NPV lever — not per-project margin",
+    summary: "At $55K price and $25K run cost, gross margin is ~55% per project. But win probability in a four-way market (including a $5K non-probability panel) is only ~37%, and 30% of wins cannibalize existing work. With 10 projects pursued per year, the model projects positive NPV with break-even around month 27 of a 36-month horizon. Cut project volume in half and the investment doesn't recover. The primary driver is not margin per project — it is how many projects you actually pursue.",
     methodology: [
-      "At defaults: win probability ~37% (out of four competitors including a $5K non-probability panel option that captures ~39% of market share on price alone), net-new fraction 70% (30% cannibalization), gross margin ~55%. Monthly margin is modest — roughly $6,700 — because wins are diluted across four competitors.",
-      "Cumulative margin at 36 months (before discounting) is approximately $248,000 versus total upfront investment of ~$297,000. NPV is negative because discounting further reduces the present value of deferred cash flows.",
-      "The primary lever is not price or margin per project — it is win rate. With four competitors in the utility model and a non-probability panel option that is 11× cheaper, Panel Twin's market share is capped unless quality or turnaround advantages are decisive. Under the stylized coefficients, quality matters most (weight 3.2) but brand trust for competitors is set to zero, which already gives Panel Twin an advantage.",
-      "Adjustments that shift NPV toward positive: increase projects_per_year (6 is conservative for an established product), increase price, reduce CAC, or extend the horizon. The model is not a prediction — it is a tool for identifying which assumptions are load-bearing for the investment case.",
+      "Win probability ~37% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $52,000 (including module and refresh add-ons). At 10 projects pursued per year, expected monthly margin is roughly $11,200. Over 36 months cumulative margin approaches $415,000 (before discounting) against ~$297,000 upfront.",
+      "A non-probability panel at $5K captures ~39% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
+      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Doubling volume roughly doubles cumulative margin while upfront investment stays at ~$297K. This means a modest increase in the pipeline has a disproportionate NPV effect.",
+      "These projections use stylized market utility coefficients, not historical win/loss data. Actual win rates depend on client relationships, proposal quality, pricing negotiations, and factors not captured in a logit model. Treat NPV as a directional planning signal, not a forecast.",
     ],
   },
   {
@@ -55,7 +55,7 @@ const INSIGHTS: InsightDef[] = [
     ],
   },
   {
-    title: "Federal mode raises the quality bar — and that alone can flip a viable scenario to not viable",
+    title: "Federal clients are a harder sell than the quality numbers alone would suggest",
     summary: "Switching to federal settings applies a +0.05 uplift to the quality threshold, derived from NSDUH, BRFSS, and GSS reliability benchmarks. A configuration that comfortably clears the commercial threshold may fall short in federal mode with the same interview design. The economic model also applies a risk penalty (−0.08 utility) to represent client conservatism, though because this applies across all options it is most meaningful as a signal of overall market difficulty rather than a change in relative win rates.",
     methodology: [
       "Federal quality threshold: the benchmark-derived threshold increases by 0.05 in federal mode. This reflects the stricter evidence standards associated with federal research procurement, derived from published NSDUH, BRFSS, and GSS reliability benchmarks. The uplift is a modeling convention, not a formally measured procurement standard.",

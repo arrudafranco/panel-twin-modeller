@@ -109,7 +109,7 @@ class RevenueParams:
     price_per_project: float = 180000.0
     module_addon_price: float = 25000.0
     refresh_wave_price: float = 60000.0
-    projects_per_year: int = 6
+    projects_per_year: int = 10
     growth_rate: float = 0.08
     churn_rate: float = 0.05
     cac: float = 20000.0

@@ -249,7 +249,7 @@ export const DEFAULT_REVENUE: RevenueParams = {
   per_project_run_cost: 25000.0,
   module_addon_price: 25000.0,
   refresh_wave_price: 60000.0,
-  projects_per_year: 6,
+  projects_per_year: 10,
   growth_rate: 0.08,
   churn_rate: 0.05,
   cac: 20000.0,
