@@ -1,7 +1,7 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.2
-Last updated: 2026-02-28
+Version: 0.2.3
+Last updated: 2026-03-01
 Status: active working design record
 
 ## Purpose
@@ -434,7 +434,41 @@ When a meaningful design or architecture change is made:
 
 If a change only affects wording, styling, or minor implementation detail without changing design intent, an update may not be necessary.
 
+## Known Issues and Deferred Work
+
+Items that are acknowledged, not urgent, and should not be forgotten.
+
+**Python config pricing divergence (low priority)**
+Both `configs/base.yaml` and `configs/federal_high_risk.yaml` still contain `price_per_project: 180000` — the pre-recalibration default. The React app defaults were updated to $55,000 in v0.2.2 to reflect a realistic pricing position below traditional probability panel benchmarks. The Python configs were not updated at that time because the Python model is treated as a reference implementation and the configs are not actively used in the public-facing flow. Before relying on the Python CLI for financial projections, these values should be updated to match the React app defaults ($55,000 price, $25,000 per-project run cost, $80,000/$60,000/$5,000 competitor prices).
+
+**Pre-existing Python test failure (low priority)**
+`test_strict_filter_changes_threshold_vs_all` in `tests/test_model_properties.py` fails. This is a pre-existing failure unrelated to changes made in v0.2.2 or later. It tests benchmark filter logic for a specific edge case. The remaining 38/39 tests pass. The failure should be investigated before relying on the Python benchmark model for strict-filter scenarios.
+
+**Federal risk penalty has no effect on win probability (acknowledged, not a bug)**
+In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
+
 ## Version Updates
+
+### 0.2.3 - 2026-03-01
+
+Copy, defaults, and documentation cleanup.
+
+**projects_per_year raised from 6 to 10**
+- Updated default in `docs-app/src/model/params.ts`, `twin_econ/params.py`, `configs/base.yaml`, and `configs/federal_high_risk.yaml`.
+- Rationale: 6 projects/year produced negative NPV at the recalibrated price ($55K) and run cost ($25K), which is a misleading default signal for a tool users will treat as a planning baseline. 10 is still conservative for an operational research service with an existing client base and breaks even around month 27 of a 36-month horizon with default win probability.
+
+**Landing page insight cards 3 and 5 rewritten**
+- Card 3 (was: methodology disclaimer about the self_report_behavior 0.75 planning discount): replaced with a genuine model finding about project volume being the primary NPV driver. Quantifies break-even at default settings (10 projects/year, ~37% win probability, ~month 27). Methodology section explains why volume matters more than per-project margin given the fixed upfront investment structure.
+- Card 5 (was: "Federal viability applies two independent filters, not one"): retitled to "Federal clients are a harder sell than the quality numbers alone would suggest." Summary and methodology now accurately describe what the model actually does — quality threshold uplift (+0.05) is the primary actionable effect; the federal_risk_penalty is acknowledged to apply equally to all competitors and not shift relative win probabilities. The acknowledged behavioral description is also documented in the Known Issues section.
+
+**NPV acronym expanded on first use**
+- "NPV" was undefined for first-time readers. All six files that used the abbreviation now spell it out as "net present value (NPV)" on first use within each standalone UI context: EconomicsTab, OverviewTab, DynamicNarrative, QualityTab, ExecutiveLanding.
+
+**Stale "synthetic" copy removed**
+- EconomicsTab intro referenced "data collection or generation" — a leftover from the era when the third benchmark was fully synthetic data. Updated to "data collection."
+
+**Known issues section added to this document**
+- Documents three deferred items: Python config pricing divergence, pre-existing test failure, and the federal risk penalty behavior. See "Known Issues and Deferred Work" section above.
 
 ### 0.2.2 - 2026-02-28
 

@@ -69,11 +69,14 @@ To run tests:
 pytest -q tests/
 ```
 
+38 of 39 tests pass. One pre-existing failure (`test_strict_filter_changes_threshold_vs_all`) covers a benchmark filter edge case unrelated to the primary model flow. See [docs/design_decisions.md](docs/design_decisions.md) for details.
+
 ## Notes
 
 - Config files are real YAML and loaded with `PyYAML`.
 - Construct-focused presets are available in `configs/attitude_profile.yaml`, `configs/self_report_profile.yaml`, and `configs/incentivized_profile.yaml`.
 - A sample pilot CSV with optional response-mode calibration columns is available at `pilot_logs/template_response_modes.csv`.
 - All RNG-driven paths are seeded.
+- The Python model defaults (`twin_econ/params.py`, `configs/`) reflect an earlier calibration and may diverge from the React app's current defaults. See the Known Issues section in [docs/design_decisions.md](docs/design_decisions.md) before using the Python CLI for financial projections.
 - Plain-English architecture and rationale are documented in [docs/design_decisions.md](docs/design_decisions.md).
 - Optional external anchor references are documented in [docs/external_reference_defaults.md](docs/external_reference_defaults.md).
