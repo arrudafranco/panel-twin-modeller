@@ -92,11 +92,20 @@ export function ScenarioControls({
           tooltip="Revenue per project. Represents the full-service price for data collection, agent construction, and basic deliverables (weighted dataset and crosstabs). Does not include custom analysis or reporting. Combined with cost per project this determines the gross margin."
         />
         <Slider
+          label="Deployment study size"
+          value={cfg.sampling.scaleup_n}
+          min={200} max={5000} step={100}
+          onChange={(v) => {
+            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
+          }}
+          tooltip="Number of participants per commercial deployment study. This drives the cost-per-project used in the Feasibility tab NPV and break-even calculations. Keep the pilot sample size small for validation; set this to your expected commercial scale (typically 500–2,000)."
+        />
+        <Slider
           label="Projects per year"
           value={cfg.revenue.projects_per_year}
           min={1} max={30} step={1}
           onChange={(v) => updateRevenue('projects_per_year', v)}
-          tooltip="Expected number of client projects per year. Drives the total revenue projection in the NPV model."
+          tooltip="Expected number of projects per year. Drives the total revenue projection in the NPV model."
         />
         <Slider
           label="Time horizon (months)"

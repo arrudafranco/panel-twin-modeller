@@ -16,7 +16,7 @@ const money = (v: number) => `$${Math.round(v).toLocaleString()}`;
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 
 export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
-  const { finance, mcResult } = results;
+  const { finance, mcResult, deploymentCosts } = results;
 
   return (
     <section id="panel-economics" role="tabpanel" aria-labelledby="tab-economics">
@@ -24,40 +24,23 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
       <p>
         Fidelity and cost do not exist in isolation. They shape whether this approach
         is viable at scale and how it compares to alternative research methods. This
-        section connects those methodological trade-offs to business outcomes, illustrating
-        what the investment case might look like under different assumptions and how the
-        approach positions relative to alternatives.
+        section connects those trade-offs to business outcomes, illustrating what the
+        investment case might look like under different assumptions and how the approach
+        positions relative to alternatives.
       </p>
-
-      {/* Scope clarification */}
-      <div className="info-callout" style={{ marginBottom: 16, alignItems: 'flex-start' }}>
-        <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>ℹ</span>
-        <span>
-          The <strong>Cost tab</strong> shows what one study costs to run at the configured
-          sample size. The projections on this page use that same per-study cost as the cost
-          of one delivered project, and the configured price as the corresponding revenue.
-          To model commercial-scale deployment economics, increase the sample size slider —
-          larger studies cost more per project but the fidelity and pricing assumptions stay
-          the same. All project prices — Panel Twin and alternatives — reflect full-service
-          scope: data collection or generation, representativeness adjustments, and a weighted
-          dataset. Custom analysis and reporting are not included. Refresh costs and build-out
-          of a nationally representative panel are additional considerations not modeled here.
-        </span>
-      </div>
-
-      {/* Fix 1: Prominent coefficient warning */}
-      <div className="coefficient-warning">
-        <Tooltip content="Utility weights (quality=3.2, brand=1.1, tailwind=0.8, price=0.000012, turnaround=0.03) are scenario planning defaults, not fitted to historical market data. Market share is estimated from a multinomial logit model. Gross margin = (price − cost per project) / price.">
+      <p className="economics-context-note">
+        Cost-per-project reflects a {cfg.sampling.scaleup_n.toLocaleString()}-participant
+        deployment study (set via "Deployment study size" in the sidebar); the Cost tab
+        shows the smaller pilot. All four alternative prices cover equivalent scope: data
+        collection or generation, representativeness adjustments, and a weighted dataset —
+        not custom analysis or reporting. Win probability and NPV use{' '}
+        <Tooltip content="Utility weights (quality=3.2, brand=1.1, tailwind=0.8, price=0.000012, turnaround=0.03) are scenario planning defaults, not fitted to historical win/loss data. Market share is estimated from a multinomial logit model.">
           <span className="info-icon" aria-hidden="true">i</span>
         </Tooltip>
-        {' '}Win probability and market share use illustrative competition model coefficients. Actual
-        win rates depend on client relationships, proposal quality, and factors not captured here.
-        Treat NPV and break-even as directional planning signals, not forecasts. Competitor prices
-        and quality scores are editable in Advanced settings.
-        {' '}<span style={{ opacity: 0.6, fontSize: '0.88em' }}>
-          Defaults last updated February 2026. LLM pricing and market conditions change rapidly.
-        </span>
-      </div>
+        {' '}illustrative scenario coefficients, not fitted market data — treat them as
+        directional planning signals. Competitor prices are adjustable in Advanced settings.{' '}
+        <span style={{ opacity: 0.55, fontSize: '0.88em' }}>Defaults: February 2026.</span>
+      </p>
 
       <NpvTimelineChart finance={finance} />
       <MarketRadarChart cfg={cfg} quality={results.quality} finance={finance} />
@@ -68,7 +51,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
           <tr>
             <th>
               Win probability
-              <Tooltip content="Probability Panel Twin wins a head-to-head proposal, derived from the utility-based competition model.">
+              <Tooltip content="Estimated probability of winning a project over the modeled alternatives, derived from the utility-based competition model.">
                 {' '}<span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </th>
@@ -80,8 +63,17 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
           <tr><th>Market share (Fully synthetic)</th><td>{pct(finance.market_share_external_synthetic)}</td></tr>
           <tr>
             <th>
+              Deployment study cost
+              <Tooltip content={`Total cost of running one study at deployment scale (${cfg.sampling.scaleup_n.toLocaleString()} participants, scaleup mode). This is the cost-per-project used in NPV and gross margin calculations.`}>
+                {' '}<span className="info-icon" aria-hidden="true">i</span>
+              </Tooltip>
+            </th>
+            <td>{money(deploymentCosts.total_cost)}</td>
+          </tr>
+          <tr>
+            <th>
               Gross margin
-              <Tooltip content="(Price per project − total study cost at configured sample size) / price per project. Does not include CAC or other fixed costs.">
+              <Tooltip content="(Price per project − deployment study cost) / price per project. Does not include customer acquisition cost or other fixed costs.">
                 {' '}<span className="info-icon" aria-hidden="true">i</span>
               </Tooltip>
             </th>
@@ -94,24 +86,12 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
         </tbody>
       </table>
 
-      {/* Topical extrapolation note */}
-      <div className="methods-note" style={{ marginTop: 20 }}>
-        <h3>A key open question: topical extrapolation</h3>
-        <p>
-          We do not yet know how broadly an agent trained on one interview can be trusted to answer
-          questions outside the domains that interview covered. If topical extrapolation proves limited,
-          additional targeted "module" interviews for specific research topic areas may be needed.
-          This would add cost and participant burden but could enable coverage of multiple profitable
-          research verticals from a single base panel.
-        </p>
-        <p>
-          Similarly, agent profiles will drift as respondents' lives, opinions, and circumstances change.
-          The appropriate refresh interval is unknown and likely construct-dependent. Refresh wave pricing
-          is included in the revenue model but refresh costs are not yet modeled on the cost side.
-        </p>
-      </div>
+      <p style={{ opacity: 0.65, fontSize: '0.88em', marginTop: 16 }}>
+        Refresh wave pricing is included in the revenue model but per-refresh operational
+        costs are not modeled on the cost side. For discussion of topical extrapolation
+        limits and agent profile drift, see the Fidelity tab methods note.
+      </p>
 
-      {/* Monte Carlo section */}
       <div className="mc-section">
         <h3>Uncertainty analysis (Monte Carlo)</h3>
         <p>

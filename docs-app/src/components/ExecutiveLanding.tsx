@@ -177,8 +177,9 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     const tiers = qualityTiers(cfg);
     const threshold = recommendedQualityThreshold(cfg, 'attitude_belief');
     const costs = computeCosts(cfg);
+    const deploymentCosts = computeCosts({ ...cfg, mode: 'scaleup' });
     const qualEval = qualityMarketAdjustment(tiers.attitude_belief, threshold);
-    const finance = computeFinance(cfg, costs.total_cost, qualEval.effective_quality_for_market);
+    const finance = computeFinance(cfg, deploymentCosts.total_cost, qualEval.effective_quality_for_market);
 
     let minViableMinutes = 0;
     for (let m = 30; m <= 180; m += 5) {
@@ -353,10 +354,6 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
             <div className="landing-kpi-label">Break-even (commercial)</div>
           </div>
         </div>
-        <p className="cta-note" style={{ marginTop: 10, fontSize: 12 }}>
-          NPV and break-even reflect a hypothetical commercial deployment after pilot validation,
-          not the pilot study cost itself.
-        </p>
       </section>
 
       {/* Who is this for? */}

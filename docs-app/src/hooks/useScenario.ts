@@ -23,7 +23,8 @@ export interface ComputedResults {
     quality_pressure: number;
     effective_quality_for_market: number;
   };
-  costs: CostResult;
+  costs: CostResult;          // pilot-scale costs (shown in Cost tab)
+  deploymentCosts: CostResult; // scaleup-mode costs (used in Economics tab)
   finance: FinanceResult;
   mcResult: MCResult | null;
   warnings: string[];
@@ -70,10 +71,11 @@ export function useScenario() {
     const tiers = qualityTiers(cfg);
     const threshold = recommendedQualityThreshold(cfg, cfg.quality_profile);
     const qualEval = qualityMarketAdjustment(qual, threshold);
+    // Pilot costs: used in the Cost tab (small validation study)
     const costs = computeCosts(cfg);
-    // cogsPerProject = total cost of running one full study at the configured sample size.
-    // This is what a client project actually costs to deliver, not cost per single interview.
-    const finance = computeFinance(cfg, costs.total_cost, qualEval.effective_quality_for_market);
+    // Deployment costs: used in the Economics tab (commercial-scale study via scaleup mode)
+    const deploymentCosts = computeCosts({ ...cfg, mode: 'scaleup' });
+    const finance = computeFinance(cfg, deploymentCosts.total_cost, qualEval.effective_quality_for_market);
     const qualityUncertainty = QUALITY_UNCERTAINTY_BANDS[cfg.quality_profile] ?? 0.08;
 
     let mcResult: MCResult | null = null;
@@ -103,6 +105,7 @@ export function useScenario() {
       threshold,
       qualityEval: qualEval,
       costs,
+      deploymentCosts,
       finance,
       mcResult,
       warnings,

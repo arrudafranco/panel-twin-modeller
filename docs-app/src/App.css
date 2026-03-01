@@ -1032,6 +1032,15 @@ details.advanced-controls[open] summary::before {
   gap: 6px;
 }
 
+.economics-context-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--border-color);
+}
+
 .coefficient-warning {
   background: #FFF7EE;
   border: 1px solid #EDD4B0;
