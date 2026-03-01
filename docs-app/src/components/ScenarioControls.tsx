@@ -47,8 +47,8 @@ export function ScenarioControls({
 
       <fieldset className="control-group">
         <legend>
-          Study design{' '}
-          <Tooltip content="This tool models three cost stages. Stage 1: a small validation pilot (Cost tab) to check quality and operations before committing. Stage 2: the full library build — AI-conducted interviews with the target number of participants, creating the synthetic twin library (one-time investment in Economics tab). Stage 3: per-project runs against the existing library at marginal cost (Pricing and business section). Interview duration drives quality and per-participant AI costs at all stages.">
+          Interview design{' '}
+          <Tooltip content="These parameters describe each AI voice interview. They set quality expectations and determine the cost per participant — and since per-participant costs are the same unit whether you are running a small pilot or the full library build, these inputs drive both. Incentives, voice costs, and LLM costs are all per-participant; adjust them in Advanced settings.">
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>
@@ -57,37 +57,15 @@ export function ScenarioControls({
           value={cfg.interview_minutes}
           min={30} max={180} step={5}
           onChange={(v) => update('interview_minutes', v)}
-          tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration and directly drives voice and LLM costs. Applies to both the pilot and the full library build."
+          tooltip="Length of the AI-conducted voice interview per participant. The Stanford genagents study used ~120-minute interviews. Quality improves logarithmically with duration and directly drives voice and LLM costs per participant."
         />
-        <Slider
-          label="Stage 1 — Validation pilot size"
-          value={cfg.sampling.pilot_n}
-          min={50} max={500} step={10}
-          onChange={(v) => {
-            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, pilot_n: v } as never);
-          }}
-          tooltip="Number of participants in the small validation pilot. Run before committing to the full library build. Drives the total shown in the Cost tab. Typically 50–200 participants."
-        />
-        <Slider
-          label="Stage 2 — Library build size"
-          value={cfg.sampling.scaleup_n}
-          min={200} max={5000} step={100}
-          onChange={(v) => {
-            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
-          }}
-          tooltip="Number of participants to interview for the full synthetic twin library. This is a one-time investment — once the library is built, subsequent survey projects run against it at marginal cost only (no new interviews). Drives the initial investment line in the Economics tab. A nationally representative U.S. sample typically requires at least 2,000 participants."
-        />
-      </fieldset>
-
-      <fieldset className="control-group">
-        <legend>Field operations</legend>
         <Slider
           label="Response rate"
           value={cfg.cost.response_rate}
           min={0.05} max={0.9} step={0.01}
           onChange={(v) => updateCost('response_rate', Number(v.toFixed(2)))}
           format={pct}
-          tooltip="Fraction of invited panel members who complete the interview. For a 2-hour AI voice study via an established probability panel, 15–30% is a reasonable range. Determines how many panel slots to reserve."
+          tooltip="Fraction of invited panel members who complete the interview. For a 2-hour AI voice study via an established probability panel, 15–30% is a reasonable range. Determines how many panel slots to reserve and affects cost per complete at both pilot and library build scale."
         />
         <Slider
           label="Retest attrition"
@@ -95,34 +73,66 @@ export function ScenarioControls({
           min={0} max={0.6} step={0.01}
           onChange={(v) => updateCost('attrition_rate', Number(v.toFixed(2)))}
           format={pct}
-          tooltip="Fraction of completed participants lost before the retest wave. High attrition weakens the quality estimate grounding and reduces the number of retained agents."
+          tooltip="Fraction of completed participants lost before the retest wave. High attrition weakens the quality estimate grounding and reduces the number of retained agents in the library."
         />
       </fieldset>
 
       <fieldset className="control-group">
-        <legend>Pricing and business</legend>
+        <legend>
+          Study scale{' '}
+          <Tooltip content="Two distinct spending events. The validation pilot is a small study run first to check quality, operations, and assumptions before committing to the full build — its cost appears in the Cost tab. The library build is the full one-time investment: AI interviews with the target number of participants that creates the synthetic twin library — its cost is the initial investment in the Economics tab. Both events use the same per-participant interview design above. Per-interview costs (incentives, panel access) are in Advanced settings.">
+            <span className="info-icon" aria-hidden="true">i</span>
+          </Tooltip>
+        </legend>
+        <Slider
+          label="Validation pilot size"
+          value={cfg.sampling.pilot_n}
+          min={50} max={500} step={10}
+          onChange={(v) => {
+            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, pilot_n: v } as never);
+          }}
+          tooltip="Number of participants in the validation pilot. Shown in the Cost tab. Run this before committing to the full library build to verify response rates, quality, and cost assumptions. Typically 50–200 participants."
+        />
+        <Slider
+          label="Library build size"
+          value={cfg.sampling.scaleup_n}
+          min={200} max={5000} step={100}
+          onChange={(v) => {
+            update('sampling' as keyof ScenarioConfig, { ...cfg.sampling, scaleup_n: v } as never);
+          }}
+          tooltip="Number of participants to interview for the full synthetic twin library. Shown as the initial investment in the Economics tab. Once built, subsequent survey projects run against this library at marginal cost — no new interviews needed. A nationally representative U.S. sample typically requires at least 2,000 participants."
+        />
+      </fieldset>
+
+      <fieldset className="control-group">
+        <legend>
+          Per-project economics{' '}
+          <Tooltip content="These inputs describe what happens after the library is built. Each subsequent survey project incurs a marginal run cost (LLM inference, QA, PM, data delivery) with no new interviews. Revenue and run cost together determine the gross margin on each project, which the NPV model uses to project break-even and net present value.">
+            <span className="info-icon" aria-hidden="true">i</span>
+          </Tooltip>
+        </legend>
         <Slider
           label="Price per project"
           value={cfg.revenue.price_per_project}
           min={20000} max={300000} step={5000}
           onChange={(v) => updateRevenue('price_per_project', v)}
           format={money}
-          tooltip="Revenue per project. Covers full-service delivery: data collection, agent construction, representativeness weighting, and a weighted dataset with crosstabs. Does not include custom analysis or reporting."
+          tooltip="Revenue per project delivered against the existing library. Covers full-service delivery: agent querying, representativeness weighting, and a weighted dataset with crosstabs. Does not include custom analysis or reporting."
         />
         <Slider
-          label="Stage 3 — Per-project run cost"
+          label="Run cost per project"
           value={cfg.revenue.per_project_run_cost}
           min={5000} max={100000} step={1000}
           onChange={(v) => updateRevenue('per_project_run_cost', v)}
           format={money}
-          tooltip="Marginal cost of running one survey project against the existing twin library (Stage 3 — after the library is built). Covers LLM inference, per-project QA, PM, and data delivery. No new interviews or incentives — those are the one-time Stage 2 library build cost. Typically $20,000–$30,000 per project."
+          tooltip="Marginal cost of running one survey project against the existing library. Covers LLM inference, per-project QA, PM, and data delivery. No new interviews or participant incentives — those are part of the library build. Typically $20,000–$30,000 per project."
         />
         <Slider
           label="Projects per year"
           value={cfg.revenue.projects_per_year}
           min={1} max={30} step={1}
           onChange={(v) => updateRevenue('projects_per_year', v)}
-          tooltip="Expected number of projects per year. Drives total revenue in the NPV model."
+          tooltip="Expected number of projects per year once the library is operational. Drives total revenue in the NPV model."
         />
         <Slider
           label="Time horizon (months)"
@@ -155,26 +165,26 @@ export function ScenarioControls({
 
         <fieldset className="control-group">
           <legend>
-            Participant costs{' '}
-            <Tooltip content="This model assumes the panel provides participant access at no per-invite cost, while incentives are paid directly by the project operator. This is the correct structure for non-standard protocols (2-hour AI voice interviews) where probability panels do not bundle incentives into a flat per-complete rate, unlike standard omnibus surveys.">
+            Per-interview costs{' '}
+            <Tooltip content="Costs incurred per participant interviewed. These apply at both the validation pilot and the library build — the total scales with the number of participants in each. For non-standard 2-hour AI voice protocols, probability panels typically do not bundle incentives into a flat per-complete rate, so incentives are paid separately by the project operator.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
           <Slider
-            label="Phase 1 incentive"
+            label="Interview incentive"
             value={cfg.cost.base_incentive_phase1}
             min={10} max={200} step={5}
             onChange={(v) => updateCost('base_incentive_phase1', v)}
             format={money}
-            tooltip="Incentive paid per participant for the initial interview. Typically $40–$100 for a ~2-hour AI voice interview."
+            tooltip="Incentive paid per participant for the initial AI voice interview. Typically $40–$100 for a ~2-hour session."
           />
           <Slider
-            label="Phase 2 incentive (retest)"
+            label="Retest incentive"
             value={cfg.cost.base_incentive_phase2}
             min={5} max={100} step={5}
             onChange={(v) => updateCost('base_incentive_phase2', v)}
             format={money}
-            tooltip="Incentive for the retest wave. Usually lower than Phase 1 since the session is shorter."
+            tooltip="Incentive for the retest wave used to validate agent fidelity. Usually lower than the initial interview incentive since the session is shorter."
           />
           <Slider
             label="Cost per invite"
@@ -188,8 +198,8 @@ export function ScenarioControls({
 
         <fieldset className="control-group">
           <legend>
-            Setup and labor{' '}
-            <Tooltip content="Total staff cost for the study. Enter in dollars — include all applicable roles (PM, protocol design, engineering, QA, IRB compliance) at whatever rate structure your organization uses. Overhead below covers indirect costs on top of non-labor expenses; set it to 0 if your staff figure is already fully loaded.">
+            Build and setup costs{' '}
+            <Tooltip content="Fixed costs incurred once per study phase — not per participant. Staff cost covers all roles involved in designing, building, and running the study (PM, protocol design, engineering, QA, IRB compliance). Overhead applies to non-labor direct costs only; set to 0 if your staff figure is already fully loaded. Other upfront investment covers any additional one-time costs such as infrastructure, legal review, or partnership setup.">
               <span className="info-icon" aria-hidden="true">i</span>
             </Tooltip>
           </legend>
@@ -199,7 +209,7 @@ export function ScenarioControls({
             min={0} max={150000} step={1000}
             onChange={(v) => updateCost('total_labor_cost', v)}
             format={money}
-            tooltip="Your total estimated staff cost for the study — include all applicable roles such as PM, protocol design, engineering, QA, and IRB compliance. Enter as a lump dollar amount at your organization's rates."
+            tooltip="Your total estimated staff cost for the study — PM, protocol design, engineering, QA, and IRB compliance combined. Enter as a lump dollar amount at your organization's rates."
           />
           <Slider
             label="Indirect / overhead rate"
@@ -207,7 +217,7 @@ export function ScenarioControls({
             min={0} max={0.4} step={0.01}
             onChange={(v) => updateCost('overhead_rate', Number(v.toFixed(2)))}
             format={pct}
-            tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing) to cover facilities, admin, and organizational indirect costs. Set to 0 if your staff cost figure is already fully loaded."
+            tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing). Set to 0 if your staff cost figure is already fully loaded with overhead."
           />
           <Slider
             label="Other upfront investment"
@@ -215,7 +225,7 @@ export function ScenarioControls({
             min={0} max={1000000} step={5000}
             onChange={(v) => updateRevenue('other_initial_investment', v)}
             format={money}
-            tooltip="Additional upfront costs beyond per-study setup (e.g., infrastructure build, legal review, partnership setup). Added to the total investment in NPV and break-even calculations."
+            tooltip="Additional one-time costs beyond the per-study setup (e.g., infrastructure build, legal review, partnership agreements). Added to the total investment in NPV and break-even calculations."
           />
         </fieldset>
 
