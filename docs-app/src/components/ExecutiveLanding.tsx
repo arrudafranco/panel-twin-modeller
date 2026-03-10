@@ -209,8 +209,8 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           Explore whether digital twins built from AI-conducted voice interviews
           can deliver research-grade survey quality at scale.
         </p>
-        <button className="landing-hero-skip" onClick={onEnterExplorer} aria-label="Skip to the model">
-          Skip to the model ↓
+        <button className="landing-hero-skip" onClick={onEnterExplorer} aria-label="Explore the model">
+          Explore the model →
         </button>
       </section>
 
