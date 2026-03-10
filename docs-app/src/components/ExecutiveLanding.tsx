@@ -37,7 +37,7 @@ const INSIGHTS: InsightDef[] = [
     methodology: [
       "Win probability ~36% in the default four-way market. Net-new fraction 70% (30% cannibalization). Per-project margin $37,000 ($55K price minus $18K run cost). At 15 projects pursued per year, expected monthly margin is roughly $11,500 before discounting. Over 36 months cumulative margin approaches $425,000 against ~$186,000 upfront, with break-even around month 17.",
       "A non-probability panel at $5K captures ~40% of the market on price alone under the stylized utility coefficients. Panel Twin must win on quality and turnaround, not price. Since quality has the highest utility weight (3.2), this is achievable — but only if quality thresholds are cleared.",
-      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Reducing to fewer than 7 projects per year moves break-even outside the 36-month horizon. Use the explorer to find the volume and pricing combination that makes the investment case work for your scenario.",
+      "The model is sensitive to projects_per_year because wins scale linearly with volume but the upfront investment is fixed. Reducing to fewer than 7 projects per year moves break-even outside the 36-month horizon. Use the model to find the volume and pricing combination that makes the investment case work for your scenario.",
       "These projections use stylized market utility coefficients, not historical win/loss data. Actual win rates depend on client relationships, proposal quality, pricing negotiations, and factors not captured in a logit model. Treat NPV as a directional planning signal, not a forecast.",
     ],
   },
@@ -209,8 +209,8 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           Explore whether digital twins built from AI-conducted voice interviews
           can deliver research-grade survey quality at scale.
         </p>
-        <button className="landing-hero-skip" onClick={onEnterExplorer} aria-label="Skip to model explorer">
-          Skip to explorer ↓
+        <button className="landing-hero-skip" onClick={onEnterExplorer} aria-label="Skip to the model">
+          Skip to the model ↓
         </button>
       </section>
 
@@ -340,7 +340,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-section">
         <h2>Headline numbers at default settings</h2>
         <p className="landing-section-intro">
-          120-minute AI voice interviews, mixed general survey (attitudes, opinions, and behavioral recall combined). The library build (1,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the explorer to explore your scenario.
+          120-minute AI voice interviews, mixed general survey (attitudes, opinions, and behavioral recall combined). The library build (1,000 participants) is a one-time investment. Per-project run cost reflects ongoing marginal cost once the library exists. All figures are model estimates at default parameter values — adjust the controls in the model to explore your scenario.
         </p>
         <div className="landing-kpis">
           <div className="landing-kpi">
