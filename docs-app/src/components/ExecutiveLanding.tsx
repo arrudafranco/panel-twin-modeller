@@ -209,6 +209,9 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           Explore whether digital twins built from AI-conducted voice interviews
           can deliver research-grade survey quality at scale.
         </p>
+        <button className="landing-hero-skip" onClick={onEnterExplorer} aria-label="Skip to model explorer">
+          Skip to explorer ↓
+        </button>
       </section>
 
       {/* What is a digital panel twin? */}

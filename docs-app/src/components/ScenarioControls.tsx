@@ -104,6 +104,8 @@ export function ScenarioControls({
         />
       </fieldset>
 
+      <div className="controls-phase-divider" aria-hidden="true">After the library is built</div>
+
       <fieldset className="control-group">
         <legend>
           Per-project economics{' '}
@@ -111,6 +113,7 @@ export function ScenarioControls({
             <span className="info-icon" aria-hidden="true">i</span>
           </Tooltip>
         </legend>
+        <p className="control-hint">Price = what clients pay. Run cost = what you spend internally.</p>
         <Slider
           label="Price per project"
           value={cfg.revenue.price_per_project}
