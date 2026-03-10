@@ -204,7 +204,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
     <div className="landing">
       {/* Hero */}
       <section className="landing-hero">
-        <h1 className="landing-hero-title">Panel Twin Modeller</h1>
+        <h1 className="landing-hero-title">Panel Twin Modeler</h1>
         <p className="landing-hero-subtitle">
           Explore whether digital twins built from AI-conducted voice interviews
           can deliver research-grade survey quality at scale.

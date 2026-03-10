@@ -39,7 +39,7 @@ function App() {
               onClick={() => setView('landing')}
               aria-label="Return to landing page"
             >
-              Panel Twin Modeller
+              Panel Twin Modeler
             </button>
           </h1>
           <span className="app-subtitle">Interactive feasibility explorer</span>
