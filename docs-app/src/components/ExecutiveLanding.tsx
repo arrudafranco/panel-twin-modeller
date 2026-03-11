@@ -206,7 +206,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-hero">
         <h1 className="landing-hero-title">Panel Twin Modeler</h1>
         <p className="landing-hero-subtitle">
-          Map the investment case for AI-powered survey research: build cost, per-project pricing, market positioning, and break-even.
+          Map the investment case for AI-powered survey research: build&nbsp;cost, per-project pricing, market positioning, and break-even.
         </p>
         <button className="cta-button landing-hero-skip" onClick={onEnterExplorer} aria-label="Explore the model">
           Explore the model
