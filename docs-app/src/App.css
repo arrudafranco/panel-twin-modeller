@@ -138,33 +138,7 @@
 }
 
 .landing-hero-skip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   margin-top: 24px;
-  padding: 10px 22px;
-  background: rgba(255,255,255,0.08);
-  border: 1.5px solid rgba(255,255,255,0.45);
-  border-radius: 6px;
-  color: rgba(255,255,255,0.9);
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: 0.2px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  position: relative;
-  z-index: 1;
-}
-.landing-hero-skip:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.75);
-  color: #fff;
-}
-.landing-hero-skip:focus-visible {
-  outline: 2px solid var(--brand-orange);
-  outline-offset: 3px;
-  border-radius: 6px;
 }
 
 /* ----------------------------------------------------------------
