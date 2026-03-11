@@ -698,25 +698,6 @@
   border-color: var(--brand-orange);
 }
 
-.controls-phase-divider {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 4px 0 16px;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  opacity: 0.7;
-}
-.controls-phase-divider::before,
-.controls-phase-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border-light);
-}
 
 .control-hint {
   font-size: 11px;
@@ -740,8 +721,70 @@
   margin-bottom: 10px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border-light);
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
+}
+.legend-main {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Phase filter toggle */
+.phase-filter {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--sidebar-bg, #f4f1ec);
+  border: 1px solid var(--border-light);
+  border-radius: 7px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+.phase-filter-btn {
+  flex: 1;
+  padding: 5px 8px;
+  border: none;
+  background: none;
+  border-radius: 5px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+.phase-filter-btn.active {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+}
+.phase-filter-btn.phase-one-time.active { color: #0a6a9e; }
+.phase-filter-btn.phase-per-project.active { color: #1a6b42; }
+.phase-filter .info-icon { margin-left: 2px; flex-shrink: 0; }
+
+/* Phase tags on legends and sliders */
+.phase-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: lowercase;
+  padding: 2px 5px;
+  border-radius: 3px;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.phase-one-time {
+  background: rgba(10,106,158,0.10);
+  color: #0a6a9e;
+}
+.phase-per-project {
+  background: rgba(26,107,66,0.10);
+  color: #1a6b42;
 }
 
 .control-group select {
@@ -808,6 +851,12 @@
   gap: 4px;
 }
 
+.slider-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
 .slider-value {
   font-family: var(--font-mono);
   font-size: 12px;

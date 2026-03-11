@@ -10,9 +10,10 @@ interface SliderProps {
   onChange: (v: number) => void;
   format?: (v: number) => string;
   tooltip?: string;
+  phase?: 'build' | 'run';
 }
 
-export function Slider({ label, value, min, max, step, onChange, format, tooltip }: SliderProps) {
+export function Slider({ label, value, min, max, step, onChange, format, tooltip, phase }: SliderProps) {
   const id = useId();
   const display = format ? format(value) : String(value);
 
@@ -27,7 +28,10 @@ export function Slider({ label, value, min, max, step, onChange, format, tooltip
             </Tooltip>
           )}
         </span>
-        <span className="slider-value" aria-live="polite">{display}</span>
+        <span className="slider-right">
+          {phase && <span className={`phase-tag phase-${phase}`}>{phase}</span>}
+          <span className="slider-value" aria-live="polite">{display}</span>
+        </span>
       </label>
       <input
         id={id}
