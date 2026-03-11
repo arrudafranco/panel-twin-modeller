@@ -1,7 +1,7 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.5
-Last updated: 2026-03-01
+Version: 0.2.6
+Last updated: 2026-03-10
 Status: active working design record
 
 ## Purpose
@@ -543,6 +543,25 @@ Complement with a small vitest file asserting that key prose claims match comput
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.6 - 2026-03-10
+
+UX and copy changes. No model logic changes.
+
+**Hero subtitle reframed toward economics**
+The hero subtitle previously led with the Stanford/quality framing ("Explore whether digital twins built from AI-conducted voice interviews can deliver research-grade survey quality at scale"). Updated to foreground the investment case and business variables ("Map the investment case for AI-powered survey research: build cost, per-project pricing, market positioning, and break-even"). This reflects feedback that the economic modeling is the primary differentiator for the target audience, with quality modeling as a supporting input.
+
+**Hero CTA button added**
+Added an "Explore the model" orange CTA button to the hero section, matching the style and label of the existing bottom-of-page CTA. Addresses users who want to skip the narrative and access the model directly without scrolling.
+
+**Phase divider in sidebar**
+Added a ruled "After the library is built" label between the build-phase controls and the per-project economics controls in ScenarioControls. The sidebar previously had no visual cue separating one-time investment parameters from recurring per-project parameters, which caused confusion about which levers affect which phase of the cost structure.
+
+**Cost vs. price hint in sidebar**
+Added a small hint line ("Price = what clients pay. Run cost = what you spend internally.") inside the Per-project economics fieldset. Addresses terminology confusion between internal run cost and client-facing price, which appear in the same section.
+
+**Spelling: Modeller → Modeler**
+Corrected British spelling to American throughout all visible text (titles, headings, alt text, CSS comments). URL slugs and repository name left unchanged.
 
 ### 0.2.9 - 2026-03-01
 
