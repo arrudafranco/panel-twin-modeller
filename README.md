@@ -1,6 +1,6 @@
 # Panel Twin Modeler
 
-Digital panel twin simulator focused on pilot-first estimation and scale-up feasibility.
+Economics and feasibility model for AI-powered survey research: build cost, per-project pricing, market positioning, and break-even.
 
 ## Interactive Web App
 
