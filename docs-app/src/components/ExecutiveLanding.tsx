@@ -206,8 +206,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
       <section className="landing-hero">
         <h1 className="landing-hero-title">Panel Twin Modeler</h1>
         <p className="landing-hero-subtitle">
-          Explore whether digital twins built from AI-conducted voice interviews
-          can deliver research-grade survey quality at scale.
+          Map the investment case for AI-powered survey research: build cost, per-project pricing, market positioning, and break-even — before committing to a pilot.
         </p>
         <button className="cta-button landing-hero-skip" onClick={onEnterExplorer} aria-label="Explore the model">
           Explore the model
