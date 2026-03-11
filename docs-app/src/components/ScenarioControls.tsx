@@ -33,6 +33,7 @@ export function ScenarioControls({
         </button>
       </div>
 
+      <p className="phase-filter-label">filter by phase</p>
       <div className="phase-filter" role="group" aria-label="Show controls for phase">
         <button
           className={`phase-filter-btn${phaseFilter === 'all' ? ' active' : ''}`}
@@ -232,36 +233,28 @@ export function ScenarioControls({
               value={cfg.retest_rate}
               min={0} max={1} step={0.05}
               onChange={(v) => update('retest_rate', Number(v.toFixed(2)))}
-              format={pct}
-              phase="one-time"
-              tooltip="Study design choice: what fraction of initial participants you intentionally include in the retest validation wave. This is not an involuntary field outcome (that is Retest attrition above) — it is a deliberate scope decision that trades off validation coverage against retest incentive cost. At 80% (default), 800 of 1,000 library participants are scheduled for retest, each receiving the retest incentive. Reducing coverage saves cost but narrows the fidelity validation base."
+              format={pct}              tooltip="Study design choice: what fraction of initial participants you intentionally include in the retest validation wave. This is not an involuntary field outcome (that is Retest attrition above) — it is a deliberate scope decision that trades off validation coverage against retest incentive cost. At 80% (default), 800 of 1,000 library participants are scheduled for retest, each receiving the retest incentive. Reducing coverage saves cost but narrows the fidelity validation base."
             />
             <Slider
               label="Interview incentive"
               value={cfg.cost.base_incentive_phase1}
               min={10} max={200} step={5}
               onChange={(v) => updateCost('base_incentive_phase1', v)}
-              format={money}
-              phase="one-time"
-              tooltip="Incentive paid per participant for the initial AI voice interview. Typically $40–$100 for a ~2-hour session."
+              format={money}              tooltip="Incentive paid per participant for the initial AI voice interview. Typically $40–$100 for a ~2-hour session."
             />
             <Slider
               label="Retest incentive"
               value={cfg.cost.base_incentive_phase2}
               min={5} max={100} step={5}
               onChange={(v) => updateCost('base_incentive_phase2', v)}
-              format={money}
-              phase="one-time"
-              tooltip="Incentive for the retest wave used to validate agent fidelity. Usually lower than the initial interview incentive since the session is shorter."
+              format={money}              tooltip="Incentive for the retest wave used to validate agent fidelity. Usually lower than the initial interview incentive since the session is shorter."
             />
             <Slider
               label="Cost per invite"
               value={cfg.cost.cost_per_invite}
               min={0} max={10} step={0.25}
               onChange={(v) => updateCost('cost_per_invite', Number(v.toFixed(2)))}
-              format={money}
-              phase="one-time"
-              tooltip="Per-invite access cost for sampling from a panel. Set to $0 if your organization operates the panel as shared infrastructure with no per-study chargeback. Set to the chargeback or per-invite rate if the panel department bills studies internally, or if you are purchasing access from an external panel provider."
+              format={money}              tooltip="Per-invite access cost for sampling from a panel. Set to $0 if your organization operates the panel as shared infrastructure with no per-study chargeback. Set to the chargeback or per-invite rate if the panel department bills studies internally, or if you are purchasing access from an external panel provider."
             />
           </fieldset>
         )}
@@ -282,45 +275,35 @@ export function ScenarioControls({
               value={cfg.cost.pilot_labor_cost}
               min={0} max={80000} step={500}
               onChange={(v) => updateCost('pilot_labor_cost', v)}
-              format={money}
-              phase="one-time"
-              tooltip="Your total estimated staff cost for the validation pilot — PM, protocol design, engineering, QA, and any ethics or compliance review. Covers the small validation run only, not the full library build. A flat lump sum at your organization's blended rates."
+              format={money}              tooltip="Your total estimated staff cost for the validation pilot — PM, protocol design, engineering, QA, and any ethics or compliance review. Covers the small validation run only, not the full library build. A flat lump sum at your organization's blended rates."
             />
             <Slider
               label="Staff cost (library build)"
               value={cfg.cost.library_labor_cost}
               min={0} max={200000} step={1000}
               onChange={(v) => updateCost('library_labor_cost', v)}
-              format={money}
-              phase="one-time"
-              tooltip="Your total estimated staff cost for the full library build — typically 3–4× the pilot figure, reflecting a larger participant count plus additional engineering, data pipeline, and compliance work for production deployment. A flat lump sum at your organization's blended rates."
+              format={money}              tooltip="Your total estimated staff cost for the full library build — typically 3–4× the pilot figure, reflecting a larger participant count plus additional engineering, data pipeline, and compliance work for production deployment. A flat lump sum at your organization's blended rates."
             />
             <Slider
               label="Indirect / overhead rate"
               value={cfg.cost.overhead_rate}
               min={0} max={0.4} step={0.01}
               onChange={(v) => updateCost('overhead_rate', Number(v.toFixed(2)))}
-              format={pct}
-              phase="one-time"
-              tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing) for each study run — both pilot and library build. Set to 0 if your staff cost figure is already fully loaded with overhead."
+              format={pct}              tooltip="Applied to non-labor direct costs (incentives, voice ops, LLM, post-processing) for each study run — both pilot and library build. Set to 0 if your staff cost figure is already fully loaded with overhead."
             />
             <Slider
               label="Other ad-hoc costs (pilot)"
               value={cfg.cost.other_pilot_cost}
               min={0} max={100000} step={1000}
               onChange={(v) => updateCost('other_pilot_cost', v)}
-              format={money}
-              phase="one-time"
-              tooltip="Any ad-hoc costs specific to the validation pilot that do not fit the other categories — e.g., unexpected IRB fees, software licenses, travel for in-person testing. Added as a flat total, not per participant. Shown in the Cost tab pilot view (per-unit rows there exclude this item). Not included in the NPV model — the pilot is treated as a pre-decision sunk cost."
+              format={money}              tooltip="Any ad-hoc costs specific to the validation pilot that do not fit the other categories — e.g., unexpected IRB fees, software licenses, travel for in-person testing. Added as a flat total, not per participant. Shown in the Cost tab pilot view (per-unit rows there exclude this item). Not included in the NPV model — the pilot is treated as a pre-decision sunk cost."
             />
             <Slider
               label="Other ad-hoc costs (library build)"
               value={cfg.revenue.other_initial_investment}
               min={0} max={1000000} step={5000}
               onChange={(v) => updateRevenue('other_initial_investment', v)}
-              format={money}
-              phase="one-time"
-              tooltip="Any ad-hoc costs specific to the library build phase that do not fit the other categories — e.g., infrastructure setup, legal review, partnership agreements. Shown in the library build view of the Cost tab and added to total upfront investment in the Economics tab NPV model."
+              format={money}              tooltip="Any ad-hoc costs specific to the library build phase that do not fit the other categories — e.g., infrastructure setup, legal review, partnership agreements. Shown in the library build view of the Cost tab and added to total upfront investment in the Economics tab NPV model."
             />
           </fieldset>
         )}
@@ -341,27 +324,21 @@ export function ScenarioControls({
               value={cfg.revenue.discount_rate}
               min={0.04} max={0.30} step={0.01}
               onChange={(v) => updateRevenue('discount_rate', Number(v.toFixed(2)))}
-              format={pct}
-              phase="per-project"
-              tooltip="Annual discount rate applied to future cash flows in the NPV calculation. Represents your cost of capital or required return threshold. At 12% (default), a dollar earned 36 months from now is worth roughly $0.70 today. Higher rates penalize longer payback periods more heavily."
+              format={pct}              tooltip="Annual discount rate applied to future cash flows in the NPV calculation. Represents your cost of capital or required return threshold. At 12% (default), a dollar earned 36 months from now is worth roughly $0.70 today. Higher rates penalize longer payback periods more heavily."
             />
             <Slider
               label="Annual revenue growth"
               value={cfg.revenue.growth_rate}
               min={0} max={0.5} step={0.01}
               onChange={(v) => updateRevenue('growth_rate', Number(v.toFixed(2)))}
-              format={pct}
-              phase="per-project"
-              tooltip="Compound annual growth applied to project demand in the NPV model. At 8% (default), year-3 demand is roughly 26% higher than year-1 before churn is applied. Represents market expansion or increasing project volume over time."
+              format={pct}              tooltip="Compound annual growth applied to project demand in the NPV model. At 8% (default), year-3 demand is roughly 26% higher than year-1 before churn is applied. Represents market expansion or increasing project volume over time."
             />
             <Slider
               label="Annual client churn"
               value={cfg.revenue.churn_rate}
               min={0} max={0.4} step={0.01}
               onChange={(v) => updateRevenue('churn_rate', Number(v.toFixed(2)))}
-              format={pct}
-              phase="per-project"
-              tooltip="Compound annual decay applied to project demand in the NPV model. At 5% (default), year-3 demand is roughly 14% lower than year-1 before growth is applied. At default settings, growth and churn roughly cancel, keeping demand approximately flat across the 36-month horizon."
+              format={pct}              tooltip="Compound annual decay applied to project demand in the NPV model. At 5% (default), year-3 demand is roughly 14% lower than year-1 before growth is applied. At default settings, growth and churn roughly cancel, keeping demand approximately flat across the 36-month horizon."
             />
           </fieldset>
         )}
@@ -376,33 +353,25 @@ export function ScenarioControls({
               label="Retrieved memory items"
               value={cfg.quality.memory_retrieval_k}
               min={1} max={20} step={1}
-              onChange={(v) => updateQuality('memory_retrieval_k', v)}
-              phase="one-time"
-              tooltip="Number of memory items the agent retrieves per query. More items provide richer context but increase token costs."
+              onChange={(v) => updateQuality('memory_retrieval_k', v)}              tooltip="Number of memory items the agent retrieves per query. More items provide richer context but increase token costs."
             />
             <Slider
               label="Recency weight"
               value={cfg.quality.memory_recency_weight}
               min={0} max={3} step={0.1}
-              onChange={(v) => updateQuality('memory_recency_weight', Number(v.toFixed(1)))}
-              phase="one-time"
-              tooltip="How much the agent prioritizes recent memories over older ones when retrieving context."
+              onChange={(v) => updateQuality('memory_recency_weight', Number(v.toFixed(1)))}              tooltip="How much the agent prioritizes recent memories over older ones when retrieving context."
             />
             <Slider
               label="Relevance weight"
               value={cfg.quality.memory_relevance_weight}
               min={0} max={3} step={0.1}
-              onChange={(v) => updateQuality('memory_relevance_weight', Number(v.toFixed(1)))}
-              phase="one-time"
-              tooltip="How much the agent prioritizes memories semantically relevant to the current question."
+              onChange={(v) => updateQuality('memory_relevance_weight', Number(v.toFixed(1)))}              tooltip="How much the agent prioritizes memories semantically relevant to the current question."
             />
             <Slider
               label="Importance weight"
               value={cfg.quality.memory_importance_weight}
               min={0} max={3} step={0.1}
-              onChange={(v) => updateQuality('memory_importance_weight', Number(v.toFixed(1)))}
-              phase="one-time"
-              tooltip="How much the agent prioritizes memories marked as high-importance during reflection."
+              onChange={(v) => updateQuality('memory_importance_weight', Number(v.toFixed(1)))}              tooltip="How much the agent prioritizes memories marked as high-importance during reflection."
             />
             <div className="control-group-row">
               <label className="select-field">
@@ -459,77 +428,59 @@ export function ScenarioControls({
               label="Brand trust"
               value={cfg.competition.brand_trust}
               min={0} max={1} step={0.01}
-              onChange={(v) => updateCompetition('brand_trust', Number(v.toFixed(2)))}
-              phase="per-project"
-              tooltip="Your organization's perceived credibility on a 0–1 scale, used as a positive term in Panel Twin's utility calculation. Higher trust increases win probability. Competitors have no brand term — their prices and quality carry their full positioning. Reflect your honest assessment of how established your brand is in the research market."
+              onChange={(v) => updateCompetition('brand_trust', Number(v.toFixed(2)))}              tooltip="Your organization's perceived credibility on a 0–1 scale, used as a positive term in Panel Twin's utility calculation. Higher trust increases win probability. Competitors have no brand term — their prices and quality carry their full positioning. Reflect your honest assessment of how established your brand is in the research market."
             />
             <Slider
               label="Cannibalization rate"
               value={cfg.competition.cannibalization_rate}
               min={0} max={1} step={0.01}
               onChange={(v) => updateCompetition('cannibalization_rate', Number(v.toFixed(2)))}
-              format={pct}
-              phase="per-project"
-              tooltip="Fraction of Panel Twin revenue that displaces existing revenue rather than creating net-new revenue. At 30% (default), 30 cents of every dollar earned replaces existing business. The NPV model scales monthly margin by (1 − cannibalization rate). Set higher if your organization currently runs traditional panels that Panel Twin would partially replace."
+              format={pct}              tooltip="Fraction of Panel Twin revenue that displaces existing revenue rather than creating net-new revenue. At 30% (default), 30 cents of every dollar earned replaces existing business. The NPV model scales monthly margin by (1 − cannibalization rate). Set higher if your organization currently runs traditional panels that Panel Twin would partially replace."
             />
             <Slider
               label="Probability benchmark price"
               value={cfg.competition.probability_benchmark_price}
               min={50000} max={600000} step={5000}
               onChange={(v) => updateCompetition('probability_benchmark_price', v)}
-              format={money}
-              phase="per-project"
-              tooltip="Typical project price for a high-quality probability panel provider. Probability panels are generally the most expensive option."
+              format={money}              tooltip="Typical project price for a high-quality probability panel provider. Probability panels are generally the most expensive option."
             />
             <Slider
               label="Probability benchmark quality"
               value={cfg.competition.probability_benchmark_quality}
               min={0.4} max={1.0} step={0.01}
-              onChange={(v) => updateCompetition('probability_benchmark_quality', Number(v.toFixed(2)))}
-              phase="per-project"
-              tooltip="Estimated quality/reliability score for the probability panel benchmark (0–1 scale). Default 0.90 reflects high gold-standard quality."
+              onChange={(v) => updateCompetition('probability_benchmark_quality', Number(v.toFixed(2)))}              tooltip="Estimated quality/reliability score for the probability panel benchmark (0–1 scale). Default 0.90 reflects high gold-standard quality."
             />
             <Slider
               label="Hybrid benchmark price"
               value={cfg.competition.hybrid_benchmark_price}
               min={50000} max={600000} step={5000}
               onChange={(v) => updateCompetition('hybrid_benchmark_price', v)}
-              format={money}
-              phase="per-project"
-              tooltip="Typical project price for a calibrated hybrid panel (opt-in with weighting adjustment)."
+              format={money}              tooltip="Typical project price for a calibrated hybrid panel (opt-in with weighting adjustment)."
             />
             <Slider
               label="Hybrid benchmark quality"
               value={cfg.competition.hybrid_benchmark_quality}
               min={0.4} max={1.0} step={0.01}
-              onChange={(v) => updateCompetition('hybrid_benchmark_quality', Number(v.toFixed(2)))}
-              phase="per-project"
-              tooltip="Estimated quality score for the hybrid benchmark. Default 0.80 reflects good-but-not-gold-standard quality."
+              onChange={(v) => updateCompetition('hybrid_benchmark_quality', Number(v.toFixed(2)))}              tooltip="Estimated quality score for the hybrid benchmark. Default 0.80 reflects good-but-not-gold-standard quality."
             />
             <Slider
               label="Non-prob panel price"
               value={cfg.competition.nonprob_panel_price}
               min={1000} max={30000} step={500}
               onChange={(v) => updateCompetition('nonprob_panel_price', v)}
-              format={money}
-              phase="per-project"
-              tooltip="Full-service project price for a non-probability online panel (e.g. marketplace-based opt-in sample with representativeness weighting). Typically a few thousand dollars per project at equivalent deliverable scope."
+              format={money}              tooltip="Full-service project price for a non-probability online panel (e.g. marketplace-based opt-in sample with representativeness weighting). Typically a few thousand dollars per project at equivalent deliverable scope."
             />
             <Slider
               label="Non-prob panel quality"
               value={cfg.competition.nonprob_panel_quality}
               min={0.4} max={1.0} step={0.01}
-              onChange={(v) => updateCompetition('nonprob_panel_quality', Number(v.toFixed(2)))}
-              phase="per-project"
-              tooltip="Estimated data quality for a non-probability online panel. Default 0.70 reflects real human responses but with known opt-in panel quality concerns (satisficing, panel conditioning, selection bias) relative to probability-based approaches."
+              onChange={(v) => updateCompetition('nonprob_panel_quality', Number(v.toFixed(2)))}              tooltip="Estimated data quality for a non-probability online panel. Default 0.70 reflects real human responses but with known opt-in panel quality concerns (satisficing, panel conditioning, selection bias) relative to probability-based approaches."
             />
             <Slider
               label="Cross-price elasticity"
               value={cfg.competition.cross_price_elasticity}
               min={0} max={1} step={0.01}
-              onChange={(v) => updateCompetition('cross_price_elasticity', Number(v.toFixed(2)))}
-              phase="per-project"
-              tooltip="How much demand shifts between alternatives when prices change. Higher values indicate a more price-sensitive market. Used in the market share model alongside quality and brand utility."
+              onChange={(v) => updateCompetition('cross_price_elasticity', Number(v.toFixed(2)))}              tooltip="How much demand shifts between alternatives when prices change. Higher values indicate a more price-sensitive market. Used in the market share model alongside quality and brand utility."
             />
           </fieldset>
         )}

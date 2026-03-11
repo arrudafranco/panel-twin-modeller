@@ -733,6 +733,15 @@
 }
 
 /* Phase filter toggle */
+.phase-filter-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: lowercase;
+  letter-spacing: 0.3px;
+  margin: 0 0 5px 2px;
+}
+
 .phase-filter {
   display: flex;
   align-items: center;
