@@ -1,6 +1,6 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.6
+Version: 0.2.7
 Last updated: 2026-03-10
 Status: active working design record
 
@@ -543,6 +543,19 @@ Complement with a small vitest file asserting that key prose claims match comput
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.2.7 - 2026-03-10
+
+UX changes: phase filter replaces static divider, README screenshot updated. TypeScript type fix.
+
+**Phase filter added to sidebar**
+Replaced a static "After the library is built" section divider with a three-state toggle (All / One-time / Per-project) at the top of ScenarioControls. The filter uses conditional rendering — when "One-time" is selected, only build-phase controls appear; when "Per-project" is selected, only run-phase controls appear; "All" restores full view. Phase tags (blue for one-time, green for per-project) appear on fieldset legends and on Advanced slider rows. Terminology "one-time / per-project" was chosen over "build / run" because it is self-evident to non-technical audiences who may not know what "building" a library means in this context. This is a genuine progressive disclosure improvement over the prior static divider, which created an inconsistent hierarchy (no parallel label existed before the divider, and the "advanced" expander cut across both phases).
+
+**README screenshot updated**
+Screenshot replaced with current explorer view showing the phase filter toggle in the sidebar and default Overview tab results.
+
+**TypeScript type fix**
+`Slider.tsx` had `phase?: 'build' | 'run'` which was a stale internal label. Updated to `phase?: 'one-time' | 'per-project'` to match the values actually passed by ScenarioControls. The mismatch caused a TypeScript build error (caught by CI) while the local Vite dev server was lenient enough to ignore it.
 
 ### 0.2.6 - 2026-03-10
 

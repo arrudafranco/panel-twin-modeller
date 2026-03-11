@@ -10,7 +10,7 @@ interface SliderProps {
   onChange: (v: number) => void;
   format?: (v: number) => string;
   tooltip?: string;
-  phase?: 'build' | 'run';
+  phase?: 'one-time' | 'per-project';
 }
 
 export function Slider({ label, value, min, max, step, onChange, format, tooltip, phase }: SliderProps) {
