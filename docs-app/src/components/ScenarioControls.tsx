@@ -33,7 +33,6 @@ export function ScenarioControls({
         </button>
       </div>
 
-      <p className="phase-filter-label">filter by phase</p>
       <div className="phase-filter" role="group" aria-label="Show controls for phase">
         <button
           className={`phase-filter-btn${phaseFilter === 'all' ? ' active' : ''}`}
