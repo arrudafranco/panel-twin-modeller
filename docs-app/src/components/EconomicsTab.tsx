@@ -34,7 +34,7 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
         setup) is a one-time investment that enables many subsequent projects. Each project sold
         then incurs only per-project run costs: LLM inference, QA, PM, and data delivery against
         the existing agent library. This transforms the cost structure from linear (pay per study)
-        toward fixed-plus-marginal. The Cost tab shows the smaller validation pilot.
+        toward fixed-plus-marginal. The Cost tab breaks down both the validation pilot and the full library build (use the toggle there to switch views).
         All four alternative prices cover equivalent deliverable scope: data collection,
         representativeness adjustments, and a weighted dataset. Win probability and
         net present value (NPV) projections use{' '}
