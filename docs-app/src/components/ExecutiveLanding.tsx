@@ -230,7 +230,7 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           human interviewer, enabling scale while maintaining semi-structured depth.
           Our model explores the feasibility of operationalizing this approach commercially.
         </p>
-        <p style={{ fontSize: '0.88em', opacity: 0.65 }}>
+        <p>
           Park et al. (2024) was chosen as the quality anchor because it offered a strong, specific,
           and publicly available empirical reference with open implementation details (arXiv:2411.10109,
           pre-registered at osf.io/mexkf/). The paper is a preprint and had not been confirmed as
