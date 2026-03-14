@@ -130,8 +130,17 @@ export function EconomicsTab({ cfg, results, mcEnabled, setMcEnabled }: Props) {
       <div className="mc-section">
         <h3>Uncertainty analysis (Monte Carlo)</h3>
         <p>
-          Run 500 simulations varying interview duration, response rate, and attrition
-          to see the distribution of possible NPV outcomes.
+          Run 500 simulations varying interview duration, response rate, attrition,
+          and win probability to see the distribution of possible NPV outcomes.
+          Win probability is perturbed with an additive Normal shock (σ=10pp) to
+          reflect that the utility coefficients are illustrative assumptions, not
+          fitted to historical win/loss data.
+        </p>
+        <p style={{ fontSize: '0.88em', opacity: 0.65 }}>
+          Note: the default scenario (15 projects/year) is an illustrative viable case,
+          not a conservative baseline. It was chosen to show what a plausible business
+          case looks like. The MC distribution, not the point estimate, is the more
+          honest picture of the range of possible outcomes.
         </p>
         <label className="mc-toggle">
           <input

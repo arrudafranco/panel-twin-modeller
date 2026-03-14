@@ -29,10 +29,14 @@ export function computeFinance(
   cfg: ScenarioConfig,
   cogsPerProject: number,
   quality: number,
-  libraryBuildCost: number = 0
+  libraryBuildCost: number = 0,
+  winProbabilityOverride?: number
 ): FinanceResult {
   const base = cfg.revenue;
-  const pwin = winProbability(cfg, base.price_per_project, quality, cfg.competition.turnaround_days);
+  const pwin =
+    winProbabilityOverride !== undefined
+      ? winProbabilityOverride
+      : winProbability(cfg, base.price_per_project, quality, cfg.competition.turnaround_days);
   const shares = marketShares(cfg, base.price_per_project, quality, cfg.competition.turnaround_days);
   const monthlyD = monthlyDiscount(base.discount_rate);
   const totalUpfrontInvestment = Math.max(0.0, base.cac + base.other_initial_investment) + libraryBuildCost;
@@ -54,7 +58,10 @@ export function computeFinance(
     monthlyMargin += margin;
     npv += margin / Math.pow(1 + monthlyD, m);
     cumulativeMargins.push(monthlyMargin);
-    if (breakEvenMonth === null && monthlyMargin >= totalUpfrontInvestment) {
+    // Break-even uses discounted cumulative margin: the month when running NPV first crosses 0
+    // (i.e., discounted cash flows have recovered the upfront investment). This is the
+    // discounted payback period, consistent with the NPV calculation above.
+    if (breakEvenMonth === null && npv >= 0) {
       breakEvenMonth = m;
     }
   }

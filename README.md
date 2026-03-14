@@ -27,12 +27,16 @@ npm run dev
 ## Inspiration and Scope
 
 This project is directly inspired by Stanford HCI's `genagents` project and the paper
-*Generative Agent Simulations of 1,000 People*.
+*Generative Agent Simulations of 1,000 People* (Park et al., 2024, arXiv:2411.10109).
 
 It does not claim to reproduce that codebase or its exact empirical evaluation. Instead, it uses that work as:
 - a conceptual anchor for interview-based generative agents
 - a reference point for paper-backed quality anchors where explicitly noted
 - a design precedent for memory and reflection-centered agent construction
+
+**Why this paper was chosen as the quality anchor:** Park et al. (2024) was a strong, specific, and publicly available study of interview-based generative agents, with a large sample (1,052 participants), a canonical benchmark (GSS), and a published codebase. The paper is a preprint (arXiv, pre-registered at osf.io/mexkf/) and had not been confirmed as peer-reviewed at the time this model was built. It was used as the quality anchor because it offered the clearest, most directly applicable empirical evidence with open implementation details among the sources consulted — not as an established finding from the peer-reviewed literature.
+
+The business and economics model in this project (cost structure, NPV, competition model, break-even logic) is general across interview-based approaches. The quality anchors from Park et al. can be replaced with calibrated values from any empirical implementation. A proprietary version with different implementation details would need its own quality calibration data; the financial modeling logic applies regardless of which interview-agent architecture is used.
 
 This repository extends beyond that scope into:
 - feasibility and cost modeling

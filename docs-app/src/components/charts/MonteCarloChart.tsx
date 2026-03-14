@@ -45,6 +45,7 @@ export function MonteCarloChart({ mcResult }: Props) {
         P(NPV {'>'} 0) = {(p_positive_npv * 100).toFixed(1)}%.
         P(break-even in horizon) = {(p_break_even * 100).toFixed(1)}%.
         P(feasible) = {(p_feasible * 100).toFixed(1)}%.
+        Varied: interview duration, response rate, attrition, and win probability (additive shock, σ=10pp).
       </p>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={bins} margin={{ top: 10, right: 20, bottom: 20, left: 20 }}>

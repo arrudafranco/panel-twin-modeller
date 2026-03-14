@@ -12,3 +12,6 @@ node_modules/
 docs-app/dist/
 docs-app/node_modules/
 docs-app/*.tsbuildinfo
+
+# Reference library — PDFs and ebooks for internal research only, no distribution rights
+Reference Library/

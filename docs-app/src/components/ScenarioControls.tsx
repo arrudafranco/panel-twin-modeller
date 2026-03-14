@@ -176,7 +176,7 @@ export function ScenarioControls({
             value={cfg.revenue.projects_per_year}
             min={1} max={30} step={1}
             onChange={(v) => updateRevenue('projects_per_year', v)}
-            tooltip="Expected number of projects per year once the library is operational. Drives total revenue in the NPV model."
+            tooltip="Expected number of projects per year once the library is operational. Drives total revenue in the NPV model. The default (15) is an illustrative viable scenario, not a conservative baseline. Lower values to stress-test the investment case."
           />
           <Slider
             label="Time horizon (months)"

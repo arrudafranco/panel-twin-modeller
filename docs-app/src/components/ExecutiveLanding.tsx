@@ -64,8 +64,8 @@ const INSIGHTS: InsightDef[] = [
       "These are modeling conventions intended to make the federal/commercial distinction plannable, not predictions about any specific procurement. Actual federal buying behavior varies substantially by agency, program office, and contracting officer.",
     ],
     citations: [
-      "NSDUH Reliability Study (SAMHSA). https://www.ncbi.nlm.nih.gov/books/NBK519788/",
-      "BRFSS HRQOL Reliability (CDC). https://pubmed.ncbi.nlm.nih.gov/12700216/",
+      "SAMHSA (2010). Reliability of Key Measures in the National Survey on Drug Use and Health. https://www.ncbi.nlm.nih.gov/books/NBK519788/",
+      "Andresen et al. (2003). Retest reliability of surveillance questions on health-related quality of life. Journal of Epidemiology & Community Health, 57(5), 339–343. https://pubmed.ncbi.nlm.nih.gov/12700216/",
     ],
   },
   {
@@ -229,6 +229,14 @@ export function ExecutiveLanding({ onEnterExplorer }: Props) {
           A key innovation here is conducting those interviews using an AI voice agent rather than a
           human interviewer, enabling scale while maintaining semi-structured depth.
           Our model explores the feasibility of operationalizing this approach commercially.
+        </p>
+        <p style={{ fontSize: '0.88em', opacity: 0.65 }}>
+          Park et al. (2024) was chosen as the quality anchor because it offered a strong, specific,
+          and publicly available empirical reference with open implementation details (arXiv:2411.10109,
+          pre-registered at osf.io/mexkf/). The paper is a preprint and had not been confirmed as
+          peer-reviewed at the time this model was built. The cost and economics model is general
+          across interview-based approaches; the quality anchors can be replaced by calibrated values
+          from any empirical implementation.
         </p>
         <p>
           When agents are built from a representative sample of participants, the resulting

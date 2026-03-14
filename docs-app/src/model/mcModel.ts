@@ -3,6 +3,7 @@
 // Fix 2: Incorporates quality uncertainty bands
 
 import { qualityMarketAdjustment, recommendedQualityThreshold } from './benchmarkModel.ts';
+import { winProbability } from './competitionModel.ts';
 import { computeCosts } from './costModel.ts';
 import type { ScenarioConfig } from './params.ts';
 import { QUALITY_UNCERTAINTY_BANDS } from './params.ts';
@@ -42,6 +43,7 @@ export interface MCRow {
   interview_minutes: number;
   attrition_rate: number;
   response_rate: number;
+  win_probability: number;
   quality: number;
   quality_with_uncertainty: number;
   sellable_quality: number;
@@ -93,7 +95,10 @@ export function runMonteCarlo(
     cfgDraw.cost.attrition_rate = attrition;
     cfgDraw.cost.response_rate = response;
 
-    const cost = computeCosts(cfgDraw);
+    // Use scaleup mode to compute library build cost, matching the main path in useScenario.ts.
+    // cost.total_cost is the upfront library investment; per_project_run_cost is the marginal
+    // COGS per project sold against the existing library (not the per-interview build cost).
+    const cost = computeCosts({ ...cfgDraw, mode: 'scaleup' });
     const qual = qualityScore(cfgDraw, cfg.quality_profile);
 
     // Fix 2: Add quality noise term drawn from construct-specific band
@@ -108,10 +113,24 @@ export function runMonteCarlo(
     const qualityEval = qualityMarketAdjustment(effectiveQuality, threshold);
     const representOk = representPenalty <= cfgDraw.sampling.representativeness_penalty_max;
 
+    // Win probability perturbation: utility coefficients are stylized, not fitted to
+    // historical win/loss data. Additive noise (σ=0.10) represents uncertainty in
+    // procurement dynamics, relationship factors, and proposal quality not captured
+    // by the logit model. Clipped to [0.01, 0.99] to avoid degenerate draws.
+    const baseWinProb = winProbability(
+      cfgDraw,
+      cfgDraw.revenue.price_per_project,
+      qualityEval.effective_quality_for_market,
+      cfgDraw.competition.turnaround_days
+    );
+    const perturbedWinProb = clamp(baseWinProb + normalRandom(rand, 0, 0.10), 0.01, 0.99);
+
     const fin = computeFinance(
       cfgDraw,
-      cost.cost_per_completed_interview,
-      qualityEval.effective_quality_for_market
+      cfgDraw.revenue.per_project_run_cost,
+      qualityEval.effective_quality_for_market,
+      cost.total_cost,
+      perturbedWinProb
     );
 
     const feasible = qualityEval.quality_pass && fin.npv > 0 && representOk;
@@ -120,6 +139,7 @@ export function runMonteCarlo(
       interview_minutes: minutes,
       attrition_rate: attrition,
       response_rate: response,
+      win_probability: perturbedWinProb,
       quality: qual,
       quality_with_uncertainty: qualWithUncertainty,
       sellable_quality: effectiveQuality,

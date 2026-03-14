@@ -1,7 +1,7 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.2.7
-Last updated: 2026-03-10
+Version: 0.4.0
+Last updated: 2026-03-13
 Status: active working design record
 
 ## Purpose
@@ -140,6 +140,20 @@ So in this project:
 - pilot calibration can optionally update response-mode shares and multipliers when the pilot log includes those columns
 - the active source of response-mode assumptions is tracked explicitly as preset-driven, manual, or pilot-calibrated
 - run artifacts now surface assumption provenance directly so downstream readers do not need to infer it from configs alone
+
+### Why the Stanford Approach Was Chosen as the Quality Anchor
+
+The decision to use Park et al. (2024) as the primary quality anchor was deliberate and should be documented clearly.
+
+At the time of development, that paper offered a combination of properties not found together elsewhere among the sources consulted: a large empirical sample (1,052 participants), a widely used canonical benchmark (GSS Core), a complete and published codebase (`genagents`), and a specific, measurable fidelity figure (0.85 normalized accuracy) that could anchor quality estimates in a planning model.
+
+**On the 0.85 figure and test-retest reliability.** A common misread is that "normalized accuracy" is a generic prediction accuracy score with no connection to survey reliability standards. It is not. Park et al. benchmark agent performance *against the participants' own two-week test-retest consistency* — the 0.85 means agents replicate participant responses 85% as accurately as the participants replicate their own answers two weeks apart. This is grounded in classical test-retest reliability: participant test-retest serves as the ceiling (normalized to 1.0), and agent performance is expressed relative to that ceiling. The 0.85 anchor is therefore a stronger and more contextually appropriate quality measure than a raw prediction accuracy figure would be, and it is directly comparable to human survey reliability benchmarks used elsewhere in this model.
+
+The paper is a preprint (arXiv:2411.10109, November 2024, pre-registered at osf.io/mexkf/). It had not been confirmed as peer-reviewed at the time this model was built. It was chosen as the anchor because it was a strong, specific, and publicly available reference with open implementation details — not because it was established peer-reviewed literature. Other interview-based agent research exists; this paper was the most directly applicable to the construction approach modeled here.
+
+**Implications for a proprietary version.** The business and economics model (cost structure, NPV, competition model, break-even logic) is general across interview-based approaches. The quality anchors can be replaced with calibrated values from any empirical implementation. A proprietary version with different implementation choices would need its own quality calibration data. The financial modeling logic applies regardless of which interview-agent architecture is used.
+
+**Implication for readers.** The quality estimates in this model are planning-level inputs informed by the best publicly available evidence at time of development. They are not warranties of replication performance for a new deployment. Pilot calibration (the `calibrate` CLI command) is the intended path to grounding quality estimates in observed field data.
 
 ### How We Label Evidence
 
@@ -287,6 +301,8 @@ The quality model is therefore designed to be:
 - calibratable
 - honest about uncertainty
 
+The Benchmarks tab contextualizes agent quality scores against published human test-retest reliability values from federal surveys. The primary federal comparators are the NSDUH Reliability Study (SAMHSA, 2012), which provides attitude/belief and substance use item retest coefficients, and the BRFSS HRQOL Reliability Reinterview (Andresen et al., 2003), which provides health-related quality-of-life item retest coefficients. These serve as normalizing ceilings: a quality score at or above the corresponding federal benchmark suggests the agent library meets the retest consistency standards of those instruments.
+
 ### Sampling Model: Move From Simple Weighting to Multi-Margin Raking
 
 The sampling model began with simple design-weight logic and was later extended to support multi-margin IPF-style raking.
@@ -368,7 +384,10 @@ The revenue model runs a month-by-month NPV loop over `horizon_months` (default 
 - Projects sold = demand × win_probability × net_new_fraction
 - Revenue per project = `price_per_project` (base price only; removed attachment rates in v0.2.8)
 - Total upfront investment = `cac` ($12K default) + `other_initial_investment` ($0 default) + library build cost
-- NPV uses a 12% annual discount rate (`discount_rate`)
+- NPV uses a 12% annual discount rate (`discount_rate`), applied via discrete monthly compounding: `monthly_rate = (1 + annual_rate)^(1/12) − 1`. This is the standard corporate DCF convention for real cash flows, as distinct from the continuous compounding used in derivatives pricing (Hilpisch, 2018).
+- Break-even is detected as the month when running NPV first crosses zero — equivalent to the discounted payback period (the month when cumulative discounted cash flows recover the upfront investment).
+
+**On churn_rate semantics.** `churn_rate` (default 5%/year) is applied as an annual compound decay to the project demand base: `demand = projects_per_year × (1+growth_rate)^year × (1−churn_rate)^year`. In this model it represents gradual erosion of the addressable client base over time — clients who stop commissioning projects entirely, reduce research spend, or shift to competitors — rather than subscription cancellation in the pure SaaS sense. Note that `churn_rate` and `win_probability` address related but distinct phenomena: `win_probability` captures the competitive outcome on each individual project bid; `churn_rate` captures the secular trend in how many projects are pursued over the planning horizon. They should not be set simultaneously to represent the same risk. A 5%/year churn rate is consistent with best-in-class retention in B2B subscription and professional-services contexts (Ramanujam & Tacke, 2016; Liozu & Hinterhuber, 2023).
 
 These are scenario coefficients intended to make the investment case plannable. Actual win rates depend on client relationships, proposal quality, contracting factors, and market dynamics not captured in this model.
 
@@ -382,6 +401,7 @@ The MC model draws from the following distributions per iteration. Standard devi
 | `attrition_rate` | Normal, clipped [0.02, 0.50] | 0.05 | Typical field variation in 2-wave completion |
 | `response_rate` | Normal, clipped [0.05, 0.80] | 0.04 | Typical sampling frame variation |
 | Quality score (additive noise) | Normal, mean=0 | qualityUncertainty / 2 | Construct-specific extrapolation uncertainty |
+| Win probability (additive shock) | Normal, mean=0, clipped [0.01, 0.99] | 0.10 (10pp) | Utility coefficients are stylized, not fitted to historical win/loss data. ±10pp (1σ) represents uncertainty in procurement dynamics, relationship factors, and proposal quality not captured by the logit model. Grounded in Bodea & Ferguson (2014): bid-response coefficient uncertainty without historical data is typically larger than cost uncertainty. |
 
 **Quality uncertainty bands (used in MC and quality charts)**
 
@@ -389,9 +409,11 @@ The MC model draws from the following distributions per iteration. Standard devi
 |---|---|---|
 | `mixed_general` | ±0.06 | Directly paper-anchored (Park et al., GSS Core, GPT-4, 2-hr interviews) |
 | `incentivized_behavior` | ±0.10 | Anchored at 0.66 from Park et al. economic games; narrower anchoring |
-| `behavioral_recall` | ±0.10 | Extrapolated from 0.85 GSS Core base; not separately measured |
+| `behavioral_recall` | ±0.10 | Base (0.80) is a conservative planning discount below the 0.85 GSS Core anchor; not separately measured for behavioral recall items specifically |
 
-The band for `mixed_general` is narrower because the 0.85 anchor is directly from the paper. Bands for other constructs are wider to reflect greater extrapolation uncertainty. In MC, quality noise is drawn from Normal(0, band/2), meaning ~68% of draws fall within ±(band/2) of the base quality estimate.
+The band for `mixed_general` is narrower because the 0.85 anchor is directly from the paper. Bands for other constructs are wider to reflect greater extrapolation uncertainty. In MC, quality noise is drawn from Normal(0, band/2), meaning ~68% of draws fall within ±(band/2) of the base quality estimate. The ±1 SEM framing (±0.06 for `mixed_general`) is consistent with the Classical Test Theory formula σE = σX√(1−α); at α = 0.85 and a typical standard deviation for a proportion-based accuracy score, this yields approximately ±0.058 (Mair, 2018).
+
+**On the behavioral_recall base (0.80).** Park et al.'s GSS Core benchmark (0.85) actually spans both attitude and self-reported behavioral items — the paper does not report separate fidelity figures for behavioral recall items in isolation. The 0.80 base is a deliberate conservative planning discount: it assumes behavioral recall items are somewhat harder for agents to replicate accurately than the mixed GSS Core average, but does not imply the paper showed lower performance for them. Published evidence on nonprobability online panels (independent of this architecture) shows 5–10 percentage point absolute errors on behavioral/factual items relative to gold-standard benchmarks, suggesting the risk for behavioral items is real (Callegaro et al., 2014, Table 2.4: four large-scale experiments reporting average absolute errors of 5.2–8.5pp against RDD and national benchmarks). The ±0.10 uncertainty band is intentionally wider than `mixed_general` to reflect this. If field data from a pilot shows behavioral recall fidelity close to the mixed_general anchor, the band and base can be updated via pilot calibration.
 
 ### Monte Carlo: Uncertainty as a First-Class Output
 
@@ -543,6 +565,42 @@ Complement with a small vitest file asserting that key prose claims match comput
 In the competition model, `federal_risk_penalty` is subtracted from all utility values equally. Because softmax is shift-invariant, this does not change relative win probabilities among the four competitors. The intended interpretation is that the penalty represents an overall market-level headwind rather than a Panel Twin-specific disadvantage. If the goal is to model Panel Twin specifically losing market share in federal settings (relative to established alternatives), the penalty would need to apply only to Panel Twin's utility. The current behavior is documented in the landing page insight card for federal settings.
 
 ## Version Updates
+
+### 0.4.0 - 2026-03-13
+
+Reference library audit: two MC model bug fixes, break-even correction, documentation improvements, and citation pass.
+
+**MC model bug fixes**
+- Fixed: MC path was passing `cost_per_completed_interview` (full per-interview build cost) as COGS to `computeFinance`, where the main path uses `per_project_run_cost` ($18K marginal run cost). These represent structurally different costs — the build cost is a one-time investment, not a per-project variable cost.
+- Fixed: MC path hardcoded `libraryBuildCost = 0`, omitting the ~$173K library build deduction from every MC NPV. This caused MC NPVs to be systematically inflated relative to the point estimate, making the MC distribution and the main path NPV non-comparable. Fix: MC now calls `computeCosts({ ...cfgDraw, mode: 'scaleup' })` and passes `cost.total_cost` as `libraryBuildCost`, matching the main path in `useScenario.ts` exactly.
+
+**Break-even correction**
+- Previously: break-even was detected when cumulative *undiscounted* margin ≥ upfront investment (undiscounted payback period).
+- Now: break-even is detected when running NPV ≥ 0 (discounted payback period — the month when cumulative *discounted* cash flows recover the upfront investment). At default settings (12% discount rate), the numeric change is small (month 16 → month 17 discounted), but the calculation is now consistent with the NPV formula above it.
+
+**Documentation improvements**
+- Added "Why the Stanford Approach Was Chosen as the Quality Anchor" section documenting preprint status and rationale.
+- Added test-retest framing clarification: the 0.85 normalized accuracy is explicitly benchmarked against participants' own two-week test-retest — this is a strength of the anchor, not a limitation.
+- Added behavioral_recall derivation note with external empirical context.
+- Added churn_rate semantics clarification distinguishing demand-base erosion from subscription churn and from win probability.
+- Added discrete compounding note with citation.
+- Added ±1 SEM framing for uncertainty bands with citation.
+- Added References section.
+
+**Citation pass**
+Added inline citations throughout for: Mair (2018) on CTT/SEM framing of uncertainty bands; Callegaro et al. (2014) on behavioral item error in nonprobability panels; Ramanujam & Tacke (2016) and Liozu & Hinterhuber (2023) on churn benchmarks; Hilpisch (2018) on discrete vs. continuous compounding convention.
+
+### 0.3.0 - 2026-03-13
+
+Model change: win probability perturbation added to Monte Carlo. Clarity improvement: default projects/year labeled as illustrative.
+
+**Win probability perturbation in Monte Carlo**
+The MC simulation previously varied only interview duration, response rate, attrition, and quality noise. Win probability fed into NPV deterministically from stylized utility coefficients that are not fitted to historical win/loss data. This understated true NPV uncertainty, since coefficient uncertainty in B2B bid markets is typically larger than cost uncertainty (Bodea & Ferguson, 2014).
+
+Added an additive Normal shock (σ=0.10, clipped to [0.01, 0.99]) on top of the logit-derived win probability for each MC draw. The shock is computed after quality uncertainty is applied, so the base win probability already reflects the quality draw for that iteration. The `win_probability` field is now present on each `MCRow`. The MonteCarloChart subtitle updated to name win probability as one of the varied inputs.
+
+**"Illustrative scenario" language for default projects/year**
+The default of 15 projects/year was chosen in v0.2.8 to produce a directionally useful break-even, not as a conservative baseline. Three locations now make this explicit: the MC section description in EconomicsTab, a small sub-note below that description, and the projects/year slider tooltip. This directly addresses the risk that users read the default point estimate as a probable outcome rather than as one plausible scenario.
 
 ### 0.2.7 - 2026-03-10
 
@@ -889,6 +947,28 @@ Included:
 - app and frontend design rationale
 - guardrails and limitations philosophy
 - documentation and maintenance conventions
+
+---
+
+## References
+
+**Quality and psychometrics**
+- Park, J. S., Zou, C. Q., Shaw, A., Hill, B. M., Cai, C., Morris, M. R., Willer, R., Liang, P., & Bernstein, M. S. (2024). *Generative Agent Simulations of 1,000 People*. arXiv:2411.10109. Pre-registered at osf.io/mexkf/. https://arxiv.org/abs/2411.10109
+- Mair, P. (2018). *Modern Psychometrics with R*. Use R! series. Springer International Publishing. ISBN 978-3-319-93175-3.
+- Callegaro, M., Baker, R., Bethlehem, J., Göritz, A. S., Krosnick, J. A., & Lavrakas, P. J. (Eds.) (2014). *Online Panel Research: A Data Quality Perspective*. John Wiley & Sons.
+
+**Federal survey benchmarks**
+- SAMHSA (2010). *Reliability of Key Measures in the National Survey on Drug Use and Health*. Substance Abuse and Mental Health Services Administration, Rockville, MD. https://www.ncbi.nlm.nih.gov/books/NBK519788/
+- Andresen, E. M., Catlin, T. K., Wyrwich, K. W., & Jackson-Thompson, J. (2003). Retest reliability of surveillance questions on health-related quality of life. *Journal of Epidemiology & Community Health*, 57(5), 339–343. https://pubmed.ncbi.nlm.nih.gov/12700216/
+
+**Pricing, revenue, and competition**
+- Bodea, T., & Ferguson, M. (2014). *Segmentation, Revenue Management and Pricing Analytics*. Routledge / Taylor & Francis.
+- Ramanujam, M., & Tacke, G. (2016). *Monetizing Innovation: How Smart Companies Design the Product Around the Price*. Wiley.
+- Liozu, S. M., & Hinterhuber, A. (Eds.) (2023). *Digital Pricing Strategy: Capturing Value from Digital Innovations*. Routledge.
+
+**Financial modeling**
+- Hilpisch, Y. (2018). *Python for Finance: Mastering Data-Driven Finance* (2nd ed.). O'Reilly Media.
+
 
 
 
