@@ -33,16 +33,15 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="app-header-inner">
-          <h1 className="app-title">
-            <button
-              className="app-title-btn"
-              onClick={() => setView('landing')}
-              aria-label="Return to landing page"
-            >
-              Panel Twin Modeler
-            </button>
-          </h1>
+          <h1 className="app-title">Panel Twin Modeler</h1>
           <span className="app-subtitle">Interactive feasibility explorer</span>
+          <button
+            className="app-header-back-btn"
+            onClick={() => setView('landing')}
+            aria-label="Return to executive summary"
+          >
+            ← Executive Summary
+          </button>
           <a
             href="https://github.com/arrudafranco"
             target="_blank"

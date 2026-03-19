@@ -1,7 +1,7 @@
 ﻿# Design Decisions and Architecture
 
-Version: 0.4.0
-Last updated: 2026-03-13
+Version: 0.4.1
+Last updated: 2026-03-19
 Status: active working design record
 
 ## Purpose
@@ -566,6 +566,16 @@ In the competition model, `federal_risk_penalty` is subtracted from all utility 
 
 ## Version Updates
 
+### 0.4.1 - 2026-03-19
+
+**UI: explicit navigation back to executive summary**
+
+Added a dedicated "← Executive Summary" button to the right side of the explorer header. Previously, the only way to return to the landing page from the explorer was a hidden affordance: clicking the "Panel Twin Modeler" title text. That pattern is invisible to most users and violates the principle that interactive elements should be visually distinguishable. The title is now a non-interactive heading; the explicit button takes its place as the navigation affordance.
+
+Design rationale: the landing page is not a peer tab — it is a different mode (executive summary vs. detailed exploration), so placing it in the tab bar would misrepresent the information hierarchy. A header button correctly signals a top-level mode switch rather than a section change.
+
+Accessibility: button has `aria-label="Return to executive summary"`, native `<button>` element for keyboard navigation, and a `focus-visible` outline matching the brand accent.
+
 ### 0.4.0 - 2026-03-13
 
 Reference library audit: two MC model bug fixes, break-even correction, documentation improvements, and citation pass.
@@ -589,6 +599,13 @@ Reference library audit: two MC model bug fixes, break-even correction, document
 
 **Citation pass**
 Added inline citations throughout for: Mair (2018) on CTT/SEM framing of uncertainty bands; Callegaro et al. (2014) on behavioral item error in nonprobability panels; Ramanujam & Tacke (2016) and Liozu & Hinterhuber (2023) on churn benchmarks; Hilpisch (2018) on discrete vs. continuous compounding convention.
+
+**Tooltip positioning fix (Firefox and all browsers)**
+The `Tooltip` component used a fixed threshold (`r.top > 140`) to decide whether to show above or below the trigger element, with no `max-height` constraint. On Firefox, the "Study type" tooltip near the top of the sidebar bled above the sticky app header.
+
+Root cause: a tooltip with a large content block placed near the 140px threshold could have its top edge pushed off-screen above the header even when the `above` branch was chosen.
+
+Fix: replaced the hard threshold with a space-comparison approach. The component now computes available space above (between trigger top and header bottom, with padding) and available space below (between trigger bottom and viewport bottom, with padding), picks whichever direction has more room, and sets `maxHeight` accordingly. `overflow-y: auto` added to `.tooltip-content` in CSS so capped content scrolls rather than clips. The `HEADER_HEIGHT` constant (60px) accounts for the sticky header height (50px inner + 3px border-top + buffer) to ensure "above" tooltips never overlap the navigation.
 
 ### 0.3.0 - 2026-03-13
 

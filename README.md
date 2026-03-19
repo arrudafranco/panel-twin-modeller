@@ -6,7 +6,7 @@ Economics and feasibility model for AI-powered survey research: build cost, per-
 
 **GitHub Pages:** https://arrudafranco.github.io/panel-twin-modeller/
 
-![Panel Twin Modeler — interactive feasibility explorer showing the Economics tab with the NPV timeline chart, sidebar scenario controls, and financial summary table](screenshot.png)
+![Panel Twin Modeler — interactive feasibility explorer showing the Economics tab with the NPV timeline chart, sidebar scenario controls, and financial summary table. A header button returns to the executive summary at any time.](screenshot.png)
 
 The primary interface is a React app deployed via GitHub Pages. It includes:
 - An executive landing page with static model insights

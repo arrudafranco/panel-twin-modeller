@@ -598,28 +598,35 @@
   font-size: 16px;
   font-weight: 700;
   margin: 0;
-  cursor: pointer;
-  transition: color 0.15s;
   letter-spacing: 0.2px;
 }
 
-.app-title:hover { color: var(--brand-orange); }
-
-.app-title-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: inherit;
-  letter-spacing: inherit;
+.app-header-back-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  padding: 4px 10px;
   cursor: pointer;
-  transition: color 0.15s;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.app-title-btn:hover { color: var(--brand-orange); }
+.app-header-back-btn:hover {
+  border-color: var(--brand-orange);
+  color: var(--brand-orange);
+  background: rgba(255, 255, 255, 0.04);
+}
+.app-header-back-btn:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
+}
 
 .app-header-credit {
-  margin-left: auto;
   font-size: 11px;
   color: #fff;
   opacity: 0.45;
