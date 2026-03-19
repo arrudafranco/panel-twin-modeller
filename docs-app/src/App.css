@@ -1226,6 +1226,7 @@ details.advanced-controls[open] summary::before {
   width: 260px;
   box-shadow: var(--shadow-lg);
   pointer-events: none;
+  overflow-y: auto;
 }
 
 .tooltip-portal {

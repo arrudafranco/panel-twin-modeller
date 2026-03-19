@@ -7,6 +7,8 @@ interface TooltipProps {
 }
 
 const TOOLTIP_WIDTH = 260;
+const HEADER_HEIGHT = 60; // app-header-inner (50px) + border-top (3px) + buffer
+const VIEWPORT_PAD = 8;
 
 export function Tooltip({ content, children }: TooltipProps) {
   const [visible, setVisible] = useState(false);
@@ -16,16 +18,21 @@ export function Tooltip({ content, children }: TooltipProps) {
   const computePosition = useCallback(() => {
     if (!triggerRef.current) return;
     const r = triggerRef.current.getBoundingClientRect();
-    const above = r.top > 140;
-    // Horizontally center on trigger, but clamp to viewport
+    const vh = window.innerHeight;
+    // Horizontally center on trigger, clamped to viewport
     const left = Math.max(
-      8,
-      Math.min(r.left + r.width / 2 - TOOLTIP_WIDTH / 2, window.innerWidth - TOOLTIP_WIDTH - 8)
+      VIEWPORT_PAD,
+      Math.min(r.left + r.width / 2 - TOOLTIP_WIDTH / 2, window.innerWidth - TOOLTIP_WIDTH - VIEWPORT_PAD)
     );
-    if (above) {
-      setStyle({ left, bottom: window.innerHeight - r.top + 6, top: 'auto' });
+    // Available space above (below the fixed header) and below (above the viewport bottom)
+    const spaceAbove = r.top - HEADER_HEIGHT - VIEWPORT_PAD;
+    const spaceBelow = vh - r.bottom - VIEWPORT_PAD;
+    if (spaceAbove >= spaceBelow) {
+      // Show above: anchor bottom edge just above the trigger, cap height so it clears the header
+      setStyle({ left, bottom: vh - r.top + 6, top: 'auto', maxHeight: Math.max(40, spaceAbove) });
     } else {
-      setStyle({ left, top: r.bottom + 6, bottom: 'auto' });
+      // Show below: anchor top edge just below the trigger, cap height so it stays in viewport
+      setStyle({ left, top: r.bottom + 6, bottom: 'auto', maxHeight: Math.max(40, spaceBelow) });
     }
   }, []);
 
